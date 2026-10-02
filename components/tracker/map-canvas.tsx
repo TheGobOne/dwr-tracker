@@ -206,7 +206,10 @@ export function MapCanvas() {
   }
 
   return (
-    <section aria-label="Overworld map" className="dw-window flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+  <section aria-label="Overworld map" className="dw-window relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+  <h1 className="font-display pointer-events-none absolute inset-x-0 top-1.5 z-10 text-center text-[10px] leading-none text-primary [text-shadow:0_0_3px_#000,0_0_3px_#000]">
+        DWR <span className="text-foreground">Tracker</span>
+      </h1>
       <div ref={containerRef} className="flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-[#050508]">
         <canvas
           ref={canvasRef}
