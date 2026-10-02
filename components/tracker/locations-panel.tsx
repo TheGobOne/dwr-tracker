@@ -125,7 +125,6 @@ export function LocationsPanel() {
                     setTool('marker')
                   }
                 }}
-                title={marker ? `${location.name} at ${marker.x},${marker.y} — click to show` : `${location.hint} — click to place`}
                 className="flex min-w-0 flex-1 items-center gap-1 text-left focus-visible:outline-2 focus-visible:outline-primary"
               >
                 <span
@@ -151,7 +150,6 @@ export function LocationsPanel() {
                 <button
                   type="button"
                   aria-label={isSelected ? 'Cancel moving' : `Move ${location.name}`}
-                  title={isSelected ? 'Cancel moving' : 'Move marker'}
                   onClick={() => {
                     setSelectedLocation(isSelected ? null : location.id)
                     setTool('marker')
