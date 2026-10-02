@@ -3,11 +3,11 @@
 import { useEffect, useRef } from 'react'
 
 export const CAVE_MAPS: Record<string, { title: string; src: string }> = {
-  'erdricks-cave': { title: "Erdrick's Cave", src: '/cave-maps/erdricks.png' },
-  'garins-grave': { title: "Garin's Grave", src: '/cave-maps/grave.png' },
-  'mountain-cave': { title: 'Mountain Cave', src: '/cave-maps/mountain.png' },
-  'swamp-north': { title: 'Swamp Cave', src: '/cave-maps/swamp.png' },
-  'swamp-south': { title: 'Swamp Cave', src: '/cave-maps/swamp.png' },
+  'erdricks-cave': { title: "Erdrick's Cave", src: '/cave-maps/erdricks.png?v=3' },
+  'garins-grave': { title: "Garin's Grave", src: '/cave-maps/grave.png?v=3' },
+  'mountain-cave': { title: 'Mountain Cave', src: '/cave-maps/mountain.png?v=3' },
+  'swamp-north': { title: 'Swamp Cave', src: '/cave-maps/swamp.png?v=3' },
+  'swamp-south': { title: 'Swamp Cave', src: '/cave-maps/swamp.png?v=3' },
 }
 
 export function CaveMapViewer({ locationId, onClose }: { locationId: string | null; onClose: () => void }) {
@@ -31,12 +31,12 @@ export function CaveMapViewer({ locationId, onClose }: { locationId: string | nu
       role="dialog"
       aria-modal="true"
       aria-label={`${map.title} map`}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+      className="fixed inset-y-0 left-1/2 z-50 flex w-full max-w-[640px] -translate-x-1/2 items-center justify-center bg-black/85 p-1.5"
       onPointerDown={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className="dw-window flex max-h-full max-w-full flex-col gap-2 p-3">
+      <div className="dw-window flex h-full max-h-full w-full flex-col gap-2 p-3">
         <div className="flex items-center justify-between gap-4">
           <h2 className="font-display text-[10px] text-primary">{map.title}</h2>
           <button
@@ -51,7 +51,7 @@ export function CaveMapViewer({ locationId, onClose }: { locationId: string | nu
         <img
           src={map.src || '/placeholder.svg'}
           alt={`${map.title} dungeon map`}
-          className="max-h-[85vh] max-w-[92vw] object-contain"
+          className="min-h-0 w-full flex-1 object-contain"
           style={{ imageRendering: 'pixelated' }}
         />
       </div>
