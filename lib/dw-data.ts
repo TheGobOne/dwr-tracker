@@ -77,7 +77,6 @@ export const ITEM_GROUPS: { label: string; items: ItemDef[] }[] = [
       { id: 'staff-of-rain', name: 'Staff of Rain' },
       { id: 'stones-of-sunlight', name: 'Stones of Sunlight' },
       { id: 'erdricks-token', name: "Erdrick's Token" },
-      { id: 'rainbow-drop', name: 'Rainbow Drop' },
       { id: 'fairy-flute', name: 'Fairy Flute' },
       { id: 'gwaelins-love', name: "Gwaelin's Love" },
     ],
@@ -92,12 +91,7 @@ export const ITEM_GROUPS: { label: string; items: ItemDef[] }[] = [
   {
     label: 'Other',
     items: [
-      { id: 'magic-key', name: 'Magic Key' },
-      { id: 'dragons-scale', name: "Dragon's Scale" },
-      { id: 'fighters-ring', name: "Fighter's Ring" },
       { id: 'death-necklace', name: 'Death Necklace' },
-      { id: 'cursed-belt', name: 'Cursed Belt' },
-      { id: 'silver-shield', name: 'Silver Shield' },
     ],
   },
 ]
