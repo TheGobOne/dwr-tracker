@@ -75,6 +75,7 @@ export function NotesPanel() {
   return (
   <section className="flex shrink-0 flex-col gap-1">
   <label htmlFor="run-notes">
+  <span className="sr-only">Notes</span>
   <PanelTitle>Notes</PanelTitle>
   </label>
   <textarea
