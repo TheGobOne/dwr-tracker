@@ -11,8 +11,10 @@ interface Point {
   y: number
 }
 
-function markerSize(scale: number) {
-  return Math.max(24, Math.round(scale * 3))
+function markerSize(scale: number, marker?: Marker) {
+  const base = Math.max(16, Math.round(scale * 2))
+  const isCharlock = marker?.locationId && LOCATION_BY_ID[marker.locationId]?.name === 'Charlock'
+  return isCharlock ? base * 3 : base
 }
 
 function markerColor(marker: Marker) {
@@ -142,11 +144,11 @@ export function MapCanvas() {
       ctx.strokeRect(hover.x * scale, hover.y * scale, scale, scale)
     }
 
-    const ms = markerSize(scale)
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
-    ctx.font = `bold ${Math.round(ms * 0.5)}px ui-monospace, monospace`
     for (const marker of markers) {
+      const ms = markerSize(scale, marker)
+      ctx.font = `bold ${Math.round(ms * 0.5)}px ui-monospace, monospace`
       const cx = marker.x * scale + scale / 2
       const cy = marker.y * scale + scale / 2
       const done = marker.locationId ? visited[marker.locationId] : false
@@ -183,7 +185,7 @@ export function MapCanvas() {
       ctx.strokeStyle = '#F8B800'
       ctx.lineWidth = 3
       ctx.beginPath()
-      ctx.arc(flash.x * scale + scale / 2, flash.y * scale + scale / 2, ms * 1.4, 0, Math.PI * 2)
+      ctx.arc(flash.x * scale + scale / 2, flash.y * scale + scale / 2, markerSize(scale) * 1.4, 0, Math.PI * 2)
       ctx.stroke()
     }
   }, [tiles, markers, visited, canvasPx, scale, showGrid, hover, flash, bridgeImg])
@@ -207,9 +209,9 @@ export function MapCanvas() {
     const rect = (e.currentTarget as HTMLCanvasElement).getBoundingClientRect()
     const px = e.clientX - rect.left
     const py = e.clientY - rect.top
-    const half = markerSize(scale) / 2 + 2
     for (let i = markers.length - 1; i >= 0; i--) {
       const m = markers[i]
+      const half = markerSize(scale, m) / 2 + 2
       const cx = m.x * scale + scale / 2
       const cy = m.y * scale + scale / 2
       if (Math.abs(px - cx) <= half && Math.abs(py - cy) <= half) return m
