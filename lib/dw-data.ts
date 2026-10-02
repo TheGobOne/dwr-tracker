@@ -73,8 +73,8 @@ export const ITEM_GROUPS: { label: string; items: ItemDef[] }[] = [
   {
     label: 'Quest Items',
     items: [
-      { id: 'silver-harp', name: 'Silver Harp' },
-      { id: 'staff-of-rain', name: 'Staff of Rain' },
+      { id: 'silver-harp', name: 'Harp' },
+      { id: 'staff-of-rain', name: 'Staff' },
       { id: 'stones-of-sunlight', name: 'Stones' },
       { id: 'erdricks-token', name: 'Token' },
     ],
@@ -82,8 +82,8 @@ export const ITEM_GROUPS: { label: string; items: ItemDef[] }[] = [
   {
     label: "Erdrick's Gear",
     items: [
-      { id: 'erdricks-sword', name: "Erdrick's Sword" },
-      { id: 'erdricks-armor', name: "Erdrick's Armor" },
+      { id: 'erdricks-sword', name: 'Sword' },
+      { id: 'erdricks-armor', name: 'Armor' },
     ],
   },
 ]

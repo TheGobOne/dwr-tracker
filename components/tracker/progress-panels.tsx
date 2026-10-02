@@ -2,7 +2,7 @@
 
 import { ITEM_GROUPS, SPELLS } from '@/lib/dw-data'
 import { cn } from '@/lib/utils'
-import { PanelTitle } from './locations-panel'
+import { COORDS_LOCATION_ID, CoordsInput, PanelTitle } from './locations-panel'
 import { useTracker } from './tracker-context'
 
 const toggleBase =
@@ -20,7 +20,8 @@ export function ItemsPanel() {
         Items
       </h2>
       <PanelTitle>Items</PanelTitle>
-      <div className="flex flex-wrap justify-center gap-1">
+      <div className="flex items-center gap-2">
+      <div className="flex min-w-0 flex-1 flex-wrap justify-center gap-1">
         {all.map((item) => {
           const has = !!items[item.id]
           return (
@@ -35,6 +36,9 @@ export function ItemsPanel() {
             </button>
           )
         })}
+      </div>
+        <div aria-hidden="true" className="w-px self-stretch bg-border" />
+        <CoordsInput locationId={COORDS_LOCATION_ID} name="Jerk" />
       </div>
     </section>
   )

@@ -12,12 +12,12 @@ import {
   type NSDirection,
 } from './tracker-context'
 
-const COORDS_LOCATION_ID = 'rainbow-shrine'
+export const COORDS_LOCATION_ID = 'rainbow-shrine'
 
 const fieldClass =
   'h-4 rounded-[2px] border border-border bg-input/40 font-mono text-[10px] text-foreground focus-visible:outline-1 focus-visible:outline-primary'
 
-function CoordsInput({ locationId, name }: { locationId: string; name: string }) {
+export function CoordsInput({ locationId, name }: { locationId: string; name: string }) {
   const { coords, updateCoords } = useTracker()
   const value = coords[locationId] ?? EMPTY_COORDS
 
@@ -101,14 +101,6 @@ export function LocationsPanel() {
           const marker = markerByLocation.get(location.id)
           const isSelected = selectedLocation === location.id
           const isVisited = !!visited[location.id]
-          const coordsCell =
-            location.id === COORDS_LOCATION_ID
-              ? [
-                  <li key={`${location.id}-coords`} className="flex h-5 items-center px-0.5">
-                    <CoordsInput locationId={location.id} name={location.name} />
-                  </li>,
-                ]
-              : []
           return [
             <li
               key={location.id}
@@ -165,7 +157,6 @@ export function LocationsPanel() {
                 </button>
               )}
             </li>,
-            ...coordsCell,
           ]
         })}
       </ul>
