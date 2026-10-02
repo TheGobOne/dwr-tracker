@@ -20,6 +20,53 @@ function markerColor(marker: Marker) {
   return location ? KIND_META[location.kind].color : PIN_COLOR
 }
 
+// 16x16 recreation of the Dragon Warrior (NES) overworld bridge tile, using the NES palette.
+const BRIDGE_PALETTE: Record<string, string> = {
+  w: '#0058F8',
+  l: '#3CBCFC',
+  k: '#000000',
+  d: '#881400',
+  o: '#C84C0C',
+  t: '#FC9838',
+}
+const BRIDGE_ROWS = [
+  'wwlwwwwwwwlwwwww',
+  'wwwwwlwwwwwwwlww',
+  'kkkkkkkkkkkkkkkk',
+  'tttttttttttttttt',
+  'oottooottooottoo',
+  'otodotodotodotod',
+  'otodotodotodotod',
+  'otodotodotodotod',
+  'otodotodotodotod',
+  'otodotodotodotod',
+  'otodotodotodotod',
+  'oodoooodoooodood',
+  'dddddddddddddddd',
+  'kkkkkkkkkkkkkkkk',
+  'wwwlwwwwwwwlwwww',
+  'lwwwwwwlwwwwwwwl',
+]
+
+let bridgeSprite: HTMLCanvasElement | null = null
+function getBridgeSprite() {
+  if (bridgeSprite) return bridgeSprite
+  const c = document.createElement('canvas')
+  c.width = 16
+  c.height = 16
+  const ctx = c.getContext('2d')
+  if (ctx) {
+    BRIDGE_ROWS.forEach((row, y) => {
+      for (let x = 0; x < row.length; x++) {
+        ctx.fillStyle = BRIDGE_PALETTE[row[x]]
+        ctx.fillRect(x, y, 1, 1)
+      }
+    })
+  }
+  bridgeSprite = c
+  return c
+}
+
 function markerText(marker: Marker) {
   const location = marker.locationId ? LOCATION_BY_ID[marker.locationId] : null
   return location ? location.abbr : '!'
@@ -140,6 +187,13 @@ export function MapCanvas() {
       const cy = marker.y * scale + scale / 2
       const done = marker.locationId ? visited[marker.locationId] : false
       ctx.globalAlpha = done ? 0.55 : 1
+      if (!marker.locationId) {
+        ctx.fillStyle = '#000000'
+        ctx.fillRect(cx - ms / 2 - 2, cy - ms / 2 - 2, ms + 4, ms + 4)
+        ctx.drawImage(getBridgeSprite(), cx - ms / 2, cy - ms / 2, ms, ms)
+        ctx.globalAlpha = 1
+        continue
+      }
       ctx.fillStyle = '#000000'
       ctx.beginPath()
       ctx.roundRect(cx - ms / 2 - 2, cy - ms / 2 - 2, ms + 4, ms + 4, 4)
