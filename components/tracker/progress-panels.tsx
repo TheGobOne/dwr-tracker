@@ -20,8 +20,8 @@ export function ItemsPanel() {
         Items
       </h2>
       <PanelTitle>Items</PanelTitle>
-      <div className="flex items-center gap-2">
-      <div className="flex min-w-0 flex-1 flex-wrap justify-center gap-1">
+      <div className="flex items-center justify-center gap-2">
+      <div className="flex min-w-0 flex-wrap justify-center gap-1">
         {all.map((item) => {
           const has = !!items[item.id]
           return (

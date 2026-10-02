@@ -60,6 +60,7 @@ export const LOCATIONS: DWLocation[] = [
   { id: 'swamp-south', name: 'Swamp (S)', abbr: 'SS', kind: 'cave', hint: 'South entrance of the Swamp Cave.' },
   { id: 'staff-shrine', name: 'Staff', abbr: 'SR', kind: 'shrine', hint: 'Requires the Silver Harp.' },
   { id: 'rainbow-shrine', name: 'Jerk', abbr: 'JC', kind: 'shrine', hint: "Requires Staff, Stones & Token." },
+  { id: 'freebie-cave', name: 'Freebie', abbr: 'FC', kind: 'shrine', hint: 'Freebie cave.' },
 ]
 
 export const LOCATION_BY_ID = Object.fromEntries(LOCATIONS.map((l) => [l.id, l])) as Record<string, DWLocation>
