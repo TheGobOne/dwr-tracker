@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 
 export const CAVE_MAPS: Record<string, { title: string; src: string }> = {
   'erdricks-cave': { title: "Erdrick's Cave", src: '/cave-maps/erdricks.png?v=3' },
@@ -26,12 +27,15 @@ export function CaveMapViewer({ locationId, onClose }: { locationId: string | nu
 
   if (!map) return null
 
-  return (
+  const trackerRoot = document.querySelector('[data-tracker-root]')
+  if (!trackerRoot) return null
+
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
       aria-label={`${map.title} map`}
-      className="fixed inset-y-0 left-1/2 z-50 flex w-full max-w-[640px] -translate-x-1/2 items-center justify-center bg-black/85 p-1.5"
+      className="absolute inset-0 z-50 flex items-center justify-center bg-black/85 p-1.5"
       onPointerDown={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}
@@ -55,6 +59,7 @@ export function CaveMapViewer({ locationId, onClose }: { locationId: string | nu
           style={{ imageRendering: 'pixelated' }}
         />
       </div>
-    </div>
+    </div>,
+    trackerRoot,
   )
 }
