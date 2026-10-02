@@ -45,8 +45,8 @@ export interface DWLocation {
 }
 
 export const LOCATIONS: DWLocation[] = [
-  { id: 'tantegel', name: 'Tantegel Castle', abbr: 'TC', kind: 'castle', hint: 'Starting castle. Stones of Sunlight in the basement.' },
-  { id: 'charlock', name: 'Charlock Castle', abbr: 'DL', kind: 'castle', hint: "The Dragonlord's castle. Needs the Rainbow Bridge." },
+  { id: 'tantegel', name: 'Tantegel', abbr: 'TC', kind: 'castle', hint: 'Starting castle. Stones of Sunlight in the basement.' },
+  { id: 'charlock', name: 'Charlock', abbr: 'DL', kind: 'castle', hint: "The Dragonlord's castle. Needs the Rainbow Bridge." },
   { id: 'brecconary', name: 'Brecconary', abbr: 'Br', kind: 'town', hint: 'Town with inn, weapon & item shops.' },
   { id: 'garinham', name: 'Garinham', abbr: 'Ga', kind: 'town', hint: "Leads to Garin's Grave via the town." },
   { id: 'kol', name: 'Kol', abbr: 'Ko', kind: 'town', hint: 'Search spot (vanilla Fairy Flute).' },
