@@ -50,12 +50,12 @@ export function SpellsPanel() {
       <h2 id="spells-heading" className="sr-only">
         Spells
       </h2>
-      <PanelTitle aside={`${learned}/${SPELLS.length} · enter level learned`}>Spells</PanelTitle>
+      <PanelTitle aside={`${learned}/${SPELLS.length}`}>Spells</PanelTitle>
       <ul className="grid grid-cols-2 gap-1 sm:grid-cols-5">
         {SPELLS.map((name) => {
           const state = spells[name] ?? { learned: false, level: '' }
           return (
-            <li key={name} className="flex items-center gap-0.5">
+            <li key={name} className="flex">
               <button
                 type="button"
                 aria-pressed={state.learned}
@@ -64,16 +64,6 @@ export function SpellsPanel() {
               >
                 {name}
               </button>
-              <input
-                type="text"
-                inputMode="numeric"
-                maxLength={2}
-                value={state.level}
-                placeholder="LV"
-                onChange={(e) => updateSpell(name, { level: e.target.value.replace(/\D/g, '') })}
-                aria-label={`${name} learned at level`}
-                className="h-[22px] w-7 shrink-0 rounded-sm border border-foreground/25 bg-transparent text-center text-xs text-foreground placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:outline-none"
-              />
             </li>
           )
         })}
