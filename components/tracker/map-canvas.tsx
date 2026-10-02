@@ -14,7 +14,7 @@ interface Point {
 function markerSize(scale: number, marker?: Marker) {
   const base = Math.max(16, Math.round(scale * 2))
   const isCharlock = marker?.locationId && LOCATION_BY_ID[marker.locationId]?.name === 'Charlock'
-  return isCharlock ? base * 2 : base
+  return isCharlock ? base * 2 : Math.round(base * 1.33)
 }
 
 function markerColor(marker: Marker) {

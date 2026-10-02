@@ -45,14 +45,14 @@ export interface DWLocation {
 }
 
 export const LOCATIONS: DWLocation[] = [
-  { id: 'tantegel', name: 'Tantegel', abbr: 'TC', kind: 'castle', hint: 'Starting castle. Stones of Sunlight in the basement.' },
+  { id: 'tantegel', name: 'Tantegel', abbr: 'T', kind: 'castle', hint: 'Starting castle. Stones of Sunlight in the basement.' },
   { id: 'charlock', name: 'Charlock', abbr: 'C', kind: 'castle', hint: "The Dragonlord's castle. Needs the Rainbow Bridge." },
-  { id: 'brecconary', name: 'Brecconary', abbr: 'Br', kind: 'town', hint: 'Town with inn, weapon & item shops.' },
-  { id: 'garinham', name: 'Garinham', abbr: 'Ga', kind: 'town', hint: 'Leads to the Grave via the town.' },
-  { id: 'kol', name: 'Kol', abbr: 'Ko', kind: 'town', hint: 'Search spot (vanilla Fairy Flute).' },
-  { id: 'rimuldar', name: 'Rimuldar', abbr: 'Ri', kind: 'town', hint: 'Sells Magic Keys.' },
-  { id: 'cantlin', name: 'Cantlin', abbr: 'Ca', kind: 'town', hint: 'Walled town guarded by a Golem.' },
-  { id: 'hauksness', name: 'Hauksness', abbr: 'Ha', kind: 'town', hint: "Ruined town. Search spot (vanilla Erdrick's Armor)." },
+  { id: 'brecconary', name: 'Brecconary', abbr: 'B', kind: 'town', hint: 'Town with inn, weapon & item shops.' },
+  { id: 'garinham', name: 'Garinham', abbr: 'G', kind: 'town', hint: 'Leads to the Grave via the town.' },
+  { id: 'kol', name: 'Kol', abbr: 'K', kind: 'town', hint: 'Search spot (vanilla Fairy Flute).' },
+  { id: 'rimuldar', name: 'Rimuldar', abbr: 'R', kind: 'town', hint: 'Sells Magic Keys.' },
+  { id: 'cantlin', name: 'Cantlin', abbr: 'C', kind: 'town', hint: 'Walled town guarded by a Golem.' },
+  { id: 'hauksness', name: 'Hauksness', abbr: 'H', kind: 'town', hint: "Ruined town. Search spot (vanilla Erdrick's Armor)." },
   { id: 'erdricks-cave', name: "Erdrick's", abbr: 'EC', kind: 'cave', hint: "Erdrick's tablet." },
   { id: 'garins-grave', name: 'Grave', abbr: 'GG', kind: 'cave', hint: 'Treasure chests deep inside.' },
   { id: 'mountain-cave', name: 'Mountain', abbr: 'MC', kind: 'cave', hint: 'Two floors of chests.' },
