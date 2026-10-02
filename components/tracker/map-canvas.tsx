@@ -12,7 +12,7 @@ interface Point {
 }
 
 function markerSize(scale: number) {
-  return Math.max(12, Math.round(scale * 1.5))
+  return Math.max(24, Math.round(scale * 3))
 }
 
 function markerColor(marker: Marker) {
