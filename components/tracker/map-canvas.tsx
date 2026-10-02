@@ -48,19 +48,30 @@ export function MapCanvas() {
     const container = containerRef.current
     if (!container) return
     const root = container.closest<HTMLElement>('[data-tracker-root]')
-    const fit = () => {
-      const height = Math.floor(container.clientHeight)
-      if (root) {
-        const horizontalChrome = root.offsetWidth - container.clientWidth
-        root.style.maxWidth = `${Math.min(MAX_TRACKER_WIDTH, height + horizontalChrome)}px`
-      }
-      const available = Math.floor(Math.min(container.clientWidth, height))
-      setCanvasPx(Math.max(MAP_SIZE, available))
-    }
-    fit()
-    const observer = new ResizeObserver(fit)
-    observer.observe(container)
-    return () => observer.disconnect()
+  let frame = 0
+  const fit = () => {
+  const height = Math.floor(container.clientHeight)
+  if (root) {
+  const horizontalChrome = root.offsetWidth - container.clientWidth
+  const nextMaxWidth = `${Math.min(MAX_TRACKER_WIDTH, height + horizontalChrome)}px`
+  if (root.style.maxWidth !== nextMaxWidth) root.style.maxWidth = nextMaxWidth
+  }
+  const available = Math.floor(Math.min(container.clientWidth, height))
+  const next = Math.max(MAP_SIZE, available)
+  setCanvasPx((prev) => (prev === next ? prev : next))
+  }
+  // Layout writes are deferred to the next frame so they don't re-trigger the observer within the same loop.
+  const scheduleFit = () => {
+  cancelAnimationFrame(frame)
+  frame = requestAnimationFrame(fit)
+  }
+  fit()
+  const observer = new ResizeObserver(scheduleFit)
+  observer.observe(container)
+  return () => {
+  cancelAnimationFrame(frame)
+  observer.disconnect()
+  }
   }, [])
 
   useEffect(() => {
