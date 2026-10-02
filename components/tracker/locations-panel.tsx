@@ -22,14 +22,13 @@ export function LocationsPanel() {
   const { markers, visited, toggleVisited, selectedLocation, setSelectedLocation, setTool, requestFocus } = useTracker()
 
   const markerByLocation = new Map(markers.filter((m) => m.locationId).map((m) => [m.locationId as string, m]))
-  const pinCount = markers.length - markerByLocation.size
 
   return (
     <section aria-labelledby="locations-heading" className="flex flex-col gap-1">
       <h2 id="locations-heading" className="sr-only">
         Locations
       </h2>
-      <PanelTitle aside={`${markerByLocation.size}/${LOCATIONS.length} found · ${pinCount} pins`}>Locations</PanelTitle>
+      <PanelTitle>Locations</PanelTitle>
       <ul className="grid grid-cols-2 gap-x-1.5 sm:grid-cols-4">
         {ORDERED_LOCATIONS.map((location) => {
           const marker = markerByLocation.get(location.id)

@@ -13,14 +13,13 @@ const toggleOff = 'border-foreground/25 text-muted-foreground hover:border-foreg
 export function ItemsPanel() {
   const { items, toggleItem } = useTracker()
   const all = ITEM_GROUPS.flatMap((g) => g.items)
-  const owned = all.filter((i) => items[i.id]).length
 
   return (
     <section aria-labelledby="items-heading" className="flex flex-col gap-1">
       <h2 id="items-heading" className="sr-only">
         Items
       </h2>
-      <PanelTitle aside={`${owned}/${all.length}`}>Items</PanelTitle>
+      <PanelTitle>Items</PanelTitle>
       <div className="flex flex-wrap gap-1">
         {all.map((item) => {
           const has = !!items[item.id]
@@ -43,14 +42,13 @@ export function ItemsPanel() {
 
 export function SpellsPanel() {
   const { spells, updateSpell } = useTracker()
-  const learned = SPELLS.filter((s) => spells[s]?.learned).length
 
   return (
     <section aria-labelledby="spells-heading" className="flex flex-col gap-1">
       <h2 id="spells-heading" className="sr-only">
         Spells
       </h2>
-      <PanelTitle aside={`${learned}/${SPELLS.length}`}>Spells</PanelTitle>
+      <PanelTitle>Spells</PanelTitle>
       <ul className="grid grid-cols-2 gap-1 sm:grid-cols-5">
         {SPELLS.map((name) => {
           const state = spells[name] ?? { learned: false, level: '' }
