@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { KIND_META, LOCATION_BY_ID, MAP_SIZE, PIN_COLOR, TERRAIN_RGB, TERRAINS } from '@/lib/dw-data'
+import { KIND_META, LOCATION_BY_ID, MAP_SIZE, PIN_COLOR, TERRAIN_RGB } from '@/lib/dw-data'
 import { useTracker, type Marker } from './tracker-context'
 
 const MAP_PADDING = 4
@@ -26,7 +26,7 @@ function markerText(marker: Marker) {
 }
 
 export function MapCanvas() {
-  const { tiles, markers, visited, showGrid, selectedLocation, placeMarker, removeMarker, focusRequest } = useTracker()
+  const { tiles, markers, visited, showGrid, placeMarker, removeMarker, focusRequest } = useTracker()
 
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -199,9 +199,6 @@ export function MapCanvas() {
     if (marker) removeMarker(marker.id)
   }
 
-  const hoverTerrain = hover ? TERRAINS[tiles[hover.y * MAP_SIZE + hover.x]] : null
-  const hoverMarkers = hover ? markers.filter((m) => m.x === hover.x && m.y === hover.y) : []
-
   return (
     <section aria-label="Overworld map" className="dw-window flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
       <div ref={containerRef} className="flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-[#050508]">
@@ -216,20 +213,6 @@ export function MapCanvas() {
           onPointerLeave={() => setHover(null)}
           onContextMenu={handleContextMenu}
         />
-      </div>
-      <div className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-0.5 border-t-2 border-foreground/80 px-2 py-1 text-xs">
-        <span className="font-display text-[10px] text-primary" aria-live="polite">
-          {hover ? `X ${String(hover.x).padStart(3, '0')}  Y ${String(hover.y).padStart(3, '0')}` : 'X ---  Y ---'}
-        </span>
-        <span className="text-muted-foreground">{hoverTerrain ? hoverTerrain.name : 'Hover the map'}</span>
-        {hoverMarkers.length > 0 && <span className="text-foreground">{hoverMarkers.map((m) => m.label).join(', ')}</span>}
-        <span className="ml-auto text-muted-foreground">
-          {selectedLocation ? (
-            <span className="text-primary">Click the map to place {LOCATION_BY_ID[selectedLocation]?.name}</span>
-          ) : (
-            <>Click to pin · Right-click to remove</>
-          )}
-        </span>
       </div>
     </section>
   )
