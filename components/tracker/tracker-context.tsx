@@ -18,6 +18,37 @@ export interface SpellState {
   level: string
 }
 
+export const DIRECTIONS = ['N', 'E', 'S', 'W'] as const
+export type Direction = (typeof DIRECTIONS)[number]
+
+export interface ManualCoords {
+  first: string
+  firstDir: Direction
+  second: string
+  secondDir: Direction
+}
+
+export const EMPTY_COORDS: ManualCoords = { first: '', firstDir: 'N', second: '', secondDir: 'E' }
+
+function isDirection(value: unknown): value is Direction {
+  return typeof value === 'string' && (DIRECTIONS as readonly string[]).includes(value)
+}
+
+function sanitizeCoords(raw: unknown): Record<string, ManualCoords> {
+  if (!raw || typeof raw !== 'object') return {}
+  const result: Record<string, ManualCoords> = {}
+  for (const [id, value] of Object.entries(raw as Record<string, Partial<ManualCoords>>)) {
+    if (!LOCATION_BY_ID[id] || !value) continue
+    result[id] = {
+      first: String(value.first ?? '').slice(0, 4),
+      firstDir: isDirection(value.firstDir) ? value.firstDir : EMPTY_COORDS.firstDir,
+      second: String(value.second ?? '').slice(0, 4),
+      secondDir: isDirection(value.secondDir) ? value.secondDir : EMPTY_COORDS.secondDir,
+    }
+  }
+  return result
+}
+
 interface Snapshot {
   tiles: Uint8Array
   markers: Marker[]
@@ -32,6 +63,7 @@ export interface SaveFile {
   items: Record<string, boolean>
   spells: Record<string, SpellState>
   notes: string
+  coords?: Record<string, ManualCoords>
 }
 
 const HISTORY_LIMIT = 100
@@ -110,6 +142,7 @@ interface TrackerContextValue {
   items: Record<string, boolean>
   spells: Record<string, SpellState>
   notes: string
+  coords: Record<string, ManualCoords>
   seed: string
   tool: Tool
   terrain: number
@@ -133,6 +166,7 @@ interface TrackerContextValue {
   toggleItem: (id: string) => void
   toggleVisited: (id: string) => void
   updateSpell: (name: string, patch: Partial<SpellState>) => void
+  updateCoords: (locationId: string, patch: Partial<ManualCoords>) => void
 
   beginStroke: () => void
   paintLine: (x0: number, y0: number, x1: number, y1: number) => void
@@ -156,6 +190,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<Record<string, boolean>>({})
   const [spells, setSpells] = useState<Record<string, SpellState>>({})
   const [notes, setNotes] = useState('')
+  const [coords, setCoords] = useState<Record<string, ManualCoords>>({})
   const [seed, setSeed] = useState('')
   const [tool, setTool] = useState<Tool>('paint')
   const [terrain, setTerrain] = useState(2)
@@ -257,6 +292,9 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
   const updateSpell = useCallback((name: string, patch: Partial<SpellState>) => {
     setSpells((prev) => ({ ...prev, [name]: { ...(prev[name] ?? { learned: false, level: '' }), ...patch } }))
   }, [])
+  const updateCoords = useCallback((locationId: string, patch: Partial<ManualCoords>) => {
+    setCoords((prev) => ({ ...prev, [locationId]: { ...(prev[locationId] ?? EMPTY_COORDS), ...patch } }))
+  }, [])
 
   const requestFocus = useCallback((x: number, y: number) => {
     setFocusRequest({ x, y, nonce: Date.now() })
@@ -271,6 +309,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     setItems({})
     setSpells({})
     setNotes('')
+    setCoords({})
     setSeed('')
     setSelectedLocation(null)
   }, [commitTiles, commitMarkers])
@@ -285,8 +324,9 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       items,
       spells,
       notes,
+      coords,
     }),
-    [seed, visited, items, spells, notes],
+    [seed, visited, items, spells, notes, coords],
   )
 
   const importSave = useCallback(
@@ -318,6 +358,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       setItems(save.items ?? {})
       setSpells(save.spells ?? {})
       setNotes(String(save.notes ?? ''))
+      setCoords(sanitizeCoords(save.coords))
       setSeed(String(save.seed ?? ''))
     },
     [commitTiles, commitMarkers],
@@ -331,6 +372,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       items,
       spells,
       notes,
+      coords,
       seed,
       tool,
       terrain,
@@ -353,6 +395,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       toggleItem,
       toggleVisited,
       updateSpell,
+      updateCoords,
       beginStroke,
       paintLine,
       fillAt,
@@ -372,6 +415,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       items,
       spells,
       notes,
+      coords,
       seed,
       tool,
       terrain,
@@ -386,6 +430,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       toggleItem,
       toggleVisited,
       updateSpell,
+      updateCoords,
       beginStroke,
       paintLine,
       fillAt,
