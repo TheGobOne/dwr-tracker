@@ -11,8 +11,8 @@ const ORDERED_LOCATIONS = KIND_ORDER.flatMap((kind) => LOCATIONS.filter((l) => l
 
 export function PanelTitle({ children, aside }: { children: React.ReactNode; aside?: React.ReactNode }) {
   return (
-    <div className="flex items-baseline justify-between gap-2">
-      <h2 className="font-display text-[9px] uppercase tracking-wider text-primary">{children}</h2>
+  <div className="flex items-baseline justify-center gap-2">
+  <h2 className="font-display text-center text-[9px] uppercase tracking-wider text-primary">{children}</h2>
       {aside && <span className="text-xs text-muted-foreground">{aside}</span>}
     </div>
   )
