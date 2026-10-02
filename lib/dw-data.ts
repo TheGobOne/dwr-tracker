@@ -53,13 +53,13 @@ export const LOCATIONS: DWLocation[] = [
   { id: 'rimuldar', name: 'Rimuldar', abbr: 'Ri', kind: 'town', hint: 'Sells Magic Keys.' },
   { id: 'cantlin', name: 'Cantlin', abbr: 'Ca', kind: 'town', hint: 'Walled town guarded by a Golem.' },
   { id: 'hauksness', name: 'Hauksness', abbr: 'Ha', kind: 'town', hint: "Ruined town. Search spot (vanilla Erdrick's Armor)." },
-  { id: 'erdricks-cave', name: "Erdrick's Cave", abbr: 'EC', kind: 'cave', hint: "Erdrick's tablet." },
+  { id: 'erdricks-cave', name: "Erdrick's", abbr: 'EC', kind: 'cave', hint: "Erdrick's tablet." },
   { id: 'garins-grave', name: "Garin's Grave", abbr: 'GG', kind: 'cave', hint: 'Treasure chests deep inside.' },
-  { id: 'mountain-cave', name: 'Mountain Cave', abbr: 'MC', kind: 'cave', hint: 'Two floors of chests.' },
-  { id: 'swamp-north', name: 'Swamp Cave (N)', abbr: 'SN', kind: 'cave', hint: 'North entrance. Green Dragon & Gwaelin.' },
-  { id: 'swamp-south', name: 'Swamp Cave (S)', abbr: 'SS', kind: 'cave', hint: 'South entrance of the Swamp Cave.' },
-  { id: 'staff-shrine', name: 'Staff Cave', abbr: 'SR', kind: 'shrine', hint: 'Requires the Silver Harp.' },
-  { id: 'rainbow-shrine', name: 'Jerk Cave', abbr: 'JC', kind: 'shrine', hint: "Requires Staff, Stones & Erdrick's Token." },
+  { id: 'mountain-cave', name: 'Mountain', abbr: 'MC', kind: 'cave', hint: 'Two floors of chests.' },
+  { id: 'swamp-north', name: 'Swamp (N)', abbr: 'SN', kind: 'cave', hint: 'North entrance. Green Dragon & Gwaelin.' },
+  { id: 'swamp-south', name: 'Swamp (S)', abbr: 'SS', kind: 'cave', hint: 'South entrance of the Swamp Cave.' },
+  { id: 'staff-shrine', name: 'Staff', abbr: 'SR', kind: 'shrine', hint: 'Requires the Silver Harp.' },
+  { id: 'rainbow-shrine', name: 'Jerk', abbr: 'JC', kind: 'shrine', hint: "Requires Staff, Stones & Erdrick's Token." },
 ]
 
 export const LOCATION_BY_ID = Object.fromEntries(LOCATIONS.map((l) => [l.id, l])) as Record<string, DWLocation>
