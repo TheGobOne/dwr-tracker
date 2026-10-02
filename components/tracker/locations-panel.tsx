@@ -3,7 +3,14 @@
 import { MapPin } from 'lucide-react'
 import { KIND_META, LOCATIONS, type LocationKind } from '@/lib/dw-data'
 import { cn } from '@/lib/utils'
-import { DIRECTIONS, EMPTY_COORDS, useTracker, type Direction } from './tracker-context'
+import {
+  EMPTY_COORDS,
+  EW_DIRECTIONS,
+  NS_DIRECTIONS,
+  useTracker,
+  type EWDirection,
+  type NSDirection,
+} from './tracker-context'
 
 const COORDS_LOCATION_ID = 'rainbow-shrine'
 
@@ -28,11 +35,12 @@ function CoordsInput({ locationId, name }: { locationId: string; name: string })
       />
       <select
         value={value.firstDir}
-        onChange={(e) => updateCoords(locationId, { firstDir: e.target.value as Direction })}
+        onChange={(e) => updateCoords(locationId, { firstDir: e.target.value as NSDirection })}
         aria-label="First coordinate direction"
         className={cn(fieldClass, 'px-0')}
       >
-        {DIRECTIONS.map((d) => (
+        <option value="" className="bg-background text-foreground" />
+        {NS_DIRECTIONS.map((d) => (
           <option key={d} value={d} className="bg-background text-foreground">
             {d}
           </option>
@@ -49,11 +57,12 @@ function CoordsInput({ locationId, name }: { locationId: string; name: string })
       />
       <select
         value={value.secondDir}
-        onChange={(e) => updateCoords(locationId, { secondDir: e.target.value as Direction })}
+        onChange={(e) => updateCoords(locationId, { secondDir: e.target.value as EWDirection })}
         aria-label="Second coordinate direction"
         className={cn(fieldClass, 'px-0')}
       >
-        {DIRECTIONS.map((d) => (
+        <option value="" className="bg-background text-foreground" />
+        {EW_DIRECTIONS.map((d) => (
           <option key={d} value={d} className="bg-background text-foreground">
             {d}
           </option>

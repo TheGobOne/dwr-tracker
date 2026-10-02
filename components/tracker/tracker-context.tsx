@@ -18,20 +18,22 @@ export interface SpellState {
   level: string
 }
 
-export const DIRECTIONS = ['N', 'E', 'S', 'W'] as const
-export type Direction = (typeof DIRECTIONS)[number]
+export const NS_DIRECTIONS = ['N', 'S'] as const
+export const EW_DIRECTIONS = ['E', 'W'] as const
+export type NSDirection = (typeof NS_DIRECTIONS)[number] | ''
+export type EWDirection = (typeof EW_DIRECTIONS)[number] | ''
 
 export interface ManualCoords {
   first: string
-  firstDir: Direction
+  firstDir: NSDirection
   second: string
-  secondDir: Direction
+  secondDir: EWDirection
 }
 
-export const EMPTY_COORDS: ManualCoords = { first: '', firstDir: 'N', second: '', secondDir: 'E' }
+export const EMPTY_COORDS: ManualCoords = { first: '', firstDir: '', second: '', secondDir: '' }
 
-function isDirection(value: unknown): value is Direction {
-  return typeof value === 'string' && (DIRECTIONS as readonly string[]).includes(value)
+function pickDirection<T extends string>(value: unknown, allowed: readonly T[]): T | '' {
+  return typeof value === 'string' && (allowed as readonly string[]).includes(value) ? (value as T) : ''
 }
 
 function sanitizeCoords(raw: unknown): Record<string, ManualCoords> {
@@ -41,9 +43,9 @@ function sanitizeCoords(raw: unknown): Record<string, ManualCoords> {
     if (!LOCATION_BY_ID[id] || !value) continue
     result[id] = {
       first: String(value.first ?? '').slice(0, 4),
-      firstDir: isDirection(value.firstDir) ? value.firstDir : EMPTY_COORDS.firstDir,
+      firstDir: pickDirection(value.firstDir, NS_DIRECTIONS),
       second: String(value.second ?? '').slice(0, 4),
-      secondDir: isDirection(value.secondDir) ? value.secondDir : EMPTY_COORDS.secondDir,
+      secondDir: pickDirection(value.secondDir, EW_DIRECTIONS),
     }
   }
   return result
