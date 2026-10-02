@@ -59,32 +59,41 @@ export function MapCanvas() {
 
   useEffect(() => {
     const container = containerRef.current
-    if (!container) return
-    const root = container.closest<HTMLElement>('[data-tracker-root]')
-  let frame = 0
-  const fit = () => {
-  const height = Math.floor(container.clientHeight)
-  if (root) {
-  const horizontalChrome = root.offsetWidth - container.clientWidth
-  const nextMaxWidth = `${Math.min(MAX_TRACKER_WIDTH, height + horizontalChrome)}px`
-  if (root.style.maxWidth !== nextMaxWidth) root.style.maxWidth = nextMaxWidth
-  }
-  const available = Math.floor(Math.min(container.clientWidth, height))
-  const next = Math.max(MAP_SIZE, available)
-  setCanvasPx((prev) => (prev === next ? prev : next))
-  }
-  // Layout writes are deferred to the next frame so they don't re-trigger the observer within the same loop.
-  const scheduleFit = () => {
-  cancelAnimationFrame(frame)
-  frame = requestAnimationFrame(fit)
-  }
-  fit()
-  const observer = new ResizeObserver(scheduleFit)
-  observer.observe(container)
-  return () => {
-  cancelAnimationFrame(frame)
-  observer.disconnect()
-  }
+    const section = container?.parentElement
+    const root = container?.closest<HTMLElement>('[data-tracker-root]')
+    if (!container || !section || !root) return
+    const sidebar = root.querySelector<HTMLElement>('[aria-label="Run progress"]')
+    let frame = 0
+    const fit = () => {
+      const rootStyle = getComputedStyle(root)
+      const padX = parseFloat(rootStyle.paddingLeft) + parseFloat(rootStyle.paddingRight)
+      const padY = parseFloat(rootStyle.paddingTop) + parseFloat(rootStyle.paddingBottom)
+      const main = section.parentElement
+      const gap = main ? parseFloat(getComputedStyle(main).rowGap) || 0 : 0
+      const chromeX = section.offsetWidth - container.offsetWidth
+      const chromeY = section.offsetHeight - container.offsetHeight
+      const widthAvail = Math.min(MAX_TRACKER_WIDTH, window.innerWidth) - padX - chromeX
+      const heightAvail = root.clientHeight - padY - gap - (sidebar?.offsetHeight ?? 0) - chromeY
+      const next = Math.max(MAP_SIZE, Math.floor(Math.min(widthAvail, heightAvail)))
+      const nextMaxWidth = `${next + padX + chromeX}px`
+      if (root.style.maxWidth !== nextMaxWidth) root.style.maxWidth = nextMaxWidth
+      setCanvasPx((prev) => (prev === next ? prev : next))
+    }
+    // Layout writes are deferred to the next frame so they don't re-trigger the observer within the same loop.
+    const scheduleFit = () => {
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(fit)
+    }
+    fit()
+    const observer = new ResizeObserver(scheduleFit)
+    observer.observe(root)
+    if (sidebar) observer.observe(sidebar)
+    window.addEventListener('resize', scheduleFit)
+    return () => {
+      cancelAnimationFrame(frame)
+      observer.disconnect()
+      window.removeEventListener('resize', scheduleFit)
+    }
   }, [])
 
   useEffect(() => {
@@ -146,9 +155,11 @@ export function MapCanvas() {
 
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
+    const nesFont = getComputedStyle(document.documentElement).getPropertyValue('--font-press-start').trim() || 'monospace'
     for (const marker of markers) {
       const ms = markerSize(scale, marker)
-      ctx.font = `bold ${Math.round(ms * 0.5)}px ui-monospace, monospace`
+      const abbrLength = (marker.locationId ? LOCATION_BY_ID[marker.locationId]?.abbr.length : undefined) ?? 1
+      ctx.font = `${Math.round(ms * (abbrLength > 1 ? 0.36 : 0.5))}px ${nesFont}`
       const cx = marker.x * scale + scale / 2
       const cy = marker.y * scale + scale / 2
       const done = marker.locationId ? visited[marker.locationId] : false
@@ -244,11 +255,11 @@ export function MapCanvas() {
   }
 
   return (
-  <section aria-label="Overworld map" className="dw-window relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+  <section aria-label="Overworld map" className="dw-window relative flex flex-none flex-col self-center overflow-hidden">
   <h1 className="font-display pointer-events-none absolute inset-x-0 top-1.5 z-10 text-center text-[10px] leading-none text-primary [text-shadow:0_0_3px_#000,0_0_3px_#000]">
         DWR <span className="text-foreground">Tracker</span>
       </h1>
-      <div ref={containerRef} className="flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-[#050508]">
+      <div ref={containerRef} className="flex items-center justify-center overflow-hidden bg-[#050508]">
         <canvas
           ref={canvasRef}
           role="img"

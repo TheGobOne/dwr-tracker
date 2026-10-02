@@ -15,7 +15,7 @@ import {
 export const COORDS_LOCATION_ID = 'rainbow-shrine'
 
 const fieldClass =
-  'h-4 rounded-[2px] border border-border bg-input/40 font-mono text-[10px] text-foreground focus-visible:outline-1 focus-visible:outline-primary'
+  'h-4 rounded-[2px] border border-border bg-input/40 font-mono text-[8px] text-foreground focus-visible:outline-1 focus-visible:outline-primary'
 
 export function CoordsInput({ locationId, name }: { locationId: string; name: string }) {
   const { coords, updateCoords } = useTracker()
@@ -96,7 +96,7 @@ export function LocationsPanel() {
         Locations
       </h2>
       <PanelTitle>Locations</PanelTitle>
-      <ul className="grid grid-cols-2 gap-x-1.5 sm:grid-cols-4">
+      <ul className="mx-auto grid w-fit grid-cols-2 gap-x-3 sm:grid-cols-4">
         {ORDERED_LOCATIONS.flatMap((location) => {
           const marker = markerByLocation.get(location.id)
           const isSelected = selectedLocation === location.id
@@ -105,7 +105,7 @@ export function LocationsPanel() {
             <li
               key={location.id}
               className={cn(
-                'flex h-5 items-center gap-1 rounded-sm border px-0.5',
+                'flex h-5 items-center justify-start gap-1 rounded-sm border px-0.5',
                 isSelected ? 'border-primary' : 'border-transparent',
               )}
             >
@@ -119,12 +119,12 @@ export function LocationsPanel() {
                     setTool('marker')
                   }
                 }}
-                className="flex min-w-0 flex-1 items-center gap-1 text-left focus-visible:outline-2 focus-visible:outline-primary"
+                className="flex min-w-0 items-center gap-1 focus-visible:outline-2 focus-visible:outline-primary"
               >
                 <span
                   aria-hidden="true"
                   className={cn(
-                    'flex h-4 w-6 shrink-0 items-center justify-center rounded-[2px] font-mono text-[10px] font-bold text-black',
+                    'flex h-4 w-6 shrink-0 items-center justify-center rounded-[2px] font-mono text-[7px] leading-none text-black',
                     !marker && 'opacity-40',
                   )}
                   style={{ backgroundColor: KIND_META[location.kind].color }}
@@ -133,7 +133,7 @@ export function LocationsPanel() {
                 </span>
                 <span
                   className={cn(
-                    'truncate text-xs',
+                    'truncate text-[8px] leading-none',
                     isVisited ? 'text-muted-foreground line-through' : marker ? 'text-foreground' : 'text-muted-foreground',
                   )}
                 >

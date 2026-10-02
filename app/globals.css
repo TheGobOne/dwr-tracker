@@ -5,7 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: var(--font-pixelify), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-press-start), ui-monospace, monospace;
+  --font-mono: var(--font-press-start), ui-monospace, monospace;
   --font-display: var(--font-press-start), ui-monospace, monospace;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -97,5 +98,9 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  /* Buttons and form controls don't inherit text-transform from the UA stylesheet. */
+  [data-tracker-root] * {
+    text-transform: uppercase;
   }
 }

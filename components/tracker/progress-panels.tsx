@@ -6,7 +6,7 @@ import { COORDS_LOCATION_ID, CoordsInput, PanelTitle } from './locations-panel'
 import { useTracker } from './tracker-context'
 
 const toggleBase =
-  'rounded-sm border px-1.5 py-0.5 text-xs leading-tight transition-colors focus-visible:outline-2 focus-visible:outline-primary'
+  'rounded-sm border px-1.5 py-1 text-[8px] leading-tight transition-colors focus-visible:outline-2 focus-visible:outline-primary'
 const toggleOn = 'border-primary bg-primary text-primary-foreground'
 const toggleOff = 'border-foreground/25 text-muted-foreground hover:border-foreground hover:text-foreground'
 
@@ -87,7 +87,7 @@ export function NotesPanel() {
   value={notes}
   onChange={(e) => setNotes(e.target.value)}
   rows={2}
-  className="h-[3.25rem] shrink-0 resize-none overflow-y-auto rounded-sm border border-foreground/25 bg-transparent px-1.5 py-1 text-xs leading-5 text-foreground [scrollbar-width:none] focus-visible:border-primary focus-visible:outline-none [&::-webkit-scrollbar]:hidden"
+  className="h-[3.25rem] shrink-0 resize-none overflow-y-auto rounded-sm border border-foreground/25 bg-transparent px-1.5 py-1 text-[9px] leading-5 text-foreground [scrollbar-width:none] focus-visible:border-primary focus-visible:outline-none [&::-webkit-scrollbar]:hidden"
       />
     </section>
   )
