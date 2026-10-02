@@ -58,10 +58,8 @@ export const LOCATIONS: DWLocation[] = [
   { id: 'mountain-cave', name: 'Mountain Cave', abbr: 'MC', kind: 'cave', hint: 'Two floors of chests.' },
   { id: 'swamp-north', name: 'Swamp Cave (N)', abbr: 'SN', kind: 'cave', hint: 'North entrance. Green Dragon & Gwaelin.' },
   { id: 'swamp-south', name: 'Swamp Cave (S)', abbr: 'SS', kind: 'cave', hint: 'South entrance of the Swamp Cave.' },
-  { id: 'staff-shrine', name: 'Staff of Rain Shrine', abbr: 'SR', kind: 'shrine', hint: 'Requires the Silver Harp.' },
-  { id: 'rainbow-shrine', name: 'Rainbow Drop Shrine', abbr: 'RD', kind: 'shrine', hint: "Requires Staff, Stones & Erdrick's Token." },
-  { id: 'rainbow-bridge', name: 'Rainbow Bridge Spot', abbr: 'RB', kind: 'special', hint: 'Use the Rainbow Drop here to reach Charlock.' },
-  { id: 'search-spot', name: 'Overworld Search Spot', abbr: 'SP', kind: 'special', hint: "Hidden item on the map (vanilla Erdrick's Token)." },
+  { id: 'staff-shrine', name: 'Staff Cave', abbr: 'SR', kind: 'shrine', hint: 'Requires the Silver Harp.' },
+  { id: 'rainbow-shrine', name: 'Jerk Cave', abbr: 'RD', kind: 'shrine', hint: "Requires Staff, Stones & Erdrick's Token." },
 ]
 
 export const LOCATION_BY_ID = Object.fromEntries(LOCATIONS.map((l) => [l.id, l])) as Record<string, DWLocation>

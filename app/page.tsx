@@ -1,5 +1,4 @@
 import { MapCanvas } from '@/components/tracker/map-canvas'
-import { MapToolbar } from '@/components/tracker/map-toolbar'
 import { TrackerProvider } from '@/components/tracker/tracker-context'
 import { TrackerHeader } from '@/components/tracker/tracker-header'
 import { TrackerShortcuts } from '@/components/tracker/tracker-shortcuts'
@@ -12,7 +11,6 @@ export default function Page() {
       <div className="mx-auto flex h-dvh w-full max-w-[640px] flex-col gap-1.5 overflow-hidden p-1.5">
         <TrackerHeader />
         <main className="flex min-h-0 flex-1 flex-col gap-1.5">
-          <MapToolbar />
           <MapCanvas />
           <TrackerSidebar />
         </main>

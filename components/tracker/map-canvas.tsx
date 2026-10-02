@@ -1,23 +1,18 @@
 'use client'
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { KIND_META, LOCATION_BY_ID, MAP_SIZE, PIN_COLOR, TERRAIN_RGB, TERRAINS } from '@/lib/dw-data'
-import { FIT_MAP_EVENT } from './map-toolbar'
-import { MAX_ZOOM, MIN_ZOOM, useTracker, type Marker } from './tracker-context'
+import { useTracker, type Marker } from './tracker-context'
 
-const MAP_PADDING = 6
+const MAP_PADDING = 4
 
 interface Point {
   x: number
   y: number
 }
 
-type DragState =
-  | { mode: 'paint'; last: Point }
-  | { mode: 'pan'; startClient: Point; startScroll: Point }
-
-function markerSize(zoom: number) {
-  return Math.max(14, Math.round(zoom * 1.5))
+function markerSize(scale: number) {
+  return Math.max(12, Math.round(scale * 1.5))
 }
 
 function markerColor(marker: Marker) {
@@ -31,38 +26,17 @@ function markerText(marker: Marker) {
 }
 
 export function MapCanvas() {
-  const {
-    tiles,
-    markers,
-    visited,
-    zoom,
-    setZoom,
-    tool,
-    showGrid,
-    brushSize,
-    selectedLocation,
-    beginStroke,
-    paintLine,
-    fillAt,
-    placeMarker,
-    removeMarker,
-    focusRequest,
-  } = useTracker()
+  const { tiles, markers, visited, showGrid, selectedLocation, placeMarker, removeMarker, focusRequest } = useTracker()
 
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const offscreenRef = useRef<HTMLCanvasElement | null>(null)
-  const dragRef = useRef<DragState | null>(null)
-  const zoomRef = useRef(zoom)
-  const zoomAnchorRef = useRef<{ tileX: number; tileY: number; offsetX: number; offsetY: number } | null>(null)
 
+  const [canvasPx, setCanvasPx] = useState(MAP_SIZE * 4)
   const [hover, setHover] = useState<Point | null>(null)
   const [flash, setFlash] = useState<Point | null>(null)
-  const [spaceHeld, setSpaceHeld] = useState(false)
-  const [isPanning, setIsPanning] = useState(false)
 
-  const canvasPx = MAP_SIZE * zoom
-  const panActive = tool === 'pan' || spaceHeld
+  const scale = canvasPx / MAP_SIZE
 
   const exploredPct = useMemo(() => {
     let count = 0
@@ -71,14 +45,26 @@ export function MapCanvas() {
   }, [tiles])
 
   useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+    const fit = () => {
+      const available = Math.floor(Math.min(container.clientWidth, container.clientHeight) - MAP_PADDING * 2)
+      setCanvasPx(Math.max(MAP_SIZE, available))
+    }
+    fit()
+    const observer = new ResizeObserver(fit)
+    observer.observe(container)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
     if (!offscreenRef.current) {
       const c = document.createElement('canvas')
       c.width = MAP_SIZE
       c.height = MAP_SIZE
       offscreenRef.current = c
     }
-    const off = offscreenRef.current
-    const offCtx = off.getContext('2d')
+    const offCtx = offscreenRef.current.getContext('2d')
     if (!offCtx) return
     const image = offCtx.createImageData(MAP_SIZE, MAP_SIZE)
     for (let i = 0; i < tiles.length; i++) {
@@ -97,9 +83,9 @@ export function MapCanvas() {
     if (!canvas || !off) return
     const dpr = window.devicePixelRatio || 1
     const size = canvasPx
-    if (canvas.width !== size * dpr) {
-      canvas.width = size * dpr
-      canvas.height = size * dpr
+    if (canvas.width !== Math.round(size * dpr)) {
+      canvas.width = Math.round(size * dpr)
+      canvas.height = Math.round(size * dpr)
     }
     const ctx = canvas.getContext('2d')
     if (!ctx) return
@@ -108,26 +94,12 @@ export function MapCanvas() {
     ctx.clearRect(0, 0, size, size)
     ctx.drawImage(off, 0, 0, size, size)
 
-    if (showGrid && zoom >= 8) {
-      ctx.strokeStyle = 'rgba(255,255,255,0.08)'
-      ctx.lineWidth = 1
-      ctx.beginPath()
-      for (let i = 1; i < MAP_SIZE; i++) {
-        if (i % 10 === 0) continue
-        const p = i * zoom + 0.5
-        ctx.moveTo(p, 0)
-        ctx.lineTo(p, size)
-        ctx.moveTo(0, p)
-        ctx.lineTo(size, p)
-      }
-      ctx.stroke()
-    }
     if (showGrid) {
-      ctx.strokeStyle = 'rgba(255,255,255,0.22)'
+      ctx.strokeStyle = 'rgba(255,255,255,0.18)'
       ctx.lineWidth = 1
       ctx.beginPath()
       for (let i = 10; i < MAP_SIZE; i += 10) {
-        const p = i * zoom + 0.5
+        const p = Math.round(i * scale) + 0.5
         ctx.moveTo(p, 0)
         ctx.lineTo(p, size)
         ctx.moveTo(0, p)
@@ -136,20 +108,19 @@ export function MapCanvas() {
       ctx.stroke()
     }
 
-    if (hover && !panActive) {
-      const r = tool === 'paint' ? Math.floor(brushSize / 2) : 0
+    if (hover) {
       ctx.strokeStyle = '#FCFCFC'
       ctx.lineWidth = 2
-      ctx.strokeRect((hover.x - r) * zoom + 1, (hover.y - r) * zoom + 1, (r * 2 + 1) * zoom - 2, (r * 2 + 1) * zoom - 2)
+      ctx.strokeRect(hover.x * scale, hover.y * scale, scale, scale)
     }
 
-    const ms = markerSize(zoom)
+    const ms = markerSize(scale)
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
     ctx.font = `bold ${Math.round(ms * 0.5)}px ui-monospace, monospace`
     for (const marker of markers) {
-      const cx = marker.x * zoom + zoom / 2
-      const cy = marker.y * zoom + zoom / 2
+      const cx = marker.x * scale + scale / 2
+      const cy = marker.y * scale + scale / 2
       const done = marker.locationId ? visited[marker.locationId] : false
       ctx.globalAlpha = done ? 0.55 : 1
       ctx.fillStyle = '#000000'
@@ -174,94 +145,16 @@ export function MapCanvas() {
     }
 
     if (flash) {
-      const cx = flash.x * zoom + zoom / 2
-      const cy = flash.y * zoom + zoom / 2
       ctx.strokeStyle = '#F8B800'
       ctx.lineWidth = 3
       ctx.beginPath()
-      ctx.arc(cx, cy, ms * 1.4, 0, Math.PI * 2)
+      ctx.arc(flash.x * scale + scale / 2, flash.y * scale + scale / 2, ms * 1.4, 0, Math.PI * 2)
       ctx.stroke()
     }
-  }, [tiles, markers, visited, zoom, canvasPx, showGrid, hover, flash, tool, brushSize, panActive])
-
-  useEffect(() => {
-    zoomRef.current = zoom
-  }, [zoom])
-
-  useLayoutEffect(() => {
-    const anchor = zoomAnchorRef.current
-    const container = containerRef.current
-    if (!anchor || !container) return
-    container.scrollLeft = anchor.tileX * zoom - anchor.offsetX
-    container.scrollTop = anchor.tileY * zoom - anchor.offsetY
-    zoomAnchorRef.current = null
-  }, [zoom])
-
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-    const onWheel = (e: WheelEvent) => {
-      if (!e.ctrlKey && !e.metaKey) return
-      e.preventDefault()
-      const current = zoomRef.current
-      const next = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, current + (e.deltaY < 0 ? 1 : -1)))
-      if (next === current) return
-      const rect = container.getBoundingClientRect()
-      const offsetX = e.clientX - rect.left
-      const offsetY = e.clientY - rect.top
-      zoomAnchorRef.current = {
-        tileX: (container.scrollLeft + offsetX) / current,
-        tileY: (container.scrollTop + offsetY) / current,
-        offsetX,
-        offsetY,
-      }
-      setZoom(next)
-    }
-    container.addEventListener('wheel', onWheel, { passive: false })
-    return () => container.removeEventListener('wheel', onWheel)
-  }, [setZoom])
-
-  useEffect(() => {
-    const isTyping = (target: EventTarget | null) =>
-      target instanceof HTMLElement && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))
-    const down = (e: KeyboardEvent) => {
-      if (e.code === 'Space' && !isTyping(e.target)) {
-        e.preventDefault()
-        setSpaceHeld(true)
-      }
-    }
-    const up = (e: KeyboardEvent) => {
-      if (e.code === 'Space') setSpaceHeld(false)
-    }
-    window.addEventListener('keydown', down)
-    window.addEventListener('keyup', up)
-    return () => {
-      window.removeEventListener('keydown', down)
-      window.removeEventListener('keyup', up)
-    }
-  }, [])
-
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-    const fit = () => {
-      const available = Math.min(container.clientWidth, container.clientHeight) - MAP_PADDING * 2
-      setZoom(Math.max(MIN_ZOOM, Math.floor(available / MAP_SIZE)))
-    }
-    fit()
-    window.addEventListener(FIT_MAP_EVENT, fit)
-    return () => window.removeEventListener(FIT_MAP_EVENT, fit)
-  }, [setZoom])
+  }, [tiles, markers, visited, canvasPx, scale, showGrid, hover, flash])
 
   useEffect(() => {
     if (!focusRequest) return
-    const container = containerRef.current
-    if (!container) return
-    container.scrollTo({
-      left: focusRequest.x * zoomRef.current - container.clientWidth / 2,
-      top: focusRequest.y * zoomRef.current - container.clientHeight / 2,
-      behavior: 'smooth',
-    })
     setFlash({ x: focusRequest.x, y: focusRequest.y })
     const t = window.setTimeout(() => setFlash(null), 1400)
     return () => window.clearTimeout(t)
@@ -270,76 +163,34 @@ export function MapCanvas() {
   function pointerToTile(e: React.PointerEvent | React.MouseEvent): Point {
     const rect = (e.currentTarget as HTMLCanvasElement).getBoundingClientRect()
     return {
-      x: Math.min(MAP_SIZE - 1, Math.max(0, Math.floor((e.clientX - rect.left) / zoom))),
-      y: Math.min(MAP_SIZE - 1, Math.max(0, Math.floor((e.clientY - rect.top) / zoom))),
+      x: Math.min(MAP_SIZE - 1, Math.max(0, Math.floor((e.clientX - rect.left) / scale))),
+      y: Math.min(MAP_SIZE - 1, Math.max(0, Math.floor((e.clientY - rect.top) / scale))),
     }
   }
 
-  function markerAtPointer(e: React.PointerEvent | React.MouseEvent) {
+  function markerAtPointer(e: React.MouseEvent) {
     const rect = (e.currentTarget as HTMLCanvasElement).getBoundingClientRect()
     const px = e.clientX - rect.left
     const py = e.clientY - rect.top
-    const half = markerSize(zoom) / 2 + 2
+    const half = markerSize(scale) / 2 + 2
     for (let i = markers.length - 1; i >= 0; i--) {
       const m = markers[i]
-      const cx = m.x * zoom + zoom / 2
-      const cy = m.y * zoom + zoom / 2
+      const cx = m.x * scale + scale / 2
+      const cy = m.y * scale + scale / 2
       if (Math.abs(px - cx) <= half && Math.abs(py - cy) <= half) return m
     }
     return null
   }
 
   function handlePointerDown(e: React.PointerEvent<HTMLCanvasElement>) {
-    const container = containerRef.current
-    if (!container) return
-    if (e.button === 2) return
-    e.currentTarget.setPointerCapture(e.pointerId)
-
-    if (panActive || e.button === 1) {
-      e.preventDefault()
-      dragRef.current = {
-        mode: 'pan',
-        startClient: { x: e.clientX, y: e.clientY },
-        startScroll: { x: container.scrollLeft, y: container.scrollTop },
-      }
-      setIsPanning(true)
-      return
-    }
     if (e.button !== 0) return
-
     const tile = pointerToTile(e)
-    if (tool === 'paint') {
-      beginStroke()
-      paintLine(tile.x, tile.y, tile.x, tile.y)
-      dragRef.current = { mode: 'paint', last: tile }
-    } else if (tool === 'fill') {
-      beginStroke()
-      fillAt(tile.x, tile.y)
-    } else if (tool === 'marker') {
-      placeMarker(tile.x, tile.y)
-    }
+    placeMarker(tile.x, tile.y)
   }
 
   function handlePointerMove(e: React.PointerEvent<HTMLCanvasElement>) {
     const tile = pointerToTile(e)
     if (!hover || hover.x !== tile.x || hover.y !== tile.y) setHover(tile)
-
-    const drag = dragRef.current
-    if (!drag) return
-    if (drag.mode === 'pan') {
-      const container = containerRef.current
-      if (!container) return
-      container.scrollLeft = drag.startScroll.x - (e.clientX - drag.startClient.x)
-      container.scrollTop = drag.startScroll.y - (e.clientY - drag.startClient.y)
-    } else if (drag.last.x !== tile.x || drag.last.y !== tile.y) {
-      paintLine(drag.last.x, drag.last.y, tile.x, tile.y)
-      drag.last = tile
-    }
-  }
-
-  function endDrag() {
-    dragRef.current = null
-    setIsPanning(false)
   }
 
   function handleContextMenu(e: React.MouseEvent<HTMLCanvasElement>) {
@@ -351,32 +202,20 @@ export function MapCanvas() {
   const hoverTerrain = hover ? TERRAINS[tiles[hover.y * MAP_SIZE + hover.x]] : null
   const hoverMarkers = hover ? markers.filter((m) => m.x === hover.x && m.y === hover.y) : []
 
-  const cursor = panActive ? (isPanning ? 'grabbing' : 'grab') : tool === 'marker' ? 'copy' : 'crosshair'
-
   return (
     <section aria-label="Overworld map" className="dw-window flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-      <div
-        ref={containerRef}
-        className="min-h-0 flex-1 overflow-auto bg-[#050508]"
-        style={{ overscrollBehavior: 'contain' }}
-      >
-        <div className="mx-auto w-fit" style={{ padding: MAP_PADDING }}>
-          <canvas
-            ref={canvasRef}
-            role="img"
-            aria-label={`Overworld map, ${exploredPct}% explored, ${markers.length} markers placed`}
-            width={canvasPx}
-            height={canvasPx}
-            style={{ width: canvasPx, height: canvasPx, cursor, touchAction: 'none', imageRendering: 'pixelated' }}
-            className="block shadow-[0_0_0_2px_#fcfcfc33]"
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={endDrag}
-            onPointerCancel={endDrag}
-            onPointerLeave={() => setHover(null)}
-            onContextMenu={handleContextMenu}
-          />
-        </div>
+      <div ref={containerRef} className="flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-[#050508]">
+        <canvas
+          ref={canvasRef}
+          role="img"
+          aria-label={`Overworld map, ${exploredPct}% explored, ${markers.length} markers placed`}
+          style={{ width: canvasPx, height: canvasPx, cursor: 'crosshair', touchAction: 'none', imageRendering: 'pixelated' }}
+          className="block shadow-[0_0_0_2px_#fcfcfc33]"
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerLeave={() => setHover(null)}
+          onContextMenu={handleContextMenu}
+        />
       </div>
       <div className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-0.5 border-t-2 border-foreground/80 px-2 py-1 text-xs">
         <span className="font-display text-[10px] text-primary" aria-live="polite">
@@ -385,10 +224,10 @@ export function MapCanvas() {
         <span className="text-muted-foreground">{hoverTerrain ? hoverTerrain.name : 'Hover the map'}</span>
         {hoverMarkers.length > 0 && <span className="text-foreground">{hoverMarkers.map((m) => m.label).join(', ')}</span>}
         <span className="ml-auto text-muted-foreground">
-          {selectedLocation && tool === 'marker' ? (
+          {selectedLocation ? (
             <span className="text-primary">Click the map to place {LOCATION_BY_ID[selectedLocation]?.name}</span>
           ) : (
-            <>Explored {exploredPct}%</>
+            <>Click to pin · Right-click to remove</>
           )}
         </span>
       </div>
