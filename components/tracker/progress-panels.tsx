@@ -20,7 +20,7 @@ export function ItemsPanel() {
         Items
       </h2>
       <PanelTitle>Items</PanelTitle>
-      <div className="flex flex-wrap gap-1">
+      <div className="flex flex-wrap justify-center gap-1">
         {all.map((item) => {
           const has = !!items[item.id]
           return (
@@ -58,7 +58,7 @@ export function SpellsPanel() {
                 type="button"
                 aria-pressed={state.learned}
                 onClick={() => updateSpell(name, { learned: !state.learned })}
-                className={cn(toggleBase, 'min-w-0 flex-1 truncate text-left', state.learned ? toggleOn : toggleOff)}
+                className={cn(toggleBase, 'min-w-0 flex-1 truncate text-center', state.learned ? toggleOn : toggleOff)}
               >
                 {name}
               </button>
@@ -81,9 +81,8 @@ export function NotesPanel() {
         id="run-notes"
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
-        rows={1}
-        placeholder="Shop inventories, townsfolk hints…"
-        className="resize-y rounded-sm border border-foreground/25 bg-transparent px-1.5 py-1 text-xs text-foreground placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:outline-none"
+        rows={4}
+        className="resize-none rounded-sm border border-foreground/25 bg-transparent px-1.5 py-1 text-xs text-foreground focus-visible:border-primary focus-visible:outline-none"
       />
     </section>
   )

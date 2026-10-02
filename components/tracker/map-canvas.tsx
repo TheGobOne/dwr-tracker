@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { KIND_META, LOCATION_BY_ID, MAP_SIZE, PIN_COLOR, TERRAIN_RGB } from '@/lib/dw-data'
 import { useTracker, type Marker } from './tracker-context'
 
-const MAP_PADDING = 4
+const MAX_TRACKER_WIDTH = 640
 
 interface Point {
   x: number
@@ -47,8 +47,14 @@ export function MapCanvas() {
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
+    const root = container.closest<HTMLElement>('[data-tracker-root]')
     const fit = () => {
-      const available = Math.floor(Math.min(container.clientWidth, container.clientHeight) - MAP_PADDING * 2)
+      const height = Math.floor(container.clientHeight)
+      if (root) {
+        const horizontalChrome = root.offsetWidth - container.clientWidth
+        root.style.maxWidth = `${Math.min(MAX_TRACKER_WIDTH, height + horizontalChrome)}px`
+      }
+      const available = Math.floor(Math.min(container.clientWidth, height))
       setCanvasPx(Math.max(MAP_SIZE, available))
     }
     fit()
@@ -207,7 +213,7 @@ export function MapCanvas() {
           role="img"
           aria-label={`Overworld map, ${exploredPct}% explored, ${markers.length} markers placed`}
           style={{ width: canvasPx, height: canvasPx, cursor: 'crosshair', touchAction: 'none', imageRendering: 'pixelated' }}
-          className="block shadow-[0_0_0_2px_#fcfcfc33]"
+          className="block"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerLeave={() => setHover(null)}

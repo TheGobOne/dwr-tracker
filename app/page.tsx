@@ -8,7 +8,7 @@ export default function Page() {
   return (
     <TrackerProvider>
       <TrackerShortcuts />
-      <div className="mx-auto flex h-dvh w-full max-w-[640px] flex-col gap-1.5 overflow-hidden p-1.5">
+      <div data-tracker-root className="mx-auto flex h-dvh w-full max-w-[640px] flex-col gap-1.5 overflow-hidden p-1.5">
         <TrackerHeader />
         <main className="flex min-h-0 flex-1 flex-col gap-1.5">
           <MapCanvas />
