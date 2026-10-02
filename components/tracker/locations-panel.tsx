@@ -33,7 +33,7 @@ function CoordsInput({ locationId, name }: { locationId: string; name: string })
         className={cn(fieldClass, 'px-0')}
       >
         {DIRECTIONS.map((d) => (
-          <option key={d} value={d}>
+          <option key={d} value={d} className="bg-background text-foreground">
             {d}
           </option>
         ))}
@@ -54,7 +54,7 @@ function CoordsInput({ locationId, name }: { locationId: string; name: string })
         className={cn(fieldClass, 'px-0')}
       >
         {DIRECTIONS.map((d) => (
-          <option key={d} value={d}>
+          <option key={d} value={d} className="bg-background text-foreground">
             {d}
           </option>
         ))}
@@ -88,17 +88,24 @@ export function LocationsPanel() {
       </h2>
       <PanelTitle>Locations</PanelTitle>
       <ul className="grid grid-cols-2 gap-x-1.5 sm:grid-cols-4">
-        {ORDERED_LOCATIONS.map((location) => {
+        {ORDERED_LOCATIONS.flatMap((location) => {
           const marker = markerByLocation.get(location.id)
           const isSelected = selectedLocation === location.id
           const isVisited = !!visited[location.id]
-          return (
+          const coordsCell =
+            location.id === COORDS_LOCATION_ID
+              ? [
+                  <li key={`${location.id}-coords`} className="flex h-5 items-center px-0.5">
+                    <CoordsInput locationId={location.id} name={location.name} />
+                  </li>,
+                ]
+              : []
+          return [
             <li
               key={location.id}
               className={cn(
                 'flex h-5 items-center gap-1 rounded-sm border px-0.5',
                 isSelected ? 'border-primary' : 'border-transparent',
-                location.id === COORDS_LOCATION_ID && 'col-span-2',
               )}
             >
               <input
@@ -119,10 +126,7 @@ export function LocationsPanel() {
                   }
                 }}
                 title={marker ? `${location.name} at ${marker.x},${marker.y} — click to show` : `${location.hint} — click to place`}
-                className={cn(
-                  'flex min-w-0 items-center gap-1 text-left focus-visible:outline-2 focus-visible:outline-primary',
-                  location.id === COORDS_LOCATION_ID ? 'mr-1' : 'flex-1',
-                )}
+                className="flex min-w-0 flex-1 items-center gap-1 text-left focus-visible:outline-2 focus-visible:outline-primary"
               >
                 <span
                   aria-hidden="true"
@@ -143,7 +147,6 @@ export function LocationsPanel() {
                   {location.name}
                 </span>
               </button>
-              {location.id === COORDS_LOCATION_ID && <CoordsInput locationId={location.id} name={location.name} />}
               {marker && (
                 <button
                   type="button"
@@ -161,8 +164,9 @@ export function LocationsPanel() {
                   <MapPin className="size-3" aria-hidden="true" />
                 </button>
               )}
-            </li>
-          )
+            </li>,
+            ...coordsCell,
+          ]
         })}
       </ul>
     </section>
