@@ -59,7 +59,7 @@ export const LOCATIONS: DWLocation[] = [
   { id: 'swamp-north', name: 'Swamp (N)', abbr: 'SN', kind: 'cave', hint: 'North entrance. Green Dragon & Gwaelin.' },
   { id: 'swamp-south', name: 'Swamp (S)', abbr: 'SS', kind: 'cave', hint: 'South entrance of the Swamp Cave.' },
   { id: 'staff-shrine', name: 'Staff', abbr: 'SR', kind: 'shrine', hint: 'Requires the Silver Harp.' },
-  { id: 'rainbow-shrine', name: 'Jerk', abbr: 'JC', kind: 'shrine', hint: "Requires Staff, Stones & Erdrick's Token." },
+  { id: 'rainbow-shrine', name: 'Jerk', abbr: 'JC', kind: 'shrine', hint: "Requires Staff, Stones & Token." },
 ]
 
 export const LOCATION_BY_ID = Object.fromEntries(LOCATIONS.map((l) => [l.id, l])) as Record<string, DWLocation>
@@ -76,7 +76,7 @@ export const ITEM_GROUPS: { label: string; items: ItemDef[] }[] = [
       { id: 'silver-harp', name: 'Silver Harp' },
       { id: 'staff-of-rain', name: 'Staff of Rain' },
       { id: 'stones-of-sunlight', name: 'Stones of Sunlight' },
-      { id: 'erdricks-token', name: "Erdrick's Token" },
+      { id: 'erdricks-token', name: 'Token' },
     ],
   },
   {
