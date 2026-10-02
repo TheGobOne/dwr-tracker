@@ -1,11 +1,11 @@
 'use client'
 
-import { Grid3x3, Hand, MapPin, Minus, PaintBucket, Paintbrush, Plus } from 'lucide-react'
-import { Input } from '@/components/ui/input'
-import { Slider } from '@/components/ui/slider'
+import { Eraser, Grid3x3, Hand, MapPin, Maximize, Minus, PaintBucket, Paintbrush, Plus } from 'lucide-react'
 import { TERRAINS } from '@/lib/dw-data'
 import { cn } from '@/lib/utils'
-import { BRUSH_SIZES, MAX_ZOOM, MIN_ZOOM, useTracker, type Tool } from './tracker-context'
+import { BRUSH_SIZES, useTracker, type Tool } from './tracker-context'
+
+export const FIT_MAP_EVENT = 'dwr:fit-map'
 
 const TOOLS: { id: Tool; label: string; key: string; icon: typeof Paintbrush }[] = [
   { id: 'paint', label: 'Paint', key: 'B', icon: Paintbrush },
@@ -14,8 +14,13 @@ const TOOLS: { id: Tool; label: string; key: string; icon: typeof Paintbrush }[]
   { id: 'pan', label: 'Pan', key: 'H', icon: Hand },
 ]
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <h2 className="font-display text-[10px] uppercase tracking-wider text-primary">{children}</h2>
+const chip =
+  'flex h-7 items-center justify-center rounded-sm border-2 text-xs transition-colors focus-visible:outline-2 focus-visible:outline-primary'
+const chipIdle = 'border-foreground/30 hover:border-foreground'
+const chipActive = 'border-primary bg-primary text-primary-foreground'
+
+function Divider() {
+  return <span aria-hidden="true" className="h-5 w-px bg-foreground/25" />
 }
 
 export function MapToolbar() {
@@ -37,88 +42,116 @@ export function MapToolbar() {
   } = useTracker()
 
   return (
-    <aside aria-label="Map tools" className="dw-window flex shrink-0 flex-col gap-5 overflow-y-auto p-4 lg:w-56">
-      <div className="flex flex-col gap-2">
-        <SectionTitle>Tool</SectionTitle>
-        <div className="grid grid-cols-4 gap-1.5 lg:grid-cols-2">
+    <section aria-label="Map tools" className="dw-window flex shrink-0 flex-col gap-1.5 px-2 py-1.5">
+      <div className="flex flex-wrap items-center gap-1.5">
+        <div className="flex gap-1" role="group" aria-label="Tool">
           {TOOLS.map(({ id, label, key, icon: Icon }) => (
             <button
               key={id}
               type="button"
               aria-pressed={tool === id}
+              aria-label={label}
+              title={`${label} (${key})`}
               onClick={() => setTool(id)}
-              className={cn(
-                'flex items-center justify-center gap-1.5 rounded-sm border-2 px-2 py-1.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-primary',
-                tool === id
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-foreground/30 hover:border-foreground',
-              )}
+              className={cn(chip, 'w-7', tool === id ? chipActive : chipIdle)}
             >
-              <Icon className="size-4" aria-hidden="true" />
-              <span>{label}</span>
-              <kbd className="hidden text-[10px] opacity-60 lg:inline">{key}</kbd>
+              <Icon className="size-3.5" aria-hidden="true" />
             </button>
           ))}
         </div>
-      </div>
 
-      <div className="flex flex-col gap-2">
-        <SectionTitle>Terrain</SectionTitle>
-        <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-5 lg:grid-cols-1">
-          {TERRAINS.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              aria-pressed={terrain === t.id}
-              onClick={() => {
-                setTerrain(t.id)
-                if (tool !== 'paint' && tool !== 'fill') setTool('paint')
-              }}
-              className={cn(
-                'flex items-center gap-2 rounded-sm border-2 px-2 py-1 text-left text-sm transition-colors focus-visible:outline-2 focus-visible:outline-primary',
-                terrain === t.id ? 'border-primary' : 'border-transparent hover:border-foreground/40',
-              )}
-            >
-              <span
-                aria-hidden="true"
-                className="size-4 shrink-0 border border-foreground/60"
-                style={{ backgroundColor: t.color }}
-              />
-              <span className="flex-1 truncate">{t.id === 0 ? 'Eraser' : t.name}</span>
-              <kbd className="hidden text-[10px] text-muted-foreground lg:inline">{t.key}</kbd>
-            </button>
-          ))}
-        </div>
-      </div>
+        <Divider />
 
-      <div className="flex flex-col gap-2">
-        <SectionTitle>Brush</SectionTitle>
-        <div className="flex gap-1.5" role="group" aria-label="Brush size">
+        <div className="flex gap-1" role="group" aria-label="Brush size">
           {BRUSH_SIZES.map((size) => (
             <button
               key={size}
               type="button"
               aria-pressed={brushSize === size}
+              aria-label={`Brush ${size}`}
+              title={`Brush ${size}×${size}`}
               onClick={() => setBrushSize(size)}
-              className={cn(
-                'flex-1 rounded-sm border-2 py-1 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-primary',
-                brushSize === size
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-foreground/30 hover:border-foreground',
-              )}
+              className={cn(chip, 'w-6 font-mono', brushSize === size ? chipActive : chipIdle)}
             >
               {size}
             </button>
           ))}
         </div>
+
+        <Divider />
+
+        <div className="flex items-center gap-1" role="group" aria-label="Zoom">
+          <button type="button" aria-label="Zoom out" onClick={() => setZoom(zoom - 1)} className={cn(chip, 'w-7', chipIdle)}>
+            <Minus className="size-3.5" aria-hidden="true" />
+          </button>
+          <span className="w-8 text-center font-mono text-xs text-muted-foreground" aria-live="polite">
+            {zoom}x
+          </span>
+          <button type="button" aria-label="Zoom in" onClick={() => setZoom(zoom + 1)} className={cn(chip, 'w-7', chipIdle)}>
+            <Plus className="size-3.5" aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            aria-label="Fit map to view"
+            title="Fit map"
+            onClick={() => window.dispatchEvent(new Event(FIT_MAP_EVENT))}
+            className={cn(chip, 'w-7', chipIdle)}
+          >
+            <Maximize className="size-3.5" aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            aria-pressed={showGrid}
+            aria-label="Toggle grid"
+            title="Grid (G)"
+            onClick={() => setShowGrid(!showGrid)}
+            className={cn(chip, 'w-7', showGrid ? 'border-primary text-primary' : chipIdle)}
+          >
+            <Grid3x3 className="size-3.5" aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-1" role="group" aria-label="Terrain">
+        {TERRAINS.map((t) => {
+          const name = t.id === 0 ? 'Eraser' : t.name
+          const active = terrain === t.id
+          return (
+            <button
+              key={t.id}
+              type="button"
+              aria-pressed={active}
+              aria-label={name}
+              title={`${name} (${t.key})`}
+              onClick={() => {
+                setTerrain(t.id)
+                if (tool !== 'paint' && tool !== 'fill') setTool('paint')
+              }}
+              className={cn(
+                'flex size-7 items-center justify-center rounded-sm border-2 transition-colors focus-visible:outline-2 focus-visible:outline-primary',
+                active ? 'border-primary ring-1 ring-primary' : 'border-foreground/30 hover:border-foreground',
+              )}
+            >
+              <span
+                aria-hidden="true"
+                className="flex size-full items-center justify-center"
+                style={{ backgroundColor: t.color }}
+              >
+                {t.id === 0 && <Eraser className="size-3.5 text-foreground" />}
+              </span>
+            </button>
+          )
+        })}
+        <span className="ml-1 truncate text-xs text-muted-foreground">
+          {terrain === 0 ? 'Eraser' : TERRAINS[terrain]?.name}
+        </span>
       </div>
 
       {tool === 'marker' && (
-        <div className="flex flex-col gap-2">
-          <SectionTitle>Marker</SectionTitle>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
           {selectedLocation ? (
-            <p className="text-sm text-muted-foreground">
-              Placing a location.{' '}
+            <p>
+              Click the map to place.{' '}
               <button
                 type="button"
                 className="text-primary underline underline-offset-2"
@@ -128,65 +161,23 @@ export function MapToolbar() {
               </button>
             </p>
           ) : (
-            <label className="flex flex-col gap-1 text-sm text-muted-foreground">
-              Custom pin label
-              <Input
+            <>
+              <label htmlFor="pin-label" className="shrink-0">
+                Pin label
+              </label>
+              <input
+                id="pin-label"
                 value={pinLabel}
                 onChange={(e) => setPinLabel(e.target.value)}
-                placeholder="e.g. Chest, Golem, Hint"
+                placeholder="Chest, Golem, Hint…"
                 maxLength={60}
-                className="text-foreground"
+                className="h-6 min-w-0 flex-1 rounded-sm border-2 border-foreground/25 bg-transparent px-1.5 text-xs text-foreground focus-visible:border-primary focus-visible:outline-none"
               />
-            </label>
+            </>
           )}
-          <p className="text-xs text-muted-foreground">Right-click a marker to remove it.</p>
+          <span className="ml-auto shrink-0">Right-click removes</span>
         </div>
       )}
-
-      <div className="flex flex-col gap-2">
-        <SectionTitle>View</SectionTitle>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            aria-label="Zoom out"
-            onClick={() => setZoom(zoom - 1)}
-            className="rounded-sm border-2 border-foreground/30 p-1 hover:border-foreground"
-          >
-            <Minus className="size-4" aria-hidden="true" />
-          </button>
-          <Slider
-            aria-label="Zoom"
-            min={MIN_ZOOM}
-            max={MAX_ZOOM}
-            step={1}
-            value={[zoom]}
-            onValueChange={(v) => setZoom(Array.isArray(v) ? v[0] : (v as number))}
-            className="flex-1"
-          />
-          <button
-            type="button"
-            aria-label="Zoom in"
-            onClick={() => setZoom(zoom + 1)}
-            className="rounded-sm border-2 border-foreground/30 p-1 hover:border-foreground"
-          >
-            <Plus className="size-4" aria-hidden="true" />
-          </button>
-        </div>
-        <p className="text-xs text-muted-foreground">{zoom}px per tile · Ctrl + scroll to zoom</p>
-        <button
-          type="button"
-          aria-pressed={showGrid}
-          onClick={() => setShowGrid(!showGrid)}
-          className={cn(
-            'flex items-center gap-2 rounded-sm border-2 px-2 py-1 text-sm transition-colors',
-            showGrid ? 'border-primary text-primary' : 'border-foreground/30 hover:border-foreground',
-          )}
-        >
-          <Grid3x3 className="size-4" aria-hidden="true" />
-          Grid {showGrid ? 'on' : 'off'}
-          <kbd className="ml-auto hidden text-[10px] opacity-60 lg:inline">G</kbd>
-        </button>
-      </div>
-    </aside>
+    </section>
   )
 }

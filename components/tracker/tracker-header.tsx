@@ -47,35 +47,35 @@ export function TrackerHeader() {
   }
 
   return (
-    <header className="dw-window flex flex-wrap items-center gap-3 px-4 py-3">
-      <div className="mr-auto flex flex-col gap-1">
-        <h1 className="font-display text-xs leading-relaxed text-primary sm:text-sm">Dragon Warrior Randomizer</h1>
-        <p className="text-sm text-muted-foreground">Overworld map tracker</p>
-      </div>
+    <header className="dw-window flex shrink-0 flex-wrap items-center gap-2 px-2.5 py-1.5">
+      <h1 className="font-display text-[10px] leading-none text-primary">
+        DWR <span className="text-foreground">Tracker</span>
+      </h1>
 
-      <label className="flex items-center gap-2 text-sm text-muted-foreground">
-        <span className="font-display text-[10px] uppercase">Seed</span>
-        <Input
-          value={seed}
-          onChange={(e) => setSeed(e.target.value)}
-          placeholder="Seed / flags"
-          maxLength={80}
-          className="h-8 w-44 text-foreground"
-        />
-      </label>
+      <Input
+        value={seed}
+        onChange={(e) => setSeed(e.target.value)}
+        placeholder="Seed / flags"
+        aria-label="Seed or flags"
+        maxLength={80}
+        className="h-7 min-w-0 flex-1 text-sm text-foreground"
+      />
 
-      <div className="flex flex-wrap items-center gap-2">
-        <Button variant="outline" size="sm" onClick={undo} disabled={!canUndo}>
-          <Undo2 data-icon="inline-start" aria-hidden="true" />
-          Undo
+      <div className="flex items-center gap-1">
+        <Button variant="outline" size="icon-sm" onClick={undo} disabled={!canUndo} aria-label="Undo" title="Undo (Ctrl+Z)">
+          <Undo2 aria-hidden="true" />
         </Button>
-        <Button variant="outline" size="sm" onClick={handleExport}>
-          <Download data-icon="inline-start" aria-hidden="true" />
-          Save
+        <Button variant="outline" size="icon-sm" onClick={handleExport} aria-label="Save run to file" title="Save">
+          <Download aria-hidden="true" />
         </Button>
-        <Button variant="outline" size="sm" onClick={() => fileRef.current?.click()}>
-          <Upload data-icon="inline-start" aria-hidden="true" />
-          Load
+        <Button
+          variant="outline"
+          size="icon-sm"
+          onClick={() => fileRef.current?.click()}
+          aria-label="Load run from file"
+          title="Load"
+        >
+          <Upload aria-hidden="true" />
         </Button>
         <input
           ref={fileRef}
@@ -87,9 +87,10 @@ export function TrackerHeader() {
           onChange={handleImport}
         />
         <AlertDialog>
-          <AlertDialogTrigger render={<Button variant="destructive" size="sm" />}>
-            <RotateCcw data-icon="inline-start" aria-hidden="true" />
-            New run
+          <AlertDialogTrigger
+            render={<Button variant="destructive" size="icon-sm" aria-label="New run" title="New run" />}
+          >
+            <RotateCcw aria-hidden="true" />
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -109,7 +110,7 @@ export function TrackerHeader() {
       </div>
 
       {error && (
-        <p role="alert" className="w-full text-sm text-destructive">
+        <p role="alert" className="w-full text-xs text-destructive">
           {error}
         </p>
       )}

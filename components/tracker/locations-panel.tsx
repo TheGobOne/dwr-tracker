@@ -1,158 +1,108 @@
 'use client'
 
-import { Crosshair, MapPin, Trash2 } from 'lucide-react'
-import { KIND_META, LOCATIONS, PIN_COLOR, type LocationKind } from '@/lib/dw-data'
+import { MapPin } from 'lucide-react'
+import { KIND_META, LOCATIONS, type LocationKind } from '@/lib/dw-data'
 import { cn } from '@/lib/utils'
 import { useTracker } from './tracker-context'
 
 const KIND_ORDER: LocationKind[] = ['castle', 'town', 'cave', 'shrine', 'special']
 
-function coord(x: number, y: number) {
-  return `${x},${y}`
-}
+const ORDERED_LOCATIONS = KIND_ORDER.flatMap((kind) => LOCATIONS.filter((l) => l.kind === kind))
 
-function IconButton({
-  label,
-  onClick,
-  children,
-  active,
-}: {
-  label: string
-  onClick: () => void
-  children: React.ReactNode
-  active?: boolean
-}) {
+export function PanelTitle({ children, aside }: { children: React.ReactNode; aside?: React.ReactNode }) {
   return (
-    <button
-      type="button"
-      aria-label={label}
-      title={label}
-      onClick={onClick}
-      className={cn(
-        'rounded-sm border-2 p-1 transition-colors focus-visible:outline-2 focus-visible:outline-primary',
-        active ? 'border-primary bg-primary text-primary-foreground' : 'border-foreground/25 hover:border-foreground',
-      )}
-    >
-      {children}
-    </button>
+    <div className="flex items-baseline justify-between gap-2">
+      <h2 className="font-display text-[9px] uppercase tracking-wider text-primary">{children}</h2>
+      {aside && <span className="text-xs text-muted-foreground">{aside}</span>}
+    </div>
   )
 }
 
 export function LocationsPanel() {
-  const { markers, visited, toggleVisited, selectedLocation, setSelectedLocation, setTool, requestFocus, removeMarker } =
-    useTracker()
+  const { markers, visited, toggleVisited, selectedLocation, setSelectedLocation, setTool, requestFocus } = useTracker()
 
   const markerByLocation = new Map(markers.filter((m) => m.locationId).map((m) => [m.locationId as string, m]))
-  const pins = markers.filter((m) => !m.locationId)
-  const foundCount = markerByLocation.size
+  const pinCount = markers.length - markerByLocation.size
 
   return (
-    <div className="flex flex-col gap-5">
-      <p className="text-sm text-muted-foreground">
-        Found <span className="text-foreground">{foundCount}</span> / {LOCATIONS.length}. Pick a location, then click the
-        map to drop it.
-      </p>
-
-      {KIND_ORDER.map((kind) => (
-        <section key={kind} aria-labelledby={`kind-${kind}`} className="flex flex-col gap-1.5">
-          <h3 id={`kind-${kind}`} className="font-display text-[10px] uppercase tracking-wider" style={{ color: KIND_META[kind].color }}>
-            {KIND_META[kind].label}
-          </h3>
-          <ul className="flex flex-col gap-1">
-            {LOCATIONS.filter((l) => l.kind === kind).map((location) => {
-              const marker = markerByLocation.get(location.id)
-              const isSelected = selectedLocation === location.id
-              const isVisited = !!visited[location.id]
-              return (
-                <li
-                  key={location.id}
-                  className={cn(
-                    'flex items-center gap-2 rounded-sm border-2 px-2 py-1',
-                    isSelected ? 'border-primary' : 'border-transparent',
-                  )}
-                >
-                  <input
-                    type="checkbox"
-                    checked={isVisited}
-                    onChange={() => toggleVisited(location.id)}
-                    aria-label={`Mark ${location.name} as cleared`}
-                    className="size-4 shrink-0 accent-[var(--primary)]"
-                  />
-                  <span
-                    aria-hidden="true"
-                    className="flex h-5 w-7 shrink-0 items-center justify-center rounded-[3px] font-mono text-[11px] font-bold text-black"
-                    style={{ backgroundColor: KIND_META[kind].color }}
-                  >
-                    {location.abbr}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className={cn('truncate text-sm leading-tight', isVisited && 'text-muted-foreground line-through')} title={location.hint}>
-                      {location.name}
-                    </p>
-                    <p className="text-xs leading-tight text-muted-foreground">
-                      {marker ? coord(marker.x, marker.y) : 'Not found'}
-                    </p>
-                  </div>
-                  {marker && (
-                    <IconButton label={`Show ${location.name} on map`} onClick={() => requestFocus(marker.x, marker.y)}>
-                      <Crosshair className="size-3.5" aria-hidden="true" />
-                    </IconButton>
-                  )}
-                  <IconButton
-                    label={isSelected ? 'Cancel placing' : marker ? `Move ${location.name}` : `Place ${location.name}`}
-                    active={isSelected}
-                    onClick={() => {
-                      if (isSelected) {
-                        setSelectedLocation(null)
-                      } else {
-                        setSelectedLocation(location.id)
-                        setTool('marker')
-                      }
-                    }}
-                  >
-                    <MapPin className="size-3.5" aria-hidden="true" />
-                  </IconButton>
-                </li>
-              )
-            })}
-          </ul>
-        </section>
-      ))}
-
-      <section aria-labelledby="pins-heading" className="flex flex-col gap-1.5">
-        <h3 id="pins-heading" className="font-display text-[10px] uppercase tracking-wider" style={{ color: PIN_COLOR }}>
-          Custom Pins
-        </h3>
-        {pins.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            Use the Marker tool with no location selected to drop pins for chests, hints or anything else.
-          </p>
-        ) : (
-          <ul className="flex flex-col gap-1">
-            {pins.map((pin) => (
-              <li key={pin.id} className="flex items-center gap-2 px-2 py-1">
+    <section aria-labelledby="locations-heading" className="flex flex-col gap-1">
+      <h2 id="locations-heading" className="sr-only">
+        Locations
+      </h2>
+      <PanelTitle aside={`${markerByLocation.size}/${LOCATIONS.length} found · ${pinCount} pins`}>Locations</PanelTitle>
+      <ul className="grid grid-cols-2 gap-x-1.5 sm:grid-cols-4">
+        {ORDERED_LOCATIONS.map((location) => {
+          const marker = markerByLocation.get(location.id)
+          const isSelected = selectedLocation === location.id
+          const isVisited = !!visited[location.id]
+          return (
+            <li
+              key={location.id}
+              className={cn(
+                'flex h-5 items-center gap-1 rounded-sm border px-0.5',
+                isSelected ? 'border-primary' : 'border-transparent',
+              )}
+            >
+              <input
+                type="checkbox"
+                checked={isVisited}
+                onChange={() => toggleVisited(location.id)}
+                aria-label={`Mark ${location.name} as cleared`}
+                className="size-3.5 shrink-0 accent-[var(--primary)]"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  if (marker) {
+                    requestFocus(marker.x, marker.y)
+                  } else {
+                    setSelectedLocation(isSelected ? null : location.id)
+                    setTool('marker')
+                  }
+                }}
+                title={marker ? `${location.name} at ${marker.x},${marker.y} — click to show` : `${location.hint} — click to place`}
+                className="flex min-w-0 flex-1 items-center gap-1 text-left focus-visible:outline-2 focus-visible:outline-primary"
+              >
                 <span
                   aria-hidden="true"
-                  className="flex h-5 w-7 shrink-0 items-center justify-center rounded-[3px] font-mono text-[11px] font-bold text-black"
-                  style={{ backgroundColor: PIN_COLOR }}
+                  className={cn(
+                    'flex h-4 w-6 shrink-0 items-center justify-center rounded-[2px] font-mono text-[10px] font-bold text-black',
+                    !marker && 'opacity-40',
+                  )}
+                  style={{ backgroundColor: KIND_META[location.kind].color }}
                 >
-                  !
+                  {location.abbr}
                 </span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm leading-tight">{pin.label}</p>
-                  <p className="text-xs leading-tight text-muted-foreground">{coord(pin.x, pin.y)}</p>
-                </div>
-                <IconButton label={`Show ${pin.label} on map`} onClick={() => requestFocus(pin.x, pin.y)}>
-                  <Crosshair className="size-3.5" aria-hidden="true" />
-                </IconButton>
-                <IconButton label={`Remove ${pin.label}`} onClick={() => removeMarker(pin.id)}>
-                  <Trash2 className="size-3.5" aria-hidden="true" />
-                </IconButton>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-    </div>
+                <span
+                  className={cn(
+                    'truncate text-xs',
+                    isVisited ? 'text-muted-foreground line-through' : marker ? 'text-foreground' : 'text-muted-foreground',
+                  )}
+                >
+                  {location.name}
+                </span>
+              </button>
+              {marker && (
+                <button
+                  type="button"
+                  aria-label={isSelected ? 'Cancel moving' : `Move ${location.name}`}
+                  title={isSelected ? 'Cancel moving' : 'Move marker'}
+                  onClick={() => {
+                    setSelectedLocation(isSelected ? null : location.id)
+                    setTool('marker')
+                  }}
+                  className={cn(
+                    'shrink-0 rounded-sm p-0.5 transition-colors focus-visible:outline-2 focus-visible:outline-primary',
+                    isSelected ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground',
+                  )}
+                >
+                  <MapPin className="size-3" aria-hidden="true" />
+                </button>
+              )}
+            </li>
+          )
+        })}
+      </ul>
+    </section>
   )
 }

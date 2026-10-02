@@ -2,7 +2,10 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { KIND_META, LOCATION_BY_ID, MAP_SIZE, PIN_COLOR, TERRAIN_RGB, TERRAINS } from '@/lib/dw-data'
+import { FIT_MAP_EVENT } from './map-toolbar'
 import { MAX_ZOOM, MIN_ZOOM, useTracker, type Marker } from './tracker-context'
+
+const MAP_PADDING = 6
 
 interface Point {
   x: number
@@ -239,6 +242,18 @@ export function MapCanvas() {
   }, [])
 
   useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+    const fit = () => {
+      const available = Math.min(container.clientWidth, container.clientHeight) - MAP_PADDING * 2
+      setZoom(Math.max(MIN_ZOOM, Math.floor(available / MAP_SIZE)))
+    }
+    fit()
+    window.addEventListener(FIT_MAP_EVENT, fit)
+    return () => window.removeEventListener(FIT_MAP_EVENT, fit)
+  }, [setZoom])
+
+  useEffect(() => {
     if (!focusRequest) return
     const container = containerRef.current
     if (!container) return
@@ -342,10 +357,10 @@ export function MapCanvas() {
     <section aria-label="Overworld map" className="dw-window flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
       <div
         ref={containerRef}
-        className="min-h-[55vh] flex-1 overflow-auto bg-[#050508] lg:min-h-0"
+        className="min-h-0 flex-1 overflow-auto bg-[#050508]"
         style={{ overscrollBehavior: 'contain' }}
       >
-        <div className="p-6" style={{ width: canvasPx + 48 }}>
+        <div className="mx-auto w-fit" style={{ padding: MAP_PADDING }}>
           <canvas
             ref={canvasRef}
             role="img"
@@ -363,7 +378,7 @@ export function MapCanvas() {
           />
         </div>
       </div>
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t-2 border-foreground/80 px-3 py-2 text-sm">
+      <div className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-0.5 border-t-2 border-foreground/80 px-2 py-1 text-xs">
         <span className="font-display text-[10px] text-primary" aria-live="polite">
           {hover ? `X ${String(hover.x).padStart(3, '0')}  Y ${String(hover.y).padStart(3, '0')}` : 'X ---  Y ---'}
         </span>
