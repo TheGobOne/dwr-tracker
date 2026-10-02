@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { CAVE_MAPS, CaveMapViewer } from './cave-map-viewer'
 import { KIND_META, LOCATION_BY_ID, MAP_SIZE, PIN_COLOR, TERRAIN_RGB } from '@/lib/dw-data'
 import { useTracker, type Marker } from './tracker-context'
 
@@ -208,6 +209,9 @@ export function MapCanvas() {
     return () => window.clearTimeout(t)
   }, [focusRequest])
 
+  const [caveMapId, setCaveMapId] = useState<string | null>(null)
+  const closeCaveMap = useCallback(() => setCaveMapId(null), [])
+
   function pointerToTile(e: React.PointerEvent | React.MouseEvent): Point {
     const rect = (e.currentTarget as HTMLCanvasElement).getBoundingClientRect()
     return {
@@ -231,6 +235,12 @@ export function MapCanvas() {
   }
 
   function handlePointerDown(e: React.PointerEvent<HTMLCanvasElement>) {
+    if (e.button === 1) {
+      e.preventDefault()
+      const hit = markerAtPointer(e)
+      if (hit?.locationId && CAVE_MAPS[hit.locationId]) setCaveMapId(hit.locationId)
+      return
+    }
     if (e.button !== 0) return
     if (!selectedLocation) {
       const hit = markerAtPointer(e)
@@ -270,8 +280,10 @@ export function MapCanvas() {
           onPointerMove={handlePointerMove}
           onPointerLeave={() => setHover(null)}
           onContextMenu={handleContextMenu}
+          onAuxClick={(e) => e.preventDefault()}
         />
       </div>
+      <CaveMapViewer locationId={caveMapId} onClose={closeCaveMap} />
     </section>
   )
 }
