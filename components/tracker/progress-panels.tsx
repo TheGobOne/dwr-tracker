@@ -21,7 +21,7 @@ export function ItemsPanel() {
       </h2>
       <PanelTitle>Items</PanelTitle>
       <div className="flex items-center justify-center gap-2">
-      <div className="flex min-w-0 flex-wrap justify-center gap-1">
+      <div className="flex min-w-0 flex-wrap justify-center gap-0.5">
         {all.map((item) => {
           const has = !!items[item.id]
           return (
@@ -30,7 +30,7 @@ export function ItemsPanel() {
               type="button"
               aria-pressed={has}
               onClick={() => toggleItem(item.id)}
-              className={cn(toggleBase, has ? toggleOn : toggleOff)}
+              className={cn(toggleBase, 'px-1', has ? toggleOn : toggleOff)}
             >
               {item.name}
             </button>
