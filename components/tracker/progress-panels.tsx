@@ -73,16 +73,16 @@ export function SpellsPanel() {
 export function NotesPanel() {
   const { notes, setNotes } = useTracker()
   return (
-    <section className="flex flex-col gap-1">
-      <label htmlFor="run-notes">
-        <PanelTitle>Notes</PanelTitle>
-      </label>
-      <textarea
-        id="run-notes"
-        value={notes}
-        onChange={(e) => setNotes(e.target.value)}
-        rows={4}
-        className="resize-none rounded-sm border border-foreground/25 bg-transparent px-1.5 py-1 text-xs text-foreground focus-visible:border-primary focus-visible:outline-none"
+  <section className="flex shrink-0 flex-col gap-1">
+  <label htmlFor="run-notes">
+  <PanelTitle>Notes</PanelTitle>
+  </label>
+  <textarea
+  id="run-notes"
+  value={notes}
+  onChange={(e) => setNotes(e.target.value)}
+  rows={2}
+  className="h-[3.25rem] shrink-0 resize-none overflow-y-auto rounded-sm border border-foreground/25 bg-transparent px-1.5 py-1 text-xs leading-5 text-foreground [scrollbar-width:none] focus-visible:border-primary focus-visible:outline-none [&::-webkit-scrollbar]:hidden"
       />
     </section>
   )
