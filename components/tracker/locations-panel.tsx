@@ -77,7 +77,7 @@ export function PanelTitle({ children, aside }: { children: React.ReactNode; asi
 }
 
 export function LocationsPanel() {
-  const { markers, visited, toggleVisited, selectedLocation, setSelectedLocation, setTool, requestFocus } = useTracker()
+  const { markers, visited, selectedLocation, setSelectedLocation, setTool, requestFocus } = useTracker()
 
   const markerByLocation = new Map(markers.filter((m) => m.locationId).map((m) => [m.locationId as string, m]))
 
@@ -108,13 +108,6 @@ export function LocationsPanel() {
                 isSelected ? 'border-primary' : 'border-transparent',
               )}
             >
-              <input
-                type="checkbox"
-                checked={isVisited}
-                onChange={() => toggleVisited(location.id)}
-                aria-label={`Mark ${location.name} as cleared`}
-                className="size-3.5 shrink-0 accent-[var(--primary)]"
-              />
               <button
                 type="button"
                 onClick={() => {
