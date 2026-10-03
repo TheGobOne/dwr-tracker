@@ -12,10 +12,12 @@ export function TrackerShortcuts() {
   })
 
   useEffect(() => {
-    // Keyboard is intentionally disabled for the whole tracker (no Tab focus, Enter/Space activation, or shortcuts).
-    // Ctrl/Meta combos are left alone so browser-level shortcuts still work.
+    // Keyboard is intentionally disabled for the whole tracker except typing in the coords text boxes.
+    // Tab stays blocked there too so focus can't wander. Ctrl/Meta combos are left alone for browser shortcuts.
     const blockKey = (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey) return
+      const inCoordsField = e.target instanceof HTMLElement && e.target.matches('[data-coords-field]')
+      if (inCoordsField && e.key !== 'Tab') return
       e.preventDefault()
       e.stopImmediatePropagation()
     }

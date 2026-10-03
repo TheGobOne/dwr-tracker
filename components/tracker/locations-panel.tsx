@@ -31,6 +31,7 @@ export function CoordsInput({ locationId, name }: { locationId: string; name: st
         value={value.first}
         onChange={(e) => updateCoords(locationId, { first: e.target.value })}
         aria-label="First coordinate"
+        data-coords-field
         className={cn(fieldClass, 'w-7 px-0.5 text-center')}
       />
       <select
@@ -53,6 +54,7 @@ export function CoordsInput({ locationId, name }: { locationId: string; name: st
         value={value.second}
         onChange={(e) => updateCoords(locationId, { second: e.target.value })}
         aria-label="Second coordinate"
+        data-coords-field
         className={cn(fieldClass, 'ml-1 w-7 px-0.5 text-center')}
       />
       <select
