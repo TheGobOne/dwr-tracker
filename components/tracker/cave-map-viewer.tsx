@@ -16,14 +16,8 @@ export function CaveMapViewer({ locationId, onClose }: { locationId: string | nu
   const map = locationId ? CAVE_MAPS[locationId] : null
 
   useEffect(() => {
-    if (!map) return
-    closeRef.current?.focus()
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [map, onClose])
+    if (map) closeRef.current?.focus({ preventScroll: true })
+  }, [map])
 
   if (!map) return null
 

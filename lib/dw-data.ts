@@ -79,7 +79,7 @@ export const ITEM_GROUPS: { label: string; items: ItemDef[] }[] = [
       { id: 'stones-of-sunlight', name: 'Stones' },
   { id: 'erdricks-token', name: 'Token' },
   { id: 'death-necklace', name: 'Neck' },
-  { id: 'fighters-ring', name: 'Ring' },
+  { id: 'fairy-flute', name: 'Flute' },
   ],
   },
   {
