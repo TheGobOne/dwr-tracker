@@ -1,7 +1,14 @@
 'use client'
 
+import { Settings } from 'lucide-react'
 import { ITEM_GROUPS, SPELLS } from '@/lib/dw-data'
 import { cn } from '@/lib/utils'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { COORDS_LOCATION_ID, CoordsInput, PanelTitle } from './locations-panel'
 import { useTracker } from './tracker-context'
 
@@ -45,14 +52,27 @@ export function ItemsPanel() {
 }
 
 export function SpellsPanel() {
-  const { spells, updateSpell } = useTracker()
+  const { spells, updateSpell, clearSpells } = useTracker()
 
   return (
     <section aria-labelledby="spells-heading" className="flex flex-col gap-1">
-      <h2 id="spells-heading" className="sr-only">
-        Spells
-      </h2>
-      <PanelTitle>Spells</PanelTitle>
+      <div className="flex items-center justify-between gap-1">
+        <h2 id="spells-heading" className="sr-only">
+          Spells
+        </h2>
+        <PanelTitle>Spells</PanelTitle>
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            aria-label="Spells menu"
+            className="rounded-sm border border-foreground/25 p-0.5 text-muted-foreground transition-colors hover:border-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-primary"
+          >
+            <Settings className="size-3" aria-hidden="true" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={clearSpells}>Clear</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
       <ul className="grid grid-cols-2 gap-1 sm:grid-cols-5">
         {SPELLS.map((name) => {
           const state = spells[name] ?? { learned: false, level: '' }
@@ -62,7 +82,11 @@ export function SpellsPanel() {
                 type="button"
                 aria-pressed={state.learned}
                 onClick={() => updateSpell(name, { learned: !state.learned })}
-                className={cn(toggleBase, 'min-w-0 flex-1 truncate text-center', state.learned ? toggleOn : toggleOff)}
+                className={cn(
+                  toggleBase,
+                  'min-w-0 flex-1 truncate px-1 py-0.5 text-center text-[7px]',
+                  state.learned ? toggleOn : toggleOff,
+                )}
               >
                 {name}
               </button>

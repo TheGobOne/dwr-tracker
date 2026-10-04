@@ -168,6 +168,7 @@ interface TrackerContextValue {
   toggleItem: (id: string) => void
   toggleVisited: (id: string) => void
   updateSpell: (name: string, patch: Partial<SpellState>) => void
+  clearSpells: () => void
   updateCoords: (locationId: string, patch: Partial<ManualCoords>) => void
 
   beginStroke: () => void
@@ -294,6 +295,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
   const updateSpell = useCallback((name: string, patch: Partial<SpellState>) => {
     setSpells((prev) => ({ ...prev, [name]: { ...(prev[name] ?? { learned: false, level: '' }), ...patch } }))
   }, [])
+  const clearSpells = useCallback(() => setSpells({}), [])
   const updateCoords = useCallback((locationId: string, patch: Partial<ManualCoords>) => {
     setCoords((prev) => ({ ...prev, [locationId]: { ...(prev[locationId] ?? EMPTY_COORDS), ...patch } }))
   }, [])
@@ -397,6 +399,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       toggleItem,
       toggleVisited,
       updateSpell,
+      clearSpells,
       updateCoords,
       beginStroke,
       paintLine,
@@ -432,6 +435,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       toggleItem,
       toggleVisited,
       updateSpell,
+      clearSpells,
       updateCoords,
       beginStroke,
       paintLine,
