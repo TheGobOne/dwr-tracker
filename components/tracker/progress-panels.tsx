@@ -63,7 +63,7 @@ export function SpellsPanel() {
                   onClick={() => updateSpell(name, { learned: !state.learned })}
                   className={cn(
                     toggleBase,
-                    'block min-w-0 flex-1 truncate px-1 text-center text-[6px] leading-[14px]',
+                    'block min-w-0 flex-1 truncate px-1 text-center text-[8px] leading-[14px]',
                     state.learned ? toggleOn : toggleOff,
                   )}
                 >
