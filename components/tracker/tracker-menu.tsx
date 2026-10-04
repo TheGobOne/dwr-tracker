@@ -21,7 +21,7 @@ export function TrackerMenu() {
         <Settings className="size-6" aria-hidden="true" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={reset} className="font-display text-[9px] uppercase tracking-wider">
+        <DropdownMenuItem onClick={reset} className="font-display text-[9px] uppercase tracking-wider text-destructive focus:text-destructive">
           Clear
         </DropdownMenuItem>
       </DropdownMenuContent>
