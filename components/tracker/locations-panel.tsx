@@ -104,8 +104,8 @@ export function LocationsPanel() {
         Locations
       </h2>
       <PanelTitle>Locations</PanelTitle>
-      <div className="flex items-start gap-1.5">
-      <ul className="grid min-w-0 flex-1 grid-cols-2 gap-x-1 sm:grid-cols-4">
+      <div className="flex items-start">
+      <ul className="grid min-w-0 flex-1 grid-cols-2 gap-x-1 sm:grid-cols-[repeat(4,auto)] sm:justify-between">
         {ORDERED_LOCATIONS.flatMap((location) => {
           const marker = markerByLocation.get(location.id)
           const isSelected = selectedLocation === location.id
@@ -169,8 +169,7 @@ export function LocationsPanel() {
           ]
         })}
       </ul>
-      <div aria-hidden="true" className="w-px self-stretch" />
-      <div className="flex w-15 shrink-0 flex-col items-center">
+      <div className="flex w-18 shrink-0 flex-col items-center">
         <div className="flex h-10 items-center justify-center">
           <ExperienceWizard />
         </div>
