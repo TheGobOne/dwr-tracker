@@ -56,44 +56,44 @@ export function SpellsPanel() {
 
   return (
     <section aria-labelledby="spells-heading" className="flex flex-col gap-1">
-      <div className="flex items-center justify-between gap-1">
-        <h2 id="spells-heading" className="sr-only">
-          Spells
-        </h2>
-        <PanelTitle>Spells</PanelTitle>
+      <h2 id="spells-heading" className="sr-only">
+        Spells
+      </h2>
+      <PanelTitle>Spells</PanelTitle>
+      <div className="flex items-center gap-1.5">
+        <ul className="grid flex-1 grid-cols-2 gap-1 sm:grid-cols-5">
+          {SPELLS.map((name) => {
+            const state = spells[name] ?? { learned: false, level: '' }
+            return (
+              <li key={name} className="flex">
+                <button
+                  type="button"
+                  aria-pressed={state.learned}
+                  onClick={() => updateSpell(name, { learned: !state.learned })}
+                  className={cn(
+                    toggleBase,
+                    'min-w-0 flex-1 truncate px-1 py-0.5 text-center text-[6px]',
+                    state.learned ? toggleOn : toggleOff,
+                  )}
+                >
+                  {name}
+                </button>
+              </li>
+            )
+          })}
+        </ul>
         <DropdownMenu>
           <DropdownMenuTrigger
             aria-label="Spells menu"
-            className="rounded-sm border border-foreground/25 p-0.5 text-muted-foreground transition-colors hover:border-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-primary"
+            className="shrink-0 rounded-sm p-0.5 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-primary"
           >
-            <Settings className="size-3" aria-hidden="true" />
+            <Settings className="size-6" aria-hidden="true" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={clearSpells}>Clear</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <ul className="grid grid-cols-2 gap-1 sm:grid-cols-5">
-        {SPELLS.map((name) => {
-          const state = spells[name] ?? { learned: false, level: '' }
-          return (
-            <li key={name} className="flex">
-              <button
-                type="button"
-                aria-pressed={state.learned}
-                onClick={() => updateSpell(name, { learned: !state.learned })}
-                className={cn(
-                  toggleBase,
-                  'min-w-0 flex-1 truncate px-1 py-0.5 text-center text-[7px]',
-                  state.learned ? toggleOn : toggleOff,
-                )}
-              >
-                {name}
-              </button>
-            </li>
-          )
-        })}
-      </ul>
     </section>
   )
 }
