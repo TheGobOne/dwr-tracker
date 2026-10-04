@@ -170,7 +170,7 @@ export function LocationsPanel() {
         })}
       </ul>
       <div aria-hidden="true" className="w-px self-stretch" />
-      <div className="flex w-15 shrink-0 flex-col items-center sm:mr-9">
+      <div className="flex w-15 shrink-0 flex-col items-center">
         <div className="flex h-10 items-center justify-center">
           <ExperienceWizard />
         </div>
