@@ -35,11 +35,11 @@ export function CoordsInput({
   <fieldset
     className={cn(
       'flex shrink-0',
-      horizontal ? 'flex-row items-center gap-1.5' : 'flex-col items-start gap-0.5',
+      horizontal ? 'w-full min-w-0 flex-row items-center gap-2' : 'flex-col items-start gap-0.5',
     )}
   >
       <legend className="sr-only">{`${name} coordinates`}</legend>
-      <div className="flex items-center gap-0.5">
+      <div className={cn('flex items-center gap-0.5', horizontal && 'min-w-0 flex-1')}>
       <input
         type="text"
         inputMode="numeric"
@@ -48,7 +48,7 @@ export function CoordsInput({
         onChange={(e) => updateCoords(locationId, { first: e.target.value })}
         aria-label="First coordinate"
         data-coords-field
-        className={cn(fieldClass, 'w-7 px-0.5 text-center')}
+        className={cn(fieldClass, 'px-0.5 text-center', horizontal ? 'w-0 min-w-0 flex-1' : 'w-7')}
       />
       <select
         value={value.firstDir}
@@ -64,7 +64,7 @@ export function CoordsInput({
         ))}
       </select>
       </div>
-      <div className="flex items-center gap-0.5">
+      <div className={cn('flex items-center gap-0.5', horizontal && 'min-w-0 flex-1')}>
       <input
         type="text"
         inputMode="numeric"
@@ -73,7 +73,7 @@ export function CoordsInput({
         onChange={(e) => updateCoords(locationId, { second: e.target.value })}
         aria-label="Second coordinate"
         data-coords-field
-        className={cn(fieldClass, 'w-7 px-0.5 text-center')}
+        className={cn(fieldClass, 'px-0.5 text-center', horizontal ? 'w-0 min-w-0 flex-1' : 'w-7')}
       />
       <select
         value={value.secondDir}

@@ -41,7 +41,7 @@ export function ItemsPanel() {
                 )
               })}
               {group.label === "Erdrick's Gear" && (
-                <li className="col-span-2 flex items-center">
+                <li className="col-span-2 flex min-w-0 items-center">
                   <CoordsInput locationId={COORDS_LOCATION_ID} name="Jerk" horizontal />
                 </li>
               )}
