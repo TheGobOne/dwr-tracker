@@ -109,18 +109,18 @@ function ExperienceWindow({ onClose }: { onClose: () => void }) {
             <thead className="sticky top-0 bg-background">
               <tr className="border-b border-border text-muted-foreground">
                 <th scope="col" className="py-1.5 pr-2 text-left font-normal">Level</th>
-                <th scope="col" className="py-1.5 pl-2 text-right font-normal">V. Fast</th>
-                <th scope="col" className="py-1.5 pl-2 text-right font-normal">Fast</th>
-                <th scope="col" className="py-1.5 pl-2 text-right font-normal">Normal</th>
+                <th scope="col" className="py-1.5 px-1 text-center font-normal">V. Fast</th>
+                <th scope="col" className="py-1.5 px-1 text-center font-normal">Fast</th>
+                <th scope="col" className="py-1.5 px-1 text-center font-normal">Normal</th>
               </tr>
             </thead>
             <tbody>
               {EXP_LEVELS.map((row) => (
                 <tr key={row.level} className="border-b border-border/40 last:border-b-0">
                   <th scope="row" className="py-1 pr-2 text-left font-normal text-foreground">{row.level}</th>
-                  <td className="py-1 pl-2 text-right tabular-nums text-white">{row.veryFast}</td>
-                  <td className="py-1 pl-2 text-right tabular-nums text-foreground">{row.fast}</td>
-                  <td className="py-1 pl-2 text-right tabular-nums text-foreground">{row.normal}</td>
+                  <td className="py-1 px-1 text-center tabular-nums text-white">{row.veryFast}</td>
+                  <td className="py-1 px-1 text-center tabular-nums text-foreground">{row.fast}</td>
+                  <td className="py-1 px-1 text-center tabular-nums text-foreground">{row.normal}</td>
                 </tr>
               ))}
             </tbody>
