@@ -4,6 +4,7 @@ import { MapPin } from 'lucide-react'
 import { KIND_META, LOCATIONS, type LocationKind } from '@/lib/dw-data'
 import { cn } from '@/lib/utils'
 import { ExperienceWizard } from './experience-table'
+import { TrackerMenu } from './tracker-menu'
 import {
   EMPTY_COORDS,
   EW_DIRECTIONS,
@@ -23,8 +24,9 @@ export function CoordsInput({ locationId, name }: { locationId: string; name: st
   const value = coords[locationId] ?? EMPTY_COORDS
 
   return (
-    <fieldset className="flex shrink-0 items-center gap-0.5">
+    <fieldset className="flex shrink-0 flex-col items-start gap-0.5">
       <legend className="sr-only">{`${name} coordinates`}</legend>
+      <div className="flex items-center gap-0.5">
       <input
         type="text"
         inputMode="numeric"
@@ -48,6 +50,8 @@ export function CoordsInput({ locationId, name }: { locationId: string; name: st
           </option>
         ))}
       </select>
+      </div>
+      <div className="flex items-center gap-0.5">
       <input
         type="text"
         inputMode="numeric"
@@ -56,7 +60,7 @@ export function CoordsInput({ locationId, name }: { locationId: string; name: st
         onChange={(e) => updateCoords(locationId, { second: e.target.value })}
         aria-label="Second coordinate"
         data-coords-field
-        className={cn(fieldClass, 'ml-1 w-7 px-0.5 text-center')}
+        className={cn(fieldClass, 'w-7 px-0.5 text-center')}
       />
       <select
         value={value.secondDir}
@@ -71,6 +75,7 @@ export function CoordsInput({ locationId, name }: { locationId: string; name: st
           </option>
         ))}
       </select>
+      </div>
     </fieldset>
   )
 }
@@ -164,8 +169,9 @@ export function LocationsPanel() {
           ]
         })}
       </ul>
-      <div className="flex h-10 shrink-0 items-center">
+      <div className="flex shrink-0 flex-col items-center gap-1">
         <ExperienceWizard />
+        <TrackerMenu />
       </div>
       </div>
     </section>

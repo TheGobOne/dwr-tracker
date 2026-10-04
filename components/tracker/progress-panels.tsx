@@ -1,14 +1,7 @@
 'use client'
 
-import { Settings } from 'lucide-react'
 import { ITEM_GROUPS, SPELLS } from '@/lib/dw-data'
 import { cn } from '@/lib/utils'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { COORDS_LOCATION_ID, CoordsInput, PanelTitle } from './locations-panel'
 import { useTracker } from './tracker-context'
 
@@ -44,15 +37,13 @@ export function ItemsPanel() {
           )
         })}
       </div>
-        <div aria-hidden="true" className="w-px self-stretch bg-border" />
-        <CoordsInput locationId={COORDS_LOCATION_ID} name="Jerk" />
       </div>
     </section>
   )
 }
 
 export function SpellsPanel() {
-  const { spells, updateSpell, reset } = useTracker()
+  const { spells, updateSpell } = useTracker()
 
   return (
     <section aria-labelledby="spells-heading" className="flex flex-col gap-1">
@@ -82,19 +73,8 @@ export function SpellsPanel() {
             )
           })}
         </ul>
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            aria-label="Spells menu"
-            className="shrink-0 rounded-sm p-0.5 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-primary"
-          >
-            <Settings className="size-6" aria-hidden="true" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={reset} className="font-display text-[9px] uppercase tracking-wider">
-              Clear
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div aria-hidden="true" className="w-px self-stretch bg-border" />
+        <CoordsInput locationId={COORDS_LOCATION_ID} name="Jerk" />
       </div>
     </section>
   )
