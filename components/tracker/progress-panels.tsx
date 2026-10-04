@@ -12,7 +12,6 @@ const toggleOff = 'border-foreground/25 text-muted-foreground hover:border-foreg
 
 export function ItemsPanel() {
   const { items, toggleItem } = useTracker()
-  const all = ITEM_GROUPS.flatMap((g) => g.items)
 
   return (
     <section aria-labelledby="items-heading" className="flex flex-col gap-1">
@@ -20,23 +19,29 @@ export function ItemsPanel() {
         Items
       </h2>
       <PanelTitle>Items</PanelTitle>
-      <div className="flex items-center justify-center gap-2">
-      <div className="flex min-w-0 flex-wrap justify-center gap-0.5">
-        {all.map((item) => {
-          const has = !!items[item.id]
-          return (
-            <button
-              key={item.id}
-              type="button"
-              aria-pressed={has}
-              onClick={() => toggleItem(item.id)}
-              className={cn(toggleBase, 'px-1', has ? toggleOn : toggleOff)}
-            >
-              {item.name}
-            </button>
-          )
-        })}
-      </div>
+      <div className="flex items-stretch gap-1.5">
+        {ITEM_GROUPS.map((group, groupIndex) => (
+          <div key={group.label} className="flex min-w-0 flex-1 items-stretch gap-1.5">
+            {groupIndex > 0 && <div aria-hidden="true" className="w-px self-stretch bg-border" />}
+            <ul aria-label={group.label} className="grid min-w-0 flex-1 grid-cols-2 content-start gap-1">
+              {group.items.map((item) => {
+                const has = !!items[item.id]
+                return (
+                  <li key={item.id} className="flex">
+                    <button
+                      type="button"
+                      aria-pressed={has}
+                      onClick={() => toggleItem(item.id)}
+                      className={cn(toggleBase, 'min-w-0 flex-1 px-1', has ? toggleOn : toggleOff)}
+                    >
+                      <span className="truncate">{item.name}</span>
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        ))}
       </div>
     </section>
   )

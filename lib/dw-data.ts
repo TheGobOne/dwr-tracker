@@ -77,10 +77,17 @@ export const ITEM_GROUPS: { label: string; items: ItemDef[] }[] = [
       { id: 'silver-harp', name: 'Harp' },
       { id: 'staff-of-rain', name: 'Staff' },
       { id: 'stones-of-sunlight', name: 'Stones' },
-  { id: 'erdricks-token', name: 'Token' },
-  { id: 'death-necklace', name: 'Neck' },
-  { id: 'fairy-flute', name: 'Flute' },
-  ],
+      { id: 'erdricks-token', name: 'Token' },
+    ],
+  },
+  {
+    label: 'Accessories',
+    items: [
+      { id: 'death-necklace', name: 'Neck' },
+      { id: 'fairy-flute', name: 'Flute' },
+      { id: 'fighters-ring', name: 'Ring' },
+      { id: 'dragons-scale', name: 'Scale' },
+    ],
   },
   {
     label: "Erdrick's Gear",
@@ -88,6 +95,10 @@ export const ITEM_GROUPS: { label: string; items: ItemDef[] }[] = [
       { id: 'erdricks-sword', name: 'Sword' },
       { id: 'erdricks-armor', name: 'Armor' },
     ],
+  },
+  {
+    label: 'Reserved',
+    items: [],
   },
 ]
 
