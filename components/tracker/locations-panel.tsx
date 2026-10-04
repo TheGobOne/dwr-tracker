@@ -3,6 +3,7 @@
 import { MapPin } from 'lucide-react'
 import { KIND_META, LOCATIONS, type LocationKind } from '@/lib/dw-data'
 import { cn } from '@/lib/utils'
+import { ExperienceWizard } from './experience-table'
 import {
   EMPTY_COORDS,
   EW_DIRECTIONS,
@@ -98,7 +99,8 @@ export function LocationsPanel() {
         Locations
       </h2>
       <PanelTitle>Locations</PanelTitle>
-      <ul className="mx-auto grid w-fit grid-cols-2 gap-x-3 sm:grid-cols-4">
+      <div className="flex items-start justify-center gap-1">
+      <ul className="grid min-w-0 grid-cols-2 gap-x-3 sm:grid-cols-4">
         {ORDERED_LOCATIONS.flatMap((location) => {
           const marker = markerByLocation.get(location.id)
           const isSelected = selectedLocation === location.id
@@ -162,6 +164,10 @@ export function LocationsPanel() {
           ]
         })}
       </ul>
+      <div className="flex h-10 shrink-0 items-center">
+        <ExperienceWizard />
+      </div>
+      </div>
     </section>
   )
 }
