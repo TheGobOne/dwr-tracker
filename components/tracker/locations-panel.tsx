@@ -19,12 +19,25 @@ export const COORDS_LOCATION_ID = 'rainbow-shrine'
 const fieldClass =
   'h-4 rounded-[2px] border border-border bg-input/40 font-mono text-[8px] text-foreground focus-visible:outline-1 focus-visible:outline-primary'
 
-export function CoordsInput({ locationId, name }: { locationId: string; name: string }) {
+export function CoordsInput({
+  locationId,
+  name,
+  horizontal = false,
+}: {
+  locationId: string
+  name: string
+  horizontal?: boolean
+}) {
   const { coords, updateCoords } = useTracker()
   const value = coords[locationId] ?? EMPTY_COORDS
-
+  
   return (
-    <fieldset className="flex shrink-0 flex-col items-start gap-0.5">
+  <fieldset
+    className={cn(
+      'flex shrink-0',
+      horizontal ? 'flex-row items-center gap-1.5' : 'flex-col items-start gap-0.5',
+    )}
+  >
       <legend className="sr-only">{`${name} coordinates`}</legend>
       <div className="flex items-center gap-0.5">
       <input

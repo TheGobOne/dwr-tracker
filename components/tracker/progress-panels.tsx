@@ -40,6 +40,11 @@ export function ItemsPanel() {
                   </li>
                 )
               })}
+              {group.label === "Erdrick's Gear" && (
+                <li className="col-span-2 flex items-center">
+                  <CoordsInput locationId={COORDS_LOCATION_ID} name="Jerk" horizontal />
+                </li>
+              )}
               {groupIndex === ITEM_GROUPS.length - 1 && (
               <li className="col-span-2 row-span-2 flex">
                 <MonsterLookupButton className={cn(toggleBase, toggleOff, 'h-full min-w-0 flex-1 px-1')} />
@@ -84,8 +89,6 @@ export function SpellsPanel() {
             )
           })}
         </ul>
-        <div aria-hidden="true" className="w-px self-stretch bg-border" />
-        <CoordsInput locationId={COORDS_LOCATION_ID} name="Jerk" />
       </div>
     </section>
   )
