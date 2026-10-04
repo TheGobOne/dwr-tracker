@@ -52,7 +52,7 @@ export function ItemsPanel() {
 }
 
 export function SpellsPanel() {
-  const { spells, updateSpell, clearSpells } = useTracker()
+  const { spells, updateSpell, reset } = useTracker()
 
   return (
     <section aria-labelledby="spells-heading" className="flex flex-col gap-1">
@@ -90,7 +90,9 @@ export function SpellsPanel() {
             <Settings className="size-6" aria-hidden="true" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={clearSpells}>Clear</DropdownMenuItem>
+            <DropdownMenuItem onClick={reset} className="font-display text-[9px] uppercase tracking-wider">
+              Clear
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
