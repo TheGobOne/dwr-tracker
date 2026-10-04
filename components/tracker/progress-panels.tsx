@@ -82,7 +82,9 @@ export function NotesPanel() {
   <span className="sr-only">Notes</span>
   <PanelTitle>Notes</PanelTitle>
   </label>
-  <textarea
+        <textarea
+          data-notes-field
+
   id="run-notes"
   value={notes}
   onChange={(e) => setNotes(e.target.value)}
