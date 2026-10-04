@@ -85,12 +85,12 @@ function ExperienceWindow({ onClose }: { onClose: () => void }) {
       role="dialog"
       aria-modal="true"
       aria-labelledby="exp-table-title"
-      className="absolute inset-0 z-50 flex items-center justify-center bg-black/85 p-1.5"
+      className="absolute inset-0 z-50"
       onPointerDown={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className="dw-window flex max-h-full w-full flex-col gap-2 p-3">
+      <div className="dw-window absolute top-1/2 right-1.5 bottom-1.5 left-1/2 flex flex-col gap-2 p-2.5">
         <div className="flex items-center justify-between gap-4">
           <h2 id="exp-table-title" className="font-display text-[10px] text-primary">
             Experience Levels
