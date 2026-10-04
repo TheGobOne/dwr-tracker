@@ -109,7 +109,7 @@ function ExperienceWindow({ onClose }: { onClose: () => void }) {
             <thead className="sticky top-0 bg-background">
               <tr className="border-b border-border text-muted-foreground">
                 <th scope="col" className="py-1.5 pr-2 text-left font-normal">Level</th>
-                <th scope="col" className="py-1.5 pl-2 text-right font-normal text-primary">V. Fast</th>
+                <th scope="col" className="py-1.5 pl-2 text-right font-normal">V. Fast</th>
                 <th scope="col" className="py-1.5 pl-2 text-right font-normal">Fast</th>
                 <th scope="col" className="py-1.5 pl-2 text-right font-normal">Normal</th>
               </tr>
