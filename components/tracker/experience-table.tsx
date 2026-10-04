@@ -118,7 +118,7 @@ function ExperienceWindow({ onClose }: { onClose: () => void }) {
               {EXP_LEVELS.map((row) => (
                 <tr key={row.level} className="border-b border-border/40 last:border-b-0">
                   <th scope="row" className="py-1 pr-2 text-left font-normal text-foreground">{row.level}</th>
-                  <td className="py-1 pl-2 text-right tabular-nums text-primary">{row.veryFast}</td>
+                  <td className="py-1 pl-2 text-right tabular-nums text-white">{row.veryFast}</td>
                   <td className="py-1 pl-2 text-right tabular-nums text-foreground">{row.fast}</td>
                   <td className="py-1 pl-2 text-right tabular-nums text-foreground">{row.normal}</td>
                 </tr>
