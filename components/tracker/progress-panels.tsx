@@ -3,6 +3,7 @@
 import { ITEM_GROUPS, SPELLS } from '@/lib/dw-data'
 import { cn } from '@/lib/utils'
 import { COORDS_LOCATION_ID, CoordsInput, PanelTitle } from './locations-panel'
+import { MonsterLookupButton } from './monster-lookup'
 import { useTracker } from './tracker-context'
 
 const toggleBase =
@@ -39,6 +40,11 @@ export function ItemsPanel() {
                   </li>
                 )
               })}
+              {groupIndex === ITEM_GROUPS.length - 1 && (
+                <li className="col-span-2 flex">
+                  <MonsterLookupButton className={cn(toggleBase, toggleOff, 'min-w-0 flex-1 px-1')} />
+                </li>
+              )}
             </ul>
           </div>
         ))}
