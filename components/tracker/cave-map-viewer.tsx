@@ -9,6 +9,7 @@ export const CAVE_MAPS: Record<string, { title: string; src: string }> = {
   'mountain-cave': { title: 'Mountain Cave', src: '/cave-maps/mountain.png?v=3' },
   'swamp-north': { title: 'Swamp Cave', src: '/cave-maps/swamp.png?v=3' },
   'swamp-south': { title: 'Swamp Cave', src: '/cave-maps/swamp.png?v=3' },
+  charlock: { title: 'Charlock Castle', src: '/cave-maps/charlock.png?v=1' },
 }
 
 export function CaveMapViewer({ locationId, onClose }: { locationId: string | null; onClose: () => void }) {
