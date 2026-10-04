@@ -6,7 +6,7 @@ import { COORDS_LOCATION_ID, CoordsInput, PanelTitle } from './locations-panel'
 import { useTracker } from './tracker-context'
 
 const toggleBase =
-  'rounded-sm border px-1.5 py-1 text-[8px] leading-tight transition-colors focus-visible:outline-2 focus-visible:outline-primary'
+  'inline-flex h-4 items-center justify-center rounded-sm border px-1.5 text-[8px] leading-none transition-colors focus-visible:outline-2 focus-visible:outline-primary'
 const toggleOn = 'border-primary bg-primary text-primary-foreground'
 const toggleOff = 'border-foreground/25 text-muted-foreground hover:border-foreground hover:text-foreground'
 
@@ -63,7 +63,7 @@ export function SpellsPanel() {
                   onClick={() => updateSpell(name, { learned: !state.learned })}
                   className={cn(
                     toggleBase,
-                    'min-w-0 flex-1 truncate px-1 py-0.5 text-center text-[6px]',
+                    'block min-w-0 flex-1 truncate px-1 text-center text-[6px] leading-[14px]',
                     state.learned ? toggleOn : toggleOff,
                   )}
                 >
