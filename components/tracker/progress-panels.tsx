@@ -24,7 +24,7 @@ export function ItemsPanel() {
         {ITEM_GROUPS.map((group, groupIndex) => (
           <div key={group.label} className="flex min-w-0 flex-1 items-stretch gap-1.5">
             {groupIndex > 0 && <div aria-hidden="true" className="w-px self-stretch bg-border" />}
-            <ul aria-label={group.label} className="grid min-w-0 flex-1 grid-cols-2 content-start gap-1">
+            <ul aria-label={group.label} className="grid min-w-0 flex-1 grid-cols-2 grid-rows-[repeat(2,1rem)] content-start gap-1">
               {group.items.map((item) => {
                 const has = !!items[item.id]
                 return (
@@ -41,8 +41,8 @@ export function ItemsPanel() {
                 )
               })}
               {groupIndex === ITEM_GROUPS.length - 1 && (
-                <li className="col-span-2 flex">
-                  <MonsterLookupButton className={cn(toggleBase, toggleOff, 'min-w-0 flex-1 px-1')} />
+              <li className="col-span-2 row-span-2 flex">
+                <MonsterLookupButton className={cn(toggleBase, toggleOff, 'h-full min-w-0 flex-1 px-1')} />
                 </li>
               )}
             </ul>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { MONSTERS, MONSTER_STAT_DEFINITIONS } from '@/lib/monster-data'
 import { cn } from '@/lib/utils'
@@ -17,15 +17,11 @@ function statDefinition(label: string) {
 }
 
 function MonsterWindow({ onClose }: { onClose: () => void }) {
-  const [query, setQuery] = useState('')
-  const [selectedName, setSelectedName] = useState<string | null>(null)
-  const [activeIndex, setActiveIndex] = useState(0)
-  const [listOpen, setListOpen] = useState(true)
-  const inputRef = useRef<HTMLInputElement>(null)
-  const listId = useId()
+  const [selectedName, setSelectedName] = useState('')
+  const selectRef = useRef<HTMLSelectElement>(null)
 
   useEffect(() => {
-    inputRef.current?.focus({ preventScroll: true })
+    selectRef.current?.focus({ preventScroll: true })
   }, [])
 
   useEffect(() => {
@@ -36,23 +32,10 @@ function MonsterWindow({ onClose }: { onClose: () => void }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
 
-  const matches = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    return q ? MONSTERS.filter((m) => m.name.toLowerCase().includes(q)) : MONSTERS
-  }, [query])
-
   const selected = MONSTERS.find((m) => m.name === selectedName) ?? null
-
-  const choose = (name: string) => {
-    setSelectedName(name)
-    setQuery(name)
-    setListOpen(false)
-  }
 
   const trackerRoot = document.querySelector('[data-tracker-root]')
   if (!trackerRoot) return null
-
-  const showList = listOpen && matches.length > 0
 
   return createPortal(
     <div
@@ -79,73 +62,34 @@ function MonsterWindow({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className="relative">
-          <label htmlFor="monster-search" className="sr-only">
-            Search monsters
+          <label htmlFor="monster-select" className="sr-only">
+            Choose a monster
           </label>
-          <input
-            ref={inputRef}
-            id="monster-search"
-            type="text"
-            role="combobox"
-            aria-expanded={showList}
-            aria-controls={listId}
-            aria-autocomplete="list"
-            aria-activedescendant={showList ? `${listId}-${activeIndex}` : undefined}
-            autoComplete="off"
-            spellCheck={false}
-            placeholder="Search monster"
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value)
-              setActiveIndex(0)
-              setListOpen(true)
-            }}
-            onFocus={() => setListOpen(true)}
-            onKeyDown={(e) => {
-              if (e.key === 'ArrowDown') {
-                e.preventDefault()
-                setListOpen(true)
-                setActiveIndex((i) => Math.min(i + 1, matches.length - 1))
-              } else if (e.key === 'ArrowUp') {
-                e.preventDefault()
-                setActiveIndex((i) => Math.max(i - 1, 0))
-              } else if (e.key === 'Enter') {
-                if (e.nativeEvent.isComposing || e.keyCode === 229) return
-                const pick = matches[activeIndex]
-                if (pick) {
-                  e.preventDefault()
-                  choose(pick.name)
-                }
-              }
-            }}
-            className="h-6 w-full rounded-sm border border-foreground/25 bg-background px-1.5 font-display text-[9px] uppercase text-foreground placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:outline-none"
-          />
-          {showList && (
-            <ul
-              id={listId}
-              role="listbox"
-              aria-label="Monsters"
-              className="absolute inset-x-0 top-full z-10 mt-0.5 max-h-40 overflow-y-auto rounded-sm border border-foreground/40 bg-background py-0.5"
-            >
-              {matches.map((m, i) => (
-                <li
-                  key={m.name}
-                  id={`${listId}-${i}`}
-                  role="option"
-                  aria-selected={i === activeIndex}
-                  onPointerDown={(e) => e.preventDefault()}
-                  onClick={() => choose(m.name)}
-                  onPointerEnter={() => setActiveIndex(i)}
-                  className={cn(
-                    'cursor-pointer px-1.5 py-1 font-display text-[9px] uppercase leading-none',
-                    i === activeIndex ? 'bg-primary text-primary-foreground' : 'text-foreground',
-                  )}
-                >
-                  {m.name}
-                </li>
-              ))}
-            </ul>
-          )}
+          <select
+            ref={selectRef}
+            id="monster-select"
+            value={selectedName}
+            onChange={(e) => setSelectedName(e.target.value)}
+            className={cn(
+              'h-6 w-full appearance-none rounded-sm border border-foreground/25 bg-background pr-5 pl-1.5 font-display text-[9px] uppercase focus-visible:border-primary focus-visible:outline-none',
+              selectedName ? 'text-foreground' : 'text-muted-foreground/60',
+            )}
+          >
+            <option value="" disabled>
+              Select monster
+            </option>
+            {MONSTERS.map((m) => (
+              <option key={m.name} value={m.name} className="text-foreground">
+                {m.name}
+              </option>
+            ))}
+          </select>
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute top-1/2 right-1.5 -translate-y-1/2 font-display text-[7px] text-foreground"
+          >
+            {'▼'}
+          </span>
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto">
@@ -191,7 +135,7 @@ export function MonsterLookupButton({ className }: { className?: string }) {
         onClick={() => setOpen(true)}
         className={className}
       >
-        <span className="truncate">Monster</span>
+        <span className="truncate">Monsters</span>
       </button>
       {open && <MonsterWindow onClose={() => setOpen(false)} />}
     </>
