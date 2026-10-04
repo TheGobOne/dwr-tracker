@@ -94,7 +94,7 @@ export function NotesPanel() {
   id="run-notes"
   value={notes}
   onChange={(e) => setNotes(e.target.value)}
-  placeholder="Shop inventories, townsfolk hints…"
+  placeholder="Notes"
   rows={2}
   className="h-[3.25rem] shrink-0 resize-none overflow-y-auto rounded-sm border border-foreground/25 bg-transparent px-1.5 py-1 text-[9px] leading-5 text-foreground placeholder:text-foreground/35 [scrollbar-width:none] focus-visible:border-primary focus-visible:outline-none [&::-webkit-scrollbar]:hidden"
       />
