@@ -63,11 +63,11 @@ export function SpellsPanel() {
                   onClick={() => updateSpell(name, { learned: !state.learned })}
                   className={cn(
                     toggleBase,
-                    'block min-w-0 flex-1 truncate px-1 text-center text-[8px] leading-[14px]',
+                    'min-w-0 flex-1 px-1',
                     state.learned ? toggleOn : toggleOff,
                   )}
                 >
-                  {name}
+                  <span className="truncate">{name}</span>
                 </button>
               </li>
             )
@@ -94,8 +94,9 @@ export function NotesPanel() {
   id="run-notes"
   value={notes}
   onChange={(e) => setNotes(e.target.value)}
+  placeholder="Shop inventories, townsfolk hints…"
   rows={2}
-  className="h-[3.25rem] shrink-0 resize-none overflow-y-auto rounded-sm border border-foreground/25 bg-transparent px-1.5 py-1 text-[9px] leading-5 text-foreground [scrollbar-width:none] focus-visible:border-primary focus-visible:outline-none [&::-webkit-scrollbar]:hidden"
+  className="h-[3.25rem] shrink-0 resize-none overflow-y-auto rounded-sm border border-foreground/25 bg-transparent px-1.5 py-1 text-[9px] leading-5 text-foreground placeholder:text-foreground/35 [scrollbar-width:none] focus-visible:border-primary focus-visible:outline-none [&::-webkit-scrollbar]:hidden"
       />
     </section>
   )
