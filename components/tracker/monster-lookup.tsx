@@ -16,6 +16,18 @@ function statDefinition(label: string) {
   return MONSTER_STAT_DEFINITIONS[STAT_DEFINITION_ALIASES[label] ?? label]
 }
 
+const GRIND_POTENTIAL: Record<string, 'S' | 'A' | 'B' | 'C' | 'D' | 'F'> = {}
+
+const PROMOTED_STATS = ['XP', 'Gold']
+
+function orderStats(stats: [string, string][]) {
+  const promoted = PROMOTED_STATS.flatMap((label) => stats.filter(([l]) => l === label))
+  const rest = stats.filter(([l]) => !PROMOTED_STATS.includes(l))
+  const strIndex = rest.findIndex(([l]) => l === 'STR')
+  if (strIndex === -1) return [...promoted, ...rest]
+  return [...rest.slice(0, strIndex), ...promoted, ...rest.slice(strIndex)]
+}
+
 function MonsterWindow({ onClose }: { onClose: () => void }) {
   const [selectedName, setSelectedName] = useState('')
   const selectRef = useRef<HTMLSelectElement>(null)
@@ -96,7 +108,7 @@ function MonsterWindow({ onClose }: { onClose: () => void }) {
           {selected ? (
             <div className="flex flex-col gap-2">
               <dl className="flex flex-col font-display text-[8px] leading-none">
-                {selected.stats.map(([label, value]) => (
+                {orderStats(selected.stats).map(([label, value]) => (
                   <div
                     key={label}
                     title={statDefinition(label)}
@@ -111,6 +123,14 @@ function MonsterWindow({ onClose }: { onClose: () => void }) {
                 <div className="flex flex-col gap-1">
                   <h3 className="font-display text-[9px] text-primary">Notes</h3>
                   <p className="text-[9px] leading-relaxed text-foreground">{selected.notes}</p>
+                </div>
+              )}
+              {GRIND_POTENTIAL[selected.name] && (
+                <div className="flex items-center justify-between gap-2 border-t border-border/40 pt-2">
+                  <h3 className="font-display text-[9px] text-primary">Grind Potential</h3>
+                  <span className="font-display text-[12px] text-foreground">
+                    {GRIND_POTENTIAL[selected.name]}
+                  </span>
                 </div>
               )}
             </div>
