@@ -6,6 +6,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { ControlsWindow } from './controls-window'
@@ -42,23 +43,19 @@ export function TrackerMenu() {
             Controls
           </DropdownMenuItem>
           {!installed && (
-            <DropdownMenuItem
-              onClick={install}
-              disabled={!canInstall}
-              title={canInstall ? 'Install DWR Tracker as an app' : 'Open in Chrome (outside the preview) to install'}
-              className={`${menuItemClass} gap-2`}
-            >
-              <img
-                src="/dragonlord-icon.png"
-                alt=""
-                aria-hidden="true"
-                width={12}
-                height={15}
-                className="h-[15px] w-3 shrink-0 [image-rendering:pixelated]"
-              />
-              Install
-            </DropdownMenuItem>
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={install}
+                disabled={!canInstall}
+                title={canInstall ? 'Install DWR Tracker as an app' : 'Open in Chrome (outside the preview) to install'}
+                className={menuItemClass}
+              >
+                Install
+              </DropdownMenuItem>
+            </>
           )}
+          <DropdownMenuSeparator />
           <DropdownMenuItem onClick={reset} className={`${menuItemClass} text-destructive focus:text-destructive`}>
             Clear
           </DropdownMenuItem>
