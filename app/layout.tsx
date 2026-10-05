@@ -7,26 +7,12 @@ const pixelify = Pixelify_Sans({ subsets: ['latin'], variable: '--font-pixelify'
 const pressStart = Press_Start_2P({ subsets: ['latin'], weight: '400', variable: '--font-press-start' })
 
 export const metadata: Metadata = {
-  title: 'DWR Overworld Tracker — Dragon Warrior Randomizer',
-  description:
-    'Map out the randomized Dragon Warrior (NES, 1986) overworld: paint terrain, pin towns, caves and shrines, and track key items and spells for your seed.',
+  title: 'DWR Tracker',
+  description: 'DWR Tracker',
   generator: 'v0.app',
   icons: {
-    icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
-    apple: '/apple-icon.png',
+    icon: [{ url: '/dragonlord-icon.png', type: 'image/png' }],
+    apple: '/dragonlord-icon.png',
   },
 }
 
