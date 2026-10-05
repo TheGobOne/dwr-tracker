@@ -16,7 +16,11 @@ function statDefinition(label: string) {
   return MONSTER_STAT_DEFINITIONS[STAT_DEFINITION_ALIASES[label] ?? label]
 }
 
-const GRIND_POTENTIAL: Record<string, 'S' | 'A' | 'B' | 'C' | 'D' | 'F'> = {}
+const GRIND_POTENTIAL: Record<string, 'S' | 'A' | 'B' | 'C' | 'D' | 'F'> = {
+  'Metal Scorpion': 'S',
+  Magiwyvern: 'S',
+  'Axe Knight': 'S',
+}
 
 const PROMOTED_STATS = ['XP', 'Gold']
 
