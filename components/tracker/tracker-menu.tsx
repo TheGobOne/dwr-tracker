@@ -27,7 +27,15 @@ export function TrackerMenu() {
         >
           <Settings className="size-6" aria-hidden="true" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent
+          align="end"
+          collisionBoundary={
+            typeof document === 'undefined'
+              ? undefined
+              : (document.querySelector('[data-tracker-root]') ?? undefined)
+          }
+          collisionPadding={6}
+        >
           <DropdownMenuItem onClick={() => setControlsOpen(true)} className={menuItemClass}>
             Controls
           </DropdownMenuItem>
