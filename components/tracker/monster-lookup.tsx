@@ -26,7 +26,17 @@ const GRIND_POTENTIAL: Record<string, 'S' | 'A' | 'B' | 'C' | 'D' | 'F'> = {
   Specter: 'A',
   Wyvern: 'A',
   'Green Dragon': 'A',
-}
+  'Red Slime': 'B',
+  Drakee: 'B',
+  Magician: 'B',
+  Magidrakee: 'B',
+  Droll: 'B',
+  Druinlord: 'B',
+  Drollmagi: 'B',
+  Knight: 'B',
+  Wizard: 'B',
+  'Red Dragon': 'B',
+  }
 
 const PROMOTED_STATS = ['XP', 'Gold']
 
