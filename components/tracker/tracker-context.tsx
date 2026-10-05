@@ -180,6 +180,7 @@ interface TrackerContextValue {
   fillAt: (x: number, y: number) => void
   placeMarker: (x: number, y: number) => void
   removeMarker: (id: string) => void
+  moveMarker: (id: string, x: number, y: number) => void
   removeMarkerAt: (x: number, y: number) => boolean
   undo: () => void
   reset: () => void
@@ -279,6 +280,17 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     (id: string) => {
       beginStroke()
       commitMarkers(markersRef.current.filter((m) => m.id !== id))
+    },
+    [beginStroke, commitMarkers],
+  )
+
+  const moveMarker = useCallback(
+    (id: string, x: number, y: number) => {
+      if (!inBounds(x, y)) return
+      const target = markersRef.current.find((m) => m.id === id)
+      if (!target || (target.x === x && target.y === y)) return
+      beginStroke()
+      commitMarkers(markersRef.current.map((m) => (m.id === id ? { ...m, x, y } : m)))
     },
     [beginStroke, commitMarkers],
   )
@@ -416,6 +428,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       fillAt,
       placeMarker,
       removeMarker,
+      moveMarker,
       removeMarkerAt,
       undo,
       reset,
@@ -453,6 +466,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       fillAt,
       placeMarker,
       removeMarker,
+      moveMarker,
       removeMarkerAt,
       undo,
       reset,

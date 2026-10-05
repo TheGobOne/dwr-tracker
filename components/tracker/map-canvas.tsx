@@ -28,8 +28,15 @@ const BRIDGE_SPRITE_SRC = '/sprites/bridge.png'
 
 type MapMode = 'place' | 'pen' | 'eraser'
 
+type HeldItem = { kind: 'marker'; id: string } | { kind: 'stroke'; index: number; anchor: Point }
+
 const PEN_COLOR = '#00D800'
 const ERASER_RADIUS_PX = 10
+const STROKE_PICK_RADIUS_PX = 6
+
+function translateStroke(stroke: Point[], dx: number, dy: number) {
+  return stroke.map((p) => ({ x: p.x + dx, y: p.y + dy }))
+}
 
 function svgCursor(svg: string, hotX: number, hotY: number, fallback: string) {
   return `url("data:image/svg+xml,${encodeURIComponent(svg)}") ${hotX} ${hotY}, ${fallback}`
@@ -78,6 +85,7 @@ export function MapCanvas() {
     showGrid,
     placeMarker,
     removeMarker,
+    moveMarker,
     toggleVisited,
     selectedLocation,
     focusRequest,
@@ -87,6 +95,9 @@ export function MapCanvas() {
   const [mode, setMode] = useState<MapMode>('place')
   const [activeStroke, setActiveStroke] = useState<Point[] | null>(null)
   const isErasingRef = useRef(false)
+  const [slide, setSlide] = useState(false)
+  const [held, setHeld] = useState<HeldItem | null>(null)
+  const [slidePointer, setSlidePointer] = useState<Point | null>(null)
   const [bridgeImg, setBridgeImg] = useState<HTMLImageElement | null>(null)
 
   useEffect(() => {
@@ -202,7 +213,13 @@ export function MapCanvas() {
       ctx.stroke()
     }
 
-    const strokes = activeStroke ? [...drawings, activeStroke] : drawings
+    const placedStrokes =
+      held?.kind === 'stroke' && slidePointer
+        ? drawings.map((s, i) =>
+            i === held.index ? translateStroke(s, slidePointer.x - held.anchor.x, slidePointer.y - held.anchor.y) : s,
+          )
+        : drawings
+    const strokes = activeStroke ? [...placedStrokes, activeStroke] : placedStrokes
     if (strokes.length > 0) {
       ctx.lineCap = 'round'
       ctx.lineJoin = 'round'
@@ -224,16 +241,22 @@ export function MapCanvas() {
       }
     }
 
-    if (hover && mode === 'place') {
+    const showHover = slide ? held?.kind === 'marker' : mode === 'place'
+    if (hover && showHover) {
       ctx.strokeStyle = '#FCFCFC'
       ctx.lineWidth = 2
       ctx.strokeRect(hover.x * scale, hover.y * scale, scale, scale)
     }
 
+    const displayMarkers =
+      held?.kind === 'marker' && hover
+        ? markers.map((m) => (m.id === held.id ? { ...m, x: hover.x, y: hover.y } : m))
+        : markers
+
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
     const nesFont = getComputedStyle(document.documentElement).getPropertyValue('--font-press-start').trim() || 'monospace'
-    for (const marker of markers) {
+    for (const marker of displayMarkers) {
       const ms = markerSize(scale, marker)
       const abbrLength = (marker.locationId ? LOCATION_BY_ID[marker.locationId]?.abbr.length : undefined) ?? 1
       ctx.font = `${Math.round(ms * (abbrLength > 1 ? 0.36 : 0.5))}px ${nesFont}`
@@ -276,7 +299,7 @@ export function MapCanvas() {
       ctx.arc(flash.x * scale + scale / 2, flash.y * scale + scale / 2, markerSize(scale) * 1.4, 0, Math.PI * 2)
       ctx.stroke()
     }
-  }, [tiles, markers, visited, canvasPx, scale, showGrid, hover, flash, bridgeImg, drawings, activeStroke, mode])
+  }, [tiles, markers, visited, canvasPx, scale, showGrid, hover, flash, bridgeImg, drawings, activeStroke, mode, slide, held, slidePointer])
 
   useEffect(() => {
     if (!focusRequest) return
@@ -332,7 +355,55 @@ export function MapCanvas() {
     isErasingRef.current = false
   }
 
+  function strokeIndexAtPointer(p: Point) {
+    const radius = STROKE_PICK_RADIUS_PX / scale
+    for (let i = drawings.length - 1; i >= 0; i--) if (strokeHits(drawings[i], p, radius)) return i
+    return -1
+  }
+
+  function handleSlideClick(e: React.PointerEvent<HTMLCanvasElement>) {
+    const point = pointerToMapPoint(e)
+    if (held) {
+      if (held.kind === 'marker') {
+        const tile = pointerToTile(e)
+        moveMarker(held.id, tile.x, tile.y)
+      } else {
+        const dx = point.x - held.anchor.x
+        const dy = point.y - held.anchor.y
+        setDrawings((prev) => prev.map((s, i) => (i === held.index ? translateStroke(s, dx, dy) : s)))
+      }
+      setHeld(null)
+      setSlidePointer(null)
+      return
+    }
+    const marker = markerAtPointer(e)
+    if (marker) {
+      setHeld({ kind: 'marker', id: marker.id })
+      setHover(pointerToTile(e))
+      return
+    }
+    const index = strokeIndexAtPointer(point)
+    if (index >= 0) {
+      setHeld({ kind: 'stroke', index, anchor: point })
+      setSlidePointer(point)
+    }
+  }
+
+  function toggleSlide() {
+    setSlide((on) => !on)
+    setHeld(null)
+    setSlidePointer(null)
+    setActiveStroke(null)
+    isErasingRef.current = false
+    setMode('place')
+  }
+
   function handlePointerDown(e: React.PointerEvent<HTMLCanvasElement>) {
+    if (slide) {
+      if (e.button === 1) e.preventDefault()
+      if (e.button === 0) handleSlideClick(e)
+      return
+    }
     if (e.button === 1) {
       e.preventDefault()
       if (mode === 'eraser') {
@@ -384,12 +455,18 @@ export function MapCanvas() {
       eraseAt(pointerToMapPoint(e))
       return
     }
+    if (held?.kind === 'stroke') setSlidePointer(pointerToMapPoint(e))
     const tile = pointerToTile(e)
     if (!hover || hover.x !== tile.x || hover.y !== tile.y) setHover(tile)
   }
 
   function handleContextMenu(e: React.MouseEvent<HTMLCanvasElement>) {
     e.preventDefault()
+    if (slide) {
+      setHeld(null)
+      setSlidePointer(null)
+      return
+    }
     if (mode !== 'place') {
       finishStroke()
       setMode('place')
@@ -404,7 +481,8 @@ export function MapCanvas() {
     setMode('pen')
   }
 
-  const modeLabel = mode === 'pen' ? ', pen mode' : mode === 'eraser' ? ', eraser mode' : ''
+  const modeLabel = slide ? ', slide mode' : mode === 'pen' ? ', pen mode' : mode === 'eraser' ? ', eraser mode' : ''
+  const cursor = slide ? (held ? 'grabbing' : 'grab') : MODE_CURSOR[mode]
 
   return (
   <section aria-label="Overworld map" className="dw-window relative flex flex-none flex-col self-center overflow-hidden">
@@ -416,7 +494,7 @@ export function MapCanvas() {
           ref={canvasRef}
           role="img"
           aria-label={`Overworld map, ${exploredPct}% explored, ${markers.length} markers placed${modeLabel}`}
-          style={{ width: canvasPx, height: canvasPx, cursor: MODE_CURSOR[mode], touchAction: 'none', imageRendering: 'pixelated' }}
+          style={{ width: canvasPx, height: canvasPx, cursor, touchAction: 'none', imageRendering: 'pixelated' }}
           className="block"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
@@ -427,6 +505,23 @@ export function MapCanvas() {
           onAuxClick={(e) => e.preventDefault()}
         />
       </div>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={slide}
+        onClick={toggleSlide}
+        className="font-display absolute bottom-1.5 left-1.5 z-10 flex items-center gap-1.5 rounded-sm bg-black/60 px-1.5 py-1 text-[8px] leading-none text-foreground outline-none hover:text-primary focus-visible:ring-2 focus-visible:ring-primary"
+      >
+        <span
+          aria-hidden="true"
+          className={`relative h-2.5 w-5 rounded-full border border-foreground transition-colors ${slide ? 'bg-primary' : 'bg-transparent'}`}
+        >
+          <span
+            className={`absolute top-1/2 size-1.5 -translate-y-1/2 rounded-full bg-foreground transition-[left] ${slide ? 'left-[11px]' : 'left-[1px]'}`}
+          />
+        </span>
+        Slide
+      </button>
       <div className="absolute right-1.5 bottom-1.5 z-10 rounded-sm bg-black/60">
         <TrackerMenu />
       </div>
