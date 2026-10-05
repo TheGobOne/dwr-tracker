@@ -42,6 +42,7 @@ export interface DWLocation {
   abbr: string
   kind: LocationKind
   hint: string
+  unknown?: boolean
 }
 
 export const LOCATIONS: DWLocation[] = [
@@ -61,6 +62,8 @@ export const LOCATIONS: DWLocation[] = [
   { id: 'staff-shrine', name: 'Staff', abbr: 'SR', kind: 'shrine', hint: 'Requires the Silver Harp.' },
   { id: 'rainbow-shrine', name: 'Jerk', abbr: 'JC', kind: 'shrine', hint: "Requires Staff, Stones & Token." },
   { id: 'freebie-cave', name: 'Freebie', abbr: 'FC', kind: 'shrine', hint: 'Freebie cave.' },
+  { id: 'unknown-town', name: 'Town', abbr: '?', kind: 'town', hint: 'Unidentified town.', unknown: true },
+  { id: 'unknown-cave', name: 'Cave', abbr: '?', kind: 'cave', hint: 'Unidentified cave.', unknown: true },
 ]
 
 export const LOCATION_BY_ID = Object.fromEntries(LOCATIONS.map((l) => [l.id, l])) as Record<string, DWLocation>

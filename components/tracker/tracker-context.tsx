@@ -257,7 +257,9 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       beginStroke()
       if (selectedLocation) {
         const location = LOCATION_BY_ID[selectedLocation]
-        const others = markersRef.current.filter((m) => m.locationId !== selectedLocation)
+        const others = location?.unknown
+          ? markersRef.current
+          : markersRef.current.filter((m) => m.locationId !== selectedLocation)
         commitMarkers([...others, { id: newMarkerId(), x, y, locationId: selectedLocation, label: location?.name ?? '' }])
         setSelectedLocation(null)
       } else {

@@ -1,7 +1,7 @@
 'use client'
 
 import { MapPin } from 'lucide-react'
-import { KIND_META, LOCATIONS, type LocationKind } from '@/lib/dw-data'
+import { KIND_META, LOCATIONS, type DWLocation, type LocationKind } from '@/lib/dw-data'
 import { cn } from '@/lib/utils'
 import { ExperienceWizard } from './experience-table'
 import { TrackerMenu } from './tracker-menu'
@@ -95,7 +95,40 @@ export function CoordsInput({
 
 const KIND_ORDER: LocationKind[] = ['castle', 'town', 'cave', 'shrine', 'special']
 
-const ORDERED_LOCATIONS = KIND_ORDER.flatMap((kind) => LOCATIONS.filter((l) => l.kind === kind))
+const ORDERED_LOCATIONS = KIND_ORDER.flatMap((kind) => LOCATIONS.filter((l) => l.kind === kind && !l.unknown))
+
+const UNKNOWN_LOCATIONS = LOCATIONS.filter((l) => l.unknown)
+
+function UnknownLocationButton({ location }: { location: DWLocation }) {
+  const { markers, selectedLocation, setSelectedLocation, setTool } = useTracker()
+  const isSelected = selectedLocation === location.id
+  const count = markers.filter((m) => m.locationId === location.id).length
+
+  return (
+    <button
+      type="button"
+      aria-pressed={isSelected}
+      aria-label={`Place unknown ${location.name.toLowerCase()}${count ? ` (${count} placed)` : ''}`}
+      onClick={() => {
+        setSelectedLocation(isSelected ? null : location.id)
+        setTool('marker')
+      }}
+      className={cn(
+        'flex h-5 w-full items-center gap-1 rounded-sm border px-0.5 focus-visible:outline-2 focus-visible:outline-primary',
+        isSelected ? 'border-primary' : 'border-transparent',
+      )}
+    >
+      <span
+        aria-hidden="true"
+        className="flex h-4 w-6 shrink-0 items-center justify-center rounded-[2px] font-mono text-[7px] leading-none text-black"
+        style={{ backgroundColor: KIND_META[location.kind].color }}
+      >
+        {location.abbr}
+      </span>
+      <span className="truncate text-[8px] leading-none text-foreground">{location.name}</span>
+    </button>
+  )
+}
 
 export function PanelTitle({ children, aside }: { children: React.ReactNode; aside?: React.ReactNode }) {
   return (
@@ -183,12 +216,15 @@ export function LocationsPanel() {
         })}
       </ul>
       <div className="flex w-18 shrink-0 flex-col items-center">
-        <div className="flex h-10 items-center justify-center">
-          <ExperienceWizard />
-        </div>
-        <div className="flex h-10 items-center justify-center">
+        <div className="flex h-7 items-center justify-center">
           <TrackerMenu />
         </div>
+        <div className="flex h-7 items-center justify-center">
+          <ExperienceWizard />
+        </div>
+        {UNKNOWN_LOCATIONS.map((location) => (
+          <UnknownLocationButton key={location.id} location={location} />
+        ))}
       </div>
       </div>
     </section>
