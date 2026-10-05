@@ -44,7 +44,6 @@ const CONTROL_SECTIONS: { title: string; controls: { input: string; action: stri
       { input: 'Notes', action: 'Free text for anything else in your run' },
       { input: 'Gear > Install', action: 'Install the tracker as an app in Chrome' },
       { input: 'Gear > Clear', action: 'Reset the entire tracker' },
-      { input: 'Esc', action: 'Close any open window' },
     ],
   },
 ]
