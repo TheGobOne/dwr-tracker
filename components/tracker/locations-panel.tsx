@@ -149,8 +149,7 @@ export function LocationsPanel() {
         Locations
       </h2>
       <PanelTitle>Locations</PanelTitle>
-      <div className="flex items-start">
-      <ul className="grid min-w-0 flex-1 grid-cols-2 gap-x-1 sm:grid-cols-[repeat(4,auto)] sm:justify-between">
+      <ul className="grid grid-cols-2 gap-x-1 sm:grid-cols-[repeat(4,auto)_4.5rem] sm:justify-evenly">
         {ORDERED_LOCATIONS.flatMap((location) => {
           const marker = markerByLocation.get(location.id)
           const isSelected = selectedLocation === location.id
@@ -213,16 +212,15 @@ export function LocationsPanel() {
             </li>,
           ]
         })}
+        <li className="col-span-2 flex flex-col items-center sm:col-span-1 sm:col-start-5 sm:row-span-4 sm:row-start-1">
+          <div className="flex h-10 items-center justify-center">
+            <ExperienceWizard />
+          </div>
+          {UNKNOWN_LOCATIONS.map((location) => (
+            <UnknownLocationButton key={location.id} location={location} />
+          ))}
+        </li>
       </ul>
-      <div className="flex w-18 shrink-0 flex-col items-center">
-        <div className="flex h-7 items-center justify-center">
-          <ExperienceWizard />
-        </div>
-        {UNKNOWN_LOCATIONS.map((location) => (
-          <UnknownLocationButton key={location.id} location={location} />
-        ))}
-      </div>
-      </div>
     </section>
   )
 }
