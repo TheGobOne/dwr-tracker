@@ -20,6 +20,12 @@ const GRIND_POTENTIAL: Record<string, 'S' | 'A' | 'B' | 'C' | 'D' | 'F'> = {
   'Metal Scorpion': 'S',
   Magiwyvern: 'S',
   'Axe Knight': 'S',
+  Scorpion: 'A',
+  Drakeema: 'A',
+  Wolf: 'A',
+  Specter: 'A',
+  Wyvern: 'A',
+  'Green Dragon': 'A',
 }
 
 const PROMOTED_STATS = ['XP', 'Gold']
@@ -111,6 +117,14 @@ function MonsterWindow({ onClose }: { onClose: () => void }) {
         <div className="min-h-0 flex-1 overflow-y-auto">
           {selected ? (
             <div className="flex flex-col gap-2">
+              {GRIND_POTENTIAL[selected.name] && (
+                <div className="flex items-center justify-between gap-2 border-b border-border/40 pb-2">
+                  <h3 className="font-display text-[9px] text-primary">Grind Potential</h3>
+                  <span className="font-display text-[12px] text-foreground">
+                    {GRIND_POTENTIAL[selected.name]}
+                  </span>
+                </div>
+              )}
               <dl className="flex flex-col font-display text-[8px] leading-none">
                 {orderStats(selected.stats).map(([label, value]) => (
                   <div
@@ -127,14 +141,6 @@ function MonsterWindow({ onClose }: { onClose: () => void }) {
                 <div className="flex flex-col gap-1">
                   <h3 className="font-display text-[9px] text-primary">Notes</h3>
                   <p className="text-[9px] leading-relaxed text-foreground">{selected.notes}</p>
-                </div>
-              )}
-              {GRIND_POTENTIAL[selected.name] && (
-                <div className="flex items-center justify-between gap-2 border-t border-border/40 pt-2">
-                  <h3 className="font-display text-[9px] text-primary">Grind Potential</h3>
-                  <span className="font-display text-[12px] text-foreground">
-                    {GRIND_POTENTIAL[selected.name]}
-                  </span>
                 </div>
               )}
             </div>
