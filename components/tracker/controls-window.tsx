@@ -8,8 +8,16 @@ const CONTROL_SECTIONS: { title: string; controls: { input: string; action: stri
     title: 'Map',
     controls: [
       { input: 'Left click', action: 'Place a marker, or check off a placed location' },
-      { input: 'Right click', action: 'Remove a marker' },
-      { input: 'Middle click', action: 'Open the cave or castle map for that location' },
+      { input: 'Right click marker', action: 'Remove the marker' },
+      { input: 'Middle click marker', action: 'Open the cave or castle map for that location' },
+    ],
+  },
+  {
+    title: 'Drawing',
+    controls: [
+      { input: 'Right click empty', action: 'Switch to the pen, then left drag to draw green lines' },
+      { input: 'Middle click', action: 'Switch to the eraser, then left drag over lines to erase' },
+      { input: 'Click again', action: 'Right click in pen or middle click in eraser to go back to placing' },
     ],
   },
   {
@@ -18,6 +26,7 @@ const CONTROL_SECTIONS: { title: string; controls: { input: string; action: stri
       { input: 'Click unplaced', action: 'Select it, then click the map to place it' },
       { input: 'Click placed', action: 'Highlight its marker on the map' },
       { input: 'Pin button', action: 'Move a placed marker to a new spot' },
+      { input: '? Town / ? Cave', action: 'Select, then click the map to mark unidentified spots. Place as many as you need' },
     ],
   },
   {
@@ -33,7 +42,10 @@ const CONTROL_SECTIONS: { title: string; controls: { input: string; action: stri
     controls: [
       { input: 'King', action: 'Show the experience level table' },
       { input: 'Notes', action: 'Free text for anything else in your run' },
+      { input: 'Gear', action: 'Menu in the bottom right corner of the map' },
+      { input: 'Gear > Install', action: 'Install the tracker as an app in Chrome' },
       { input: 'Gear > Clear', action: 'Reset the entire tracker' },
+      { input: 'Esc', action: 'Close any open window' },
     ],
   },
 ]
