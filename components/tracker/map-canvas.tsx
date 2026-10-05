@@ -28,11 +28,34 @@ const BRIDGE_SPRITE_SRC = '/sprites/bridge.png'
 
 type MapMode = 'place' | 'pen' | 'eraser'
 
-type HeldItem = { kind: 'marker'; id: string } | { kind: 'stroke'; index: number; anchor: Point }
-
 const PEN_COLOR = '#00D800'
 const ERASER_RADIUS_PX = 10
-const STROKE_PICK_RADIUS_PX = 6
+
+function clampShift(markers: Marker[], strokes: Point[][], dx: number, dy: number): Point {
+  let minX = Infinity
+  let minY = Infinity
+  let maxX = -Infinity
+  let maxY = -Infinity
+  for (const m of markers) {
+    minX = Math.min(minX, m.x)
+    minY = Math.min(minY, m.y)
+    maxX = Math.max(maxX, m.x + 1)
+    maxY = Math.max(maxY, m.y + 1)
+  }
+  for (const stroke of strokes) {
+    for (const p of stroke) {
+      minX = Math.min(minX, p.x)
+      minY = Math.min(minY, p.y)
+      maxX = Math.max(maxX, p.x)
+      maxY = Math.max(maxY, p.y)
+    }
+  }
+  if (minX === Infinity) return { x: 0, y: 0 }
+  return {
+    x: Math.max(Math.ceil(-minX), Math.min(Math.floor(MAP_SIZE - maxX), dx)),
+    y: Math.max(Math.ceil(-minY), Math.min(Math.floor(MAP_SIZE - maxY), dy)),
+  }
+}
 
 function translateStroke(stroke: Point[], dx: number, dy: number) {
   return stroke.map((p) => ({ x: p.x + dx, y: p.y + dy }))
@@ -85,7 +108,7 @@ export function MapCanvas() {
     showGrid,
     placeMarker,
     removeMarker,
-    moveMarker,
+    shiftMarkers,
     toggleVisited,
     selectedLocation,
     focusRequest,
@@ -96,8 +119,7 @@ export function MapCanvas() {
   const [activeStroke, setActiveStroke] = useState<Point[] | null>(null)
   const isErasingRef = useRef(false)
   const [slide, setSlide] = useState(false)
-  const [held, setHeld] = useState<HeldItem | null>(null)
-  const [slidePointer, setSlidePointer] = useState<Point | null>(null)
+  const [held, setHeld] = useState<Point | null>(null)
   const [bridgeImg, setBridgeImg] = useState<HTMLImageElement | null>(null)
 
   useEffect(() => {
@@ -213,12 +235,8 @@ export function MapCanvas() {
       ctx.stroke()
     }
 
-    const placedStrokes =
-      held?.kind === 'stroke' && slidePointer
-        ? drawings.map((s, i) =>
-            i === held.index ? translateStroke(s, slidePointer.x - held.anchor.x, slidePointer.y - held.anchor.y) : s,
-          )
-        : drawings
+    const shift = held && hover ? clampShift(markers, drawings, hover.x - held.x, hover.y - held.y) : null
+    const placedStrokes = shift ? drawings.map((s) => translateStroke(s, shift.x, shift.y)) : drawings
     const strokes = activeStroke ? [...placedStrokes, activeStroke] : placedStrokes
     if (strokes.length > 0) {
       ctx.lineCap = 'round'
@@ -241,17 +259,13 @@ export function MapCanvas() {
       }
     }
 
-    const showHover = slide ? held?.kind === 'marker' : mode === 'place'
-    if (hover && showHover) {
+    if (hover && !slide && mode === 'place') {
       ctx.strokeStyle = '#FCFCFC'
       ctx.lineWidth = 2
       ctx.strokeRect(hover.x * scale, hover.y * scale, scale, scale)
     }
 
-    const displayMarkers =
-      held?.kind === 'marker' && hover
-        ? markers.map((m) => (m.id === held.id ? { ...m, x: hover.x, y: hover.y } : m))
-        : markers
+    const displayMarkers = shift ? markers.map((m) => ({ ...m, x: m.x + shift.x, y: m.y + shift.y })) : markers
 
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
@@ -299,7 +313,7 @@ export function MapCanvas() {
       ctx.arc(flash.x * scale + scale / 2, flash.y * scale + scale / 2, markerSize(scale) * 1.4, 0, Math.PI * 2)
       ctx.stroke()
     }
-  }, [tiles, markers, visited, canvasPx, scale, showGrid, hover, flash, bridgeImg, drawings, activeStroke, mode, slide, held, slidePointer])
+  }, [tiles, markers, visited, canvasPx, scale, showGrid, hover, flash, bridgeImg, drawings, activeStroke, mode, slide, held])
 
   useEffect(() => {
     if (!focusRequest) return
@@ -355,44 +369,25 @@ export function MapCanvas() {
     isErasingRef.current = false
   }
 
-  function strokeIndexAtPointer(p: Point) {
-    const radius = STROKE_PICK_RADIUS_PX / scale
-    for (let i = drawings.length - 1; i >= 0; i--) if (strokeHits(drawings[i], p, radius)) return i
-    return -1
-  }
-
   function handleSlideClick(e: React.PointerEvent<HTMLCanvasElement>) {
-    const point = pointerToMapPoint(e)
+    const tile = pointerToTile(e)
     if (held) {
-      if (held.kind === 'marker') {
-        const tile = pointerToTile(e)
-        moveMarker(held.id, tile.x, tile.y)
-      } else {
-        const dx = point.x - held.anchor.x
-        const dy = point.y - held.anchor.y
-        setDrawings((prev) => prev.map((s, i) => (i === held.index ? translateStroke(s, dx, dy) : s)))
+      const shift = clampShift(markers, drawings, tile.x - held.x, tile.y - held.y)
+      if (shift.x !== 0 || shift.y !== 0) {
+        shiftMarkers(shift.x, shift.y)
+        setDrawings((prev) => prev.map((s) => translateStroke(s, shift.x, shift.y)))
       }
       setHeld(null)
-      setSlidePointer(null)
       return
     }
-    const marker = markerAtPointer(e)
-    if (marker) {
-      setHeld({ kind: 'marker', id: marker.id })
-      setHover(pointerToTile(e))
-      return
-    }
-    const index = strokeIndexAtPointer(point)
-    if (index >= 0) {
-      setHeld({ kind: 'stroke', index, anchor: point })
-      setSlidePointer(point)
-    }
+    if (markers.length === 0 && drawings.length === 0) return
+    setHeld(tile)
+    setHover(tile)
   }
 
   function toggleSlide() {
     setSlide((on) => !on)
     setHeld(null)
-    setSlidePointer(null)
     setActiveStroke(null)
     isErasingRef.current = false
     setMode('place')
@@ -455,7 +450,6 @@ export function MapCanvas() {
       eraseAt(pointerToMapPoint(e))
       return
     }
-    if (held?.kind === 'stroke') setSlidePointer(pointerToMapPoint(e))
     const tile = pointerToTile(e)
     if (!hover || hover.x !== tile.x || hover.y !== tile.y) setHover(tile)
   }
@@ -464,7 +458,6 @@ export function MapCanvas() {
     e.preventDefault()
     if (slide) {
       setHeld(null)
-      setSlidePointer(null)
       return
     }
     if (mode !== 'place') {
