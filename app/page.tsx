@@ -1,3 +1,4 @@
+import { DrawingLayer } from '@/components/tracker/drawing-layer'
 import { MapCanvas } from '@/components/tracker/map-canvas'
 import { TrackerProvider } from '@/components/tracker/tracker-context'
 import { TrackerShortcuts } from '@/components/tracker/tracker-shortcuts'
@@ -12,6 +13,7 @@ export default function Page() {
           <MapCanvas />
           <TrackerSidebar />
         </main>
+        <DrawingLayer />
       </div>
     </TrackerProvider>
   )
