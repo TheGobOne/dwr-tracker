@@ -10,11 +10,13 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { ControlsWindow } from './controls-window'
 import { useTracker } from './tracker-context'
+import { useInstallPrompt } from '@/hooks/use-install-prompt'
 
 const menuItemClass = 'font-display text-[9px] uppercase tracking-wider'
 
 export function TrackerMenu() {
   const { reset } = useTracker()
+  const { canInstall, installed, install } = useInstallPrompt()
   const [controlsOpen, setControlsOpen] = useState(false)
   const closeControls = useCallback(() => setControlsOpen(false), [])
 
@@ -39,6 +41,24 @@ export function TrackerMenu() {
           <DropdownMenuItem onClick={() => setControlsOpen(true)} className={menuItemClass}>
             Controls
           </DropdownMenuItem>
+          {!installed && (
+            <DropdownMenuItem
+              onClick={install}
+              disabled={!canInstall}
+              title={canInstall ? 'Install DWR Tracker as an app' : 'Open in Chrome (outside the preview) to install'}
+              className={`${menuItemClass} gap-2`}
+            >
+              <img
+                src="/dragonlord-icon.png"
+                alt=""
+                aria-hidden="true"
+                width={12}
+                height={15}
+                className="h-[15px] w-3 shrink-0 [image-rendering:pixelated]"
+              />
+              Install
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem onClick={reset} className={`${menuItemClass} text-destructive focus:text-destructive`}>
             Clear
           </DropdownMenuItem>

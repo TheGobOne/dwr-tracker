@@ -12,8 +12,9 @@ export const metadata: Metadata = {
   generator: 'v0.app',
   icons: {
     icon: [{ url: '/dragonlord-icon.png', type: 'image/png' }],
-    apple: '/dragonlord-icon.png',
+    apple: '/icon-192.png',
   },
+  appleWebApp: { capable: true, title: 'DWR Tracker', statusBarStyle: 'black-translucent' },
 }
 
 export const viewport: Viewport = {
