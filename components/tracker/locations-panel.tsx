@@ -4,7 +4,6 @@ import { MapPin } from 'lucide-react'
 import { KIND_META, LOCATIONS, type DWLocation, type LocationKind } from '@/lib/dw-data'
 import { cn } from '@/lib/utils'
 import { ExperienceWizard } from './experience-table'
-import { TrackerMenu } from './tracker-menu'
 import {
   EMPTY_COORDS,
   EW_DIRECTIONS,
@@ -216,9 +215,6 @@ export function LocationsPanel() {
         })}
       </ul>
       <div className="flex w-18 shrink-0 flex-col items-center">
-        <div className="flex h-7 items-center justify-center">
-          <TrackerMenu />
-        </div>
         <div className="flex h-7 items-center justify-center">
           <ExperienceWizard />
         </div>

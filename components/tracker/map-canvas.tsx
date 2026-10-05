@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CAVE_MAPS, CaveMapViewer } from './cave-map-viewer'
+import { TrackerMenu } from './tracker-menu'
 import { KIND_META, LOCATION_BY_ID, MAP_SIZE, PIN_COLOR, TERRAIN_RGB } from '@/lib/dw-data'
 import { useTracker, type Marker } from './tracker-context'
 
@@ -282,6 +283,9 @@ export function MapCanvas() {
           onContextMenu={handleContextMenu}
           onAuxClick={(e) => e.preventDefault()}
         />
+      </div>
+      <div className="absolute right-1.5 bottom-1.5 z-10 rounded-sm bg-black/60">
+        <TrackerMenu />
       </div>
       <CaveMapViewer locationId={caveMapId} onClose={closeCaveMap} />
     </section>
