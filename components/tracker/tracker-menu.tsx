@@ -7,7 +7,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { CLEAR_DRAWING_EVENT } from './drawing-layer'
 import { useTracker } from './tracker-context'
 
 export function TrackerMenu() {
@@ -22,12 +21,7 @@ export function TrackerMenu() {
         <Settings className="size-6" aria-hidden="true" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem
-          onClick={() => {
-            reset()
-            window.dispatchEvent(new Event(CLEAR_DRAWING_EVENT))
-          }}
-          className="font-display text-[9px] uppercase tracking-wider text-destructive focus:text-destructive">
+        <DropdownMenuItem onClick={reset} className="font-display text-[9px] uppercase tracking-wider text-destructive focus:text-destructive">
           Clear
         </DropdownMenuItem>
       </DropdownMenuContent>
