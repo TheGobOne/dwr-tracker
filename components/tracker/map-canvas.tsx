@@ -26,14 +26,67 @@ function markerColor(marker: Marker) {
 
 const BRIDGE_SPRITE_SRC = '/sprites/bridge.png'
 
+type MapMode = 'place' | 'pen' | 'eraser'
+
+const PEN_COLOR = '#00D800'
+const ERASER_RADIUS_PX = 10
+
+function svgCursor(svg: string, hotX: number, hotY: number, fallback: string) {
+  return `url("data:image/svg+xml,${encodeURIComponent(svg)}") ${hotX} ${hotY}, ${fallback}`
+}
+
+const MODE_CURSOR: Record<MapMode, string> = {
+  place: 'crosshair',
+  pen: svgCursor(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M3 21l1.5-5.5L16 4l4 4L8.5 19.5z" fill="${PEN_COLOR}" stroke="#000" stroke-width="1.5" stroke-linejoin="round"/><path d="M3 21l1.5-5.5 4 4z" fill="#FCFCFC" stroke="#000" stroke-width="1.5" stroke-linejoin="round"/></svg>`,
+    3,
+    21,
+    'crosshair',
+  ),
+  eraser: svgCursor(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="${ERASER_RADIUS_PX}" fill="rgba(252,252,252,0.15)" stroke="#000" stroke-width="2"/><circle cx="12" cy="12" r="${ERASER_RADIUS_PX}" fill="none" stroke="#FCFCFC" stroke-width="1"/></svg>`,
+    12,
+    12,
+    'cell',
+  ),
+}
+
+function distanceToSegment(p: Point, a: Point, b: Point) {
+  const dx = b.x - a.x
+  const dy = b.y - a.y
+  const lenSq = dx * dx + dy * dy
+  const t = lenSq === 0 ? 0 : Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / lenSq))
+  return Math.hypot(p.x - (a.x + t * dx), p.y - (a.y + t * dy))
+}
+
+function strokeHits(stroke: Point[], p: Point, radius: number) {
+  if (stroke.length === 1) return Math.hypot(p.x - stroke[0].x, p.y - stroke[0].y) <= radius
+  for (let i = 1; i < stroke.length; i++) if (distanceToSegment(p, stroke[i - 1], stroke[i]) <= radius) return true
+  return false
+}
+
 function markerText(marker: Marker) {
   const location = marker.locationId ? LOCATION_BY_ID[marker.locationId] : null
   return location ? location.abbr : '!'
 }
 
 export function MapCanvas() {
-  const { tiles, markers, visited, showGrid, placeMarker, removeMarker, toggleVisited, selectedLocation, focusRequest } =
-    useTracker()
+  const {
+    tiles,
+    markers,
+    visited,
+    showGrid,
+    placeMarker,
+    removeMarker,
+    toggleVisited,
+    selectedLocation,
+    focusRequest,
+    drawings,
+    setDrawings,
+  } = useTracker()
+  const [mode, setMode] = useState<MapMode>('place')
+  const [activeStroke, setActiveStroke] = useState<Point[] | null>(null)
+  const isErasingRef = useRef(false)
   const [bridgeImg, setBridgeImg] = useState<HTMLImageElement | null>(null)
 
   useEffect(() => {
@@ -149,7 +202,29 @@ export function MapCanvas() {
       ctx.stroke()
     }
 
-    if (hover) {
+    const strokes = activeStroke ? [...drawings, activeStroke] : drawings
+    if (strokes.length > 0) {
+      ctx.lineCap = 'round'
+      ctx.lineJoin = 'round'
+      ctx.strokeStyle = PEN_COLOR
+      ctx.fillStyle = PEN_COLOR
+      const width = Math.max(2, scale * 0.6)
+      ctx.lineWidth = width
+      for (const stroke of strokes) {
+        if (stroke.length === 1) {
+          ctx.beginPath()
+          ctx.arc(stroke[0].x * scale, stroke[0].y * scale, width / 2, 0, Math.PI * 2)
+          ctx.fill()
+          continue
+        }
+        ctx.beginPath()
+        ctx.moveTo(stroke[0].x * scale, stroke[0].y * scale)
+        for (let i = 1; i < stroke.length; i++) ctx.lineTo(stroke[i].x * scale, stroke[i].y * scale)
+        ctx.stroke()
+      }
+    }
+
+    if (hover && mode === 'place') {
       ctx.strokeStyle = '#FCFCFC'
       ctx.lineWidth = 2
       ctx.strokeRect(hover.x * scale, hover.y * scale, scale, scale)
@@ -201,7 +276,7 @@ export function MapCanvas() {
       ctx.arc(flash.x * scale + scale / 2, flash.y * scale + scale / 2, markerSize(scale) * 1.4, 0, Math.PI * 2)
       ctx.stroke()
     }
-  }, [tiles, markers, visited, canvasPx, scale, showGrid, hover, flash, bridgeImg])
+  }, [tiles, markers, visited, canvasPx, scale, showGrid, hover, flash, bridgeImg, drawings, activeStroke, mode])
 
   useEffect(() => {
     if (!focusRequest) return
@@ -235,14 +310,58 @@ export function MapCanvas() {
     return null
   }
 
+  function pointerToMapPoint(e: React.PointerEvent | React.MouseEvent): Point {
+    const rect = (e.currentTarget as HTMLCanvasElement).getBoundingClientRect()
+    return {
+      x: Math.min(MAP_SIZE, Math.max(0, (e.clientX - rect.left) / scale)),
+      y: Math.min(MAP_SIZE, Math.max(0, (e.clientY - rect.top) / scale)),
+    }
+  }
+
+  function eraseAt(p: Point) {
+    const radius = ERASER_RADIUS_PX / scale
+    setDrawings((prev) => {
+      const next = prev.filter((stroke) => !strokeHits(stroke, p, radius))
+      return next.length === prev.length ? prev : next
+    })
+  }
+
+  function finishStroke() {
+    if (activeStroke) setDrawings((prev) => [...prev, activeStroke])
+    setActiveStroke(null)
+    isErasingRef.current = false
+  }
+
   function handlePointerDown(e: React.PointerEvent<HTMLCanvasElement>) {
     if (e.button === 1) {
       e.preventDefault()
-      const hit = markerAtPointer(e)
-      if (hit?.locationId && CAVE_MAPS[hit.locationId]) setCaveMapId(hit.locationId)
+      if (mode === 'eraser') {
+        setMode('place')
+        return
+      }
+      if (mode === 'place') {
+        const hit = markerAtPointer(e)
+        if (hit?.locationId && CAVE_MAPS[hit.locationId]) {
+          setCaveMapId(hit.locationId)
+          return
+        }
+      }
+      setActiveStroke(null)
+      setMode('eraser')
       return
     }
     if (e.button !== 0) return
+    if (mode === 'pen') {
+      e.currentTarget.setPointerCapture(e.pointerId)
+      setActiveStroke([pointerToMapPoint(e)])
+      return
+    }
+    if (mode === 'eraser') {
+      e.currentTarget.setPointerCapture(e.pointerId)
+      isErasingRef.current = true
+      eraseAt(pointerToMapPoint(e))
+      return
+    }
     if (!selectedLocation) {
       const hit = markerAtPointer(e)
       if (hit) {
@@ -255,15 +374,37 @@ export function MapCanvas() {
   }
 
   function handlePointerMove(e: React.PointerEvent<HTMLCanvasElement>) {
+    if (activeStroke) {
+      const p = pointerToMapPoint(e)
+      const last = activeStroke[activeStroke.length - 1]
+      if (Math.hypot(p.x - last.x, p.y - last.y) * scale >= 1.5) setActiveStroke([...activeStroke, p])
+      return
+    }
+    if (isErasingRef.current) {
+      eraseAt(pointerToMapPoint(e))
+      return
+    }
     const tile = pointerToTile(e)
     if (!hover || hover.x !== tile.x || hover.y !== tile.y) setHover(tile)
   }
 
   function handleContextMenu(e: React.MouseEvent<HTMLCanvasElement>) {
     e.preventDefault()
+    if (mode !== 'place') {
+      finishStroke()
+      setMode('place')
+      return
+    }
     const marker = markerAtPointer(e)
-    if (marker) removeMarker(marker.id)
+    if (marker) {
+      removeMarker(marker.id)
+      return
+    }
+    setHover(null)
+    setMode('pen')
   }
+
+  const modeLabel = mode === 'pen' ? ', pen mode' : mode === 'eraser' ? ', eraser mode' : ''
 
   return (
   <section aria-label="Overworld map" className="dw-window relative flex flex-none flex-col self-center overflow-hidden">
@@ -274,11 +415,13 @@ export function MapCanvas() {
         <canvas
           ref={canvasRef}
           role="img"
-          aria-label={`Overworld map, ${exploredPct}% explored, ${markers.length} markers placed`}
-          style={{ width: canvasPx, height: canvasPx, cursor: 'crosshair', touchAction: 'none', imageRendering: 'pixelated' }}
+          aria-label={`Overworld map, ${exploredPct}% explored, ${markers.length} markers placed${modeLabel}`}
+          style={{ width: canvasPx, height: canvasPx, cursor: MODE_CURSOR[mode], touchAction: 'none', imageRendering: 'pixelated' }}
           className="block"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
+          onPointerUp={finishStroke}
+          onPointerCancel={finishStroke}
           onPointerLeave={() => setHover(null)}
           onContextMenu={handleContextMenu}
           onAuxClick={(e) => e.preventDefault()}

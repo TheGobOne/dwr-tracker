@@ -137,6 +137,8 @@ function newMarkerId() {
   return `m-${Date.now().toString(36)}-${markerCounter}`
 }
 
+export type DrawingStroke = { x: number; y: number }[]
+
 interface TrackerContextValue {
   tiles: Uint8Array
   markers: Marker[]
@@ -155,7 +157,9 @@ interface TrackerContextValue {
   pinLabel: string
   canUndo: boolean
   focusRequest: { x: number; y: number; nonce: number } | null
+  drawings: DrawingStroke[]
 
+  setDrawings: (update: (prev: DrawingStroke[]) => DrawingStroke[]) => void
   setTool: (tool: Tool) => void
   setTerrain: (terrain: number) => void
   setBrushSize: (size: number) => void
@@ -204,6 +208,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
   const [pinLabel, setPinLabel] = useState('')
   const [historyLength, setHistoryLength] = useState(0)
   const [focusRequest, setFocusRequest] = useState<TrackerContextValue['focusRequest']>(null)
+  const [drawings, setDrawings] = useState<DrawingStroke[]>([])
 
   const tilesRef = useRef(tiles)
   const markersRef = useRef(markers)
@@ -318,6 +323,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     setCoords({})
     setSeed('')
     setSelectedLocation(null)
+    setDrawings([])
   }, [commitTiles, commitMarkers])
 
   const exportSave = useCallback(
@@ -389,6 +395,8 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       pinLabel,
       canUndo: historyLength > 0,
       focusRequest,
+      drawings,
+      setDrawings,
       setTool,
       setTerrain,
       setBrushSize,
@@ -433,6 +441,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       pinLabel,
       historyLength,
       focusRequest,
+      drawings,
       setZoom,
       toggleItem,
       toggleVisited,
