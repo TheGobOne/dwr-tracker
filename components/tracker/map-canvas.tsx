@@ -750,14 +750,14 @@ export function MapCanvas() {
         role="switch"
         aria-checked={slide}
         onClick={toggleSlide}
-        className="font-display absolute bottom-1.5 left-1.5 z-10 flex items-center gap-1.5 rounded-sm bg-black/60 px-1.5 py-1 text-[8px] leading-none text-foreground outline-none hover:text-primary focus-visible:ring-2 focus-visible:ring-primary"
+        className="font-display absolute bottom-1.5 left-1.5 z-10 flex items-center gap-1.5 rounded-sm bg-black/60 px-1.5 py-1 text-[10px] leading-none text-foreground outline-none hover:text-primary focus-visible:ring-2 focus-visible:ring-primary"
       >
         <span
           aria-hidden="true"
-          className={`relative h-2.5 w-5 rounded-full border border-foreground transition-colors ${slide ? 'bg-primary' : 'bg-transparent'}`}
+          className={`relative h-3 w-6 rounded-full border border-foreground transition-colors ${slide ? 'bg-primary' : 'bg-transparent'}`}
         >
           <span
-            className={`absolute top-1/2 size-1.5 -translate-y-1/2 rounded-full bg-foreground transition-[left] ${slide ? 'left-[11px]' : 'left-[1px]'}`}
+            className={`absolute top-1/2 size-2 -translate-y-1/2 rounded-full bg-foreground transition-[left] ${slide ? 'left-[13px]' : 'left-[1px]'}`}
           />
         </span>
         Move
