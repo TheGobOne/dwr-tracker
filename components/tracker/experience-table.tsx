@@ -153,7 +153,7 @@ export function ExperienceWizard() {
         onClick={() => setOpen(true)}
         className="shrink-0 rounded-sm p-0.5 transition-transform hover:scale-110 focus-visible:outline-2 focus-visible:outline-primary"
       >
-        <img src="/sprites/king.png" alt="" width={36} height={36} className="size-9 [image-rendering:pixelated]" />
+        <img src="/sprites/king.png" alt="" width={32} height={32} className="size-8 [image-rendering:pixelated]" />
       </button>
       {open && <ExperienceWindow onClose={() => setOpen(false)} />}
     </>
