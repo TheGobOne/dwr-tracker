@@ -44,10 +44,8 @@ const CONTROL_SECTIONS: { title: string; controls: { input: string; action: stri
   {
     title: 'Other',
     controls: [
-      { input: 'King', action: 'Show the experience level table' },
-  { input: 'Notes', action: 'Free text for anything else in your run' },
-
-    ],
+  { input: 'King', action: 'Show the experience level table' },
+  ],
   },
 ]
 
