@@ -436,7 +436,7 @@ export function MapCanvas() {
       ctx.globalAlpha = 1
       {
         for (const icon of locationExtraIcons(marker, scale, size)) {
-          const opened = visited[icon.id]
+          const opened = icon.sprite !== 'key' && visited[icon.id]
           ctx.fillStyle = '#000000'
           ctx.fillRect(icon.x - 1, icon.y - 1, icon.size + 2, icon.size + 2)
           ctx.globalAlpha = opened ? 0.3 : 1
@@ -531,7 +531,7 @@ export function MapCanvas() {
     const py = e.clientY - rect.top
     for (const marker of markers) {
       const hit = locationExtraIcons(marker, scale, canvasPx).find(
-        (icon) => px >= icon.x - 1 && px <= icon.x + icon.size + 1 && py >= icon.y - 1 && py <= icon.y + icon.size + 1,
+        (icon) => icon.sprite !== 'key' && px >= icon.x - 1 && px <= icon.x + icon.size + 1 && py >= icon.y - 1 && py <= icon.y + icon.size + 1,
       )
       if (hit) return hit
     }

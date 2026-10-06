@@ -328,7 +328,9 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       setVisited((prev) => {
         const next = { ...prev, [id]: !prev[id] }
         if (next[id]) {
-          for (const extra of LOCATION_EXTRAS[id] ?? []) next[extra.id] = true
+          for (const extra of LOCATION_EXTRAS[id] ?? []) {
+            if (extra.sprite !== 'key') next[extra.id] = true
+          }
         }
         return next
       }),
