@@ -9,23 +9,25 @@ const TRIALS = 10000
 
 const pct = (v: number | null) => (v === null ? '-' : `${(v * 100).toFixed(1)}%`)
 
-type NumberKey = 'maxHp' | 'mp' | 'attack' | 'defense' | 'fairyWater' | 'healAt'
+type NumberKey = 'maxHp' | 'mp' | 'attack' | 'defense' | 'agility' | 'fairyWater'
 
-type FormState = Omit<SimInput, NumberKey | 'herbs'> & Record<NumberKey, number | null>
+const HEAL_AT = 48
+
+type FormState = Omit<SimInput, NumberKey | 'herbs' | 'healAt'> & Record<NumberKey, number | null>
 
 const DEFAULT_FORM: FormState = {
   maxHp: null,
   mp: null,
   attack: null,
   defense: null,
+  agility: null,
   fairyWater: null,
-  healAt: 48,
   deathNecklace: false,
   erdrickArmor: true,
   initiative: 'random',
 }
 
-const REQUIRED_KEYS: NumberKey[] = ['maxHp', 'mp', 'attack', 'defense']
+const REQUIRED_KEYS: NumberKey[] = ['maxHp', 'mp', 'attack', 'defense', 'agility']
 
 function toSimInput(form: FormState): SimInput | null {
   if (REQUIRED_KEYS.some((k) => form[k] === null)) return null
@@ -35,19 +37,20 @@ function toSimInput(form: FormState): SimInput | null {
     mp: form.mp ?? 0,
     attack: form.attack ?? 0,
     defense: form.defense ?? 0,
+    agility: form.agility ?? 0,
     fairyWater: form.fairyWater ?? 0,
-    healAt: form.healAt ?? 0,
+    healAt: HEAL_AT,
     herbs: 0,
   }
 }
 
-const NUMBER_FIELDS: { key: NumberKey; label: string; max: number }[] = [
-  { key: 'maxHp', label: 'Max HP', max: 999 },
-  { key: 'mp', label: 'MP', max: 999 },
-  { key: 'attack', label: 'Attack', max: 999 },
-  { key: 'defense', label: 'Defense', max: 999 },
-  { key: 'healAt', label: 'Heal at', max: 999 },
-  { key: 'fairyWater', label: 'Fairy', max: 6 },
+const NUMBER_FIELDS: { key: NumberKey; label: string; title: string; max: number }[] = [
+  { key: 'maxHp', label: 'HP', title: 'Max HP', max: 999 },
+  { key: 'mp', label: 'MP', title: 'Max MP', max: 999 },
+  { key: 'attack', label: 'ATK', title: 'Attack', max: 999 },
+  { key: 'defense', label: 'DEF', title: 'Defense', max: 999 },
+  { key: 'agility', label: 'AGI', title: 'Agility', max: 255 },
+  { key: 'fairyWater', label: 'Fairy', title: 'Fairy Water', max: 6 },
 ]
 
 const INITIATIVE_OPTIONS: { value: Initiative; label: string }[] = [
@@ -170,9 +173,9 @@ function SimWindow({
         </div>
 
         <div className="flex min-h-0 flex-col gap-2.5 overflow-y-auto pr-0.5">
-          <div className="grid grid-cols-4 gap-1.5">
+          <div className="grid grid-cols-4 items-end gap-1.5">
             {NUMBER_FIELDS.map((f) => (
-              <label key={f.key} className="flex flex-col gap-1 text-muted-foreground">
+              <label key={f.key} title={f.title} className="flex flex-col gap-1 whitespace-nowrap text-muted-foreground">
                 {f.label}
                 <NumberBox value={input[f.key]} max={f.max} onCommit={(raw) => setNumber(f.key, raw, f.max)} />
               </label>
@@ -211,9 +214,11 @@ function SimWindow({
             ))}
           </div>
 
+          <p className="text-muted-foreground">{`Heals at ${HEAL_AT} HP or below`}</p>
+
           {summary === null ? (
             <p className="border-t border-border pt-2.5 leading-relaxed text-muted-foreground">
-              Enter Max HP, MP, Attack and Defense to simulate.
+              Enter Max HP, MP, Attack, Defense and Agility to simulate.
             </p>
           ) : (
           <dl className="grid grid-cols-2 gap-x-3 gap-y-1.5 border-t border-border pt-2.5">

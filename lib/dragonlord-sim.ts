@@ -20,7 +20,6 @@ export const DL2 = {
 export const HEALMORE = { cost: 8, min: 85, max: 100 }
 export const HERB = { min: 23, max: 30 }
 export const DEATH_NECKLACE_AP = 10
-export const DL2_FIRST_CHANCE = 0.3
 const MAX_ROUNDS = 300
 
 export type Initiative = 'random' | 'first' | 'dlFirst'
@@ -30,6 +29,7 @@ export type SimInput = {
   mp: number
   attack: number
   defense: number
+  agility: number
   herbs: number
   fairyWater: number
   healAt: number
@@ -109,7 +109,8 @@ export function simulateFight(input: SimInput, rng: Rng, withLog = false): Fight
   const attackAvg = (Math.max(0, attack - DL2.agi / 2) * 3) / 8
 
   const dlFirst =
-    input.initiative === 'dlFirst' || (input.initiative === 'random' && rng() < DL2_FIRST_CHANCE)
+    input.initiative === 'dlFirst' ||
+    (input.initiative === 'random' && Math.floor(DL2.agi / 4) * byte(rng) > input.agility * byte(rng))
 
   say(`Dragonlord 2 appears with ${dlHp} HP.`)
   if (dlFirst) say('The Dragonlord moves first!')
