@@ -21,6 +21,15 @@ export function TrackerShortcuts() {
       if (inTypingField && e.key !== 'Tab') return
       e.preventDefault()
       e.stopImmediatePropagation()
+      // Tab cycles only among the DL2 sim boxes so focus still can't wander elsewhere.
+      if (e.type === 'keydown' && e.key === 'Tab' && e.target instanceof HTMLElement && e.target.matches('[data-sim-field]')) {
+        const scope = e.target.closest('[role="dialog"]') ?? document
+        const fields = [...scope.querySelectorAll<HTMLElement>('[data-sim-field]')]
+        const index = fields.indexOf(e.target)
+        const next = fields[(index + (e.shiftKey ? -1 : 1) + fields.length) % fields.length]
+        next?.focus()
+        if (next instanceof HTMLInputElement) next.select()
+      }
     }
     const unloadHandler = (e: BeforeUnloadEvent) => onBeforeUnload(e)
     window.addEventListener('keydown', blockKey, { capture: true })
