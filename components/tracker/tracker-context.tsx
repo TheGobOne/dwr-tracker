@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from 'react'
-import { LOCATION_BY_ID, MAP_SIZE, TERRAINS } from '@/lib/dw-data'
+import { LOCATION_BY_ID, MAP_SIZE, TANTEGEL_EXTRA_IDS, TERRAINS } from '@/lib/dw-data'
 
 export type Tool = 'paint' | 'fill' | 'marker' | 'pan'
 
@@ -322,7 +322,17 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const toggleItem = useCallback((id: string) => setItems((prev) => ({ ...prev, [id]: !prev[id] })), [])
-  const toggleVisited = useCallback((id: string) => setVisited((prev) => ({ ...prev, [id]: !prev[id] })), [])
+  const toggleVisited = useCallback(
+    (id: string) =>
+      setVisited((prev) => {
+        const next = { ...prev, [id]: !prev[id] }
+        if (id === 'tantegel' && next[id]) {
+          for (const extraId of TANTEGEL_EXTRA_IDS) next[extraId] = true
+        }
+        return next
+      }),
+    [],
+  )
   const updateSpell = useCallback((name: string, patch: Partial<SpellState>) => {
     setSpells((prev) => ({ ...prev, [name]: { ...(prev[name] ?? { learned: false, level: '' }), ...patch } }))
   }, [])

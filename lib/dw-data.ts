@@ -126,3 +126,11 @@ export const SPELLS = [
   'Healmore',
   'Hurtmore',
 ] as const
+
+export const TANTEGEL_EXTRA_IDS = [
+  'tantegel-chest-1',
+  'tantegel-chest-2',
+  'tantegel-chest-3',
+  'tantegel-chest-4',
+  'tantegel-stairs',
+] as const
