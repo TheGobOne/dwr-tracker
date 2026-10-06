@@ -9,20 +9,37 @@ const TRIALS = 10000
 
 const pct = (v: number | null) => (v === null ? '-' : `${(v * 100).toFixed(1)}%`)
 
-const DEFAULT_INPUT: SimInput = {
-  maxHp: 150,
-  mp: 120,
-  attack: 120,
-  defense: 90,
-  herbs: 0,
-  fairyWater: 0,
+type NumberKey = 'maxHp' | 'mp' | 'attack' | 'defense' | 'fairyWater' | 'healAt'
+
+type FormState = Omit<SimInput, NumberKey | 'herbs'> & Record<NumberKey, number | null>
+
+const DEFAULT_FORM: FormState = {
+  maxHp: null,
+  mp: null,
+  attack: null,
+  defense: null,
+  fairyWater: null,
   healAt: 48,
   deathNecklace: false,
   erdrickArmor: true,
   initiative: 'random',
 }
 
-type NumberKey = 'maxHp' | 'mp' | 'attack' | 'defense' | 'fairyWater' | 'healAt'
+const REQUIRED_KEYS: NumberKey[] = ['maxHp', 'mp', 'attack', 'defense']
+
+function toSimInput(form: FormState): SimInput | null {
+  if (REQUIRED_KEYS.some((k) => form[k] === null)) return null
+  return {
+    ...form,
+    maxHp: form.maxHp ?? 0,
+    mp: form.mp ?? 0,
+    attack: form.attack ?? 0,
+    defense: form.defense ?? 0,
+    fairyWater: form.fairyWater ?? 0,
+    healAt: form.healAt ?? 0,
+    herbs: 0,
+  }
+}
 
 const NUMBER_FIELDS: { key: NumberKey; label: string; max: number }[] = [
   { key: 'maxHp', label: 'Max HP', max: 999 },
@@ -72,9 +89,15 @@ function Toggle({
   )
 }
 
-function NumberBox({ value, max, onCommit }: { value: number; max: number; onCommit: (raw: string) => void }) {
-  const [draft, setDraft] = useState<string | null>(null)
-
+function NumberBox({
+  value,
+  max,
+  onCommit,
+}: {
+  value: number | null
+  max: number
+  onCommit: (raw: string) => void
+}) {
   return (
     <input
       type="text"
@@ -82,17 +105,9 @@ function NumberBox({ value, max, onCommit }: { value: number; max: number; onCom
       inputMode="numeric"
       pattern="[0-9]*"
       maxLength={String(max).length}
-      value={draft ?? String(value)}
+      value={value === null ? '' : String(value)}
       onFocus={(e) => e.currentTarget.select()}
-      onChange={(e) => {
-        const digits = e.target.value.replace(/\D/g, '')
-        setDraft(digits)
-        if (digits !== '') onCommit(digits)
-      }}
-      onBlur={() => {
-        if (draft === '') onCommit('0')
-        setDraft(null)
-      }}
+      onChange={(e) => onCommit(e.target.value.replace(/\D/g, ''))}
       onKeyDown={(e) => {
         if (e.key === 'Enter') e.currentTarget.blur()
       }}
@@ -110,9 +125,9 @@ function SimWindow({
   summary,
   onClose,
 }: {
-  input: SimInput
-  setInput: React.Dispatch<React.SetStateAction<SimInput>>
-  summary: ReturnType<typeof runSimulation>
+  input: FormState
+  setInput: React.Dispatch<React.SetStateAction<FormState>>
+  summary: ReturnType<typeof runSimulation> | null
   onClose: () => void
 }) {
   const closeRef = useRef<HTMLButtonElement>(null)
@@ -122,7 +137,7 @@ function SimWindow({
   }, [])
 
   const setNumber = (key: NumberKey, raw: string, max: number) => {
-    const n = Math.max(0, Math.min(max, Math.floor(Number(raw) || 0)))
+    const n = raw === '' ? null : Math.max(0, Math.min(max, Math.floor(Number(raw))))
     setInput((prev) => ({ ...prev, [key]: n }))
   }
 
@@ -196,6 +211,11 @@ function SimWindow({
             ))}
           </div>
 
+          {summary === null ? (
+            <p className="border-t border-border pt-2.5 leading-relaxed text-muted-foreground">
+              Enter Max HP, MP, Attack and Defense to simulate.
+            </p>
+          ) : (
           <dl className="grid grid-cols-2 gap-x-3 gap-y-1.5 border-t border-border pt-2.5">
             <dt className="text-muted-foreground">Win rate</dt>
             <dd className={cn('text-right tabular-nums', winRateColor(summary.winRate))}>
@@ -214,6 +234,7 @@ function SimWindow({
             <dt className="text-muted-foreground">Out of heals</dt>
             <dd className="text-right tabular-nums text-foreground">{pct(summary.outOfHealingRate)}</dd>
           </dl>
+          )}
         </div>
       </div>
     </div>,
@@ -223,15 +244,22 @@ function SimWindow({
 
 export function DragonlordSimButton() {
   const [open, setOpen] = useState(false)
-  const [input, setInput] = useState<SimInput>(DEFAULT_INPUT)
+  const [input, setInput] = useState<FormState>(DEFAULT_FORM)
   const deferredInput = useDeferredValue(input)
-  const summary = useMemo(() => runSimulation(deferredInput, TRIALS, 1), [deferredInput])
+  const summary = useMemo(() => {
+    const simInput = toSimInput(deferredInput)
+    return simInput ? runSimulation(simInput, TRIALS, 1) : null
+  }, [deferredInput])
 
   return (
     <>
       <button
         type="button"
-        aria-label={`Open Dragonlord 2 fight simulator, win rate ${pct(summary.winRate)}`}
+        aria-label={
+          summary
+            ? `Open Dragonlord 2 fight simulator, win rate ${pct(summary.winRate)}`
+            : 'Open Dragonlord 2 fight simulator'
+        }
         aria-haspopup="dialog"
         onClick={() => setOpen(true)}
         className="group flex shrink-0 flex-col items-center gap-0.5 rounded-sm p-0.5 focus-visible:outline-2 focus-visible:outline-primary"
@@ -243,9 +271,11 @@ export function DragonlordSimButton() {
           height={36}
           className="size-9 object-contain transition-transform [image-rendering:pixelated] group-hover:scale-110"
         />
-        <span className={cn('font-display text-[9px] leading-none tabular-nums', winRateColor(summary.winRate))}>
-          {pct(summary.winRate)}
-        </span>
+        {summary && (
+          <span className={cn('font-display text-[9px] leading-none tabular-nums', winRateColor(summary.winRate))}>
+            {pct(summary.winRate)}
+          </span>
+        )}
       </button>
       {open && <SimWindow input={input} setInput={setInput} summary={summary} onClose={() => setOpen(false)} />}
     </>
