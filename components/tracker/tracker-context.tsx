@@ -181,7 +181,7 @@ interface TrackerContextValue {
   placeMarker: (x: number, y: number) => void
   removeMarker: (id: string) => void
   moveMarker: (id: string, x: number, y: number) => void
-  shiftMarkers: (dx: number, dy: number) => void
+  shiftMarkers: (dx: number, dy: number, ids?: ReadonlySet<string>) => void
   removeMarkerAt: (x: number, y: number) => boolean
   undo: () => void
   reset: () => void
@@ -297,12 +297,13 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
   )
 
   const shiftMarkers = useCallback(
-    (dx: number, dy: number) => {
+    (dx: number, dy: number, ids?: ReadonlySet<string>) => {
       if (dx === 0 && dy === 0) return
       const current = markersRef.current
-      if (current.length === 0 || current.some((m) => !inBounds(m.x + dx, m.y + dy))) return
+      const moving = ids ? current.filter((m) => ids.has(m.id)) : current
+      if (moving.length === 0 || moving.some((m) => !inBounds(m.x + dx, m.y + dy))) return
       beginStroke()
-      commitMarkers(current.map((m) => ({ ...m, x: m.x + dx, y: m.y + dy })))
+      commitMarkers(current.map((m) => (!ids || ids.has(m.id) ? { ...m, x: m.x + dx, y: m.y + dy } : m)))
     },
     [beginStroke, commitMarkers],
   )

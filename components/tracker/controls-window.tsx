@@ -18,9 +18,10 @@ const CONTROL_SECTIONS: { title: string; controls: { input: string; action: stri
       { input: 'Right click empty', action: 'Switch to the pen, then left drag to draw green lines' },
       { input: 'Middle click', action: 'Switch to the eraser, then left drag over lines to erase' },
       { input: 'Click again', action: 'Right click in pen or middle click in eraser to go back to placing' },
-  { input: 'Slide toggle', action: 'Bottom left of the map: turn on to move all markers and lines together' },
-  { input: 'Left click (Slide)', action: 'Pick up everything on the map, then left click again to drop it' },
-  { input: 'Right click (Slide)', action: 'Cancel the move and put everything back where it was' },
+  { input: 'Slide toggle', action: 'Bottom left of the map: turn on to move a group of markers and lines' },
+  { input: 'Left drag (Slide)', action: 'Draw a box to select the markers and lines inside it' },
+  { input: 'Left click (Slide)', action: 'Click inside the selection to pick it up, then left click again to drop it' },
+  { input: 'Right click (Slide)', action: 'Cancel the move, or clear the selection if nothing is held' },
     ],
   },
   {

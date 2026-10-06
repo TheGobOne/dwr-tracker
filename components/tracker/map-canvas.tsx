@@ -121,6 +121,43 @@ function clampShift(markers: Marker[], strokes: Point[][], dx: number, dy: numbe
   }
 }
 
+type SlideSelection = { markerIds: Set<string>; strokeIdx: Set<number> }
+type Bounds = { minX: number; minY: number; maxX: number; maxY: number }
+
+const SELECTION_PAD = 0.3
+
+function itemBounds(markers: Marker[], strokes: Point[][], scale: number): Bounds | null {
+  let minX = Infinity
+  let minY = Infinity
+  let maxX = -Infinity
+  let maxY = -Infinity
+  for (const m of markers) {
+    const half = Math.max(0.5, (markerSize(scale, m) / 2 + 2) / scale)
+    minX = Math.min(minX, m.x + 0.5 - half)
+    minY = Math.min(minY, m.y + 0.5 - half)
+    maxX = Math.max(maxX, m.x + 0.5 + half)
+    maxY = Math.max(maxY, m.y + 0.5 + half)
+  }
+  for (const stroke of strokes) {
+    for (const p of stroke) {
+      minX = Math.min(minX, p.x)
+      minY = Math.min(minY, p.y)
+      maxX = Math.max(maxX, p.x)
+      maxY = Math.max(maxY, p.y)
+    }
+  }
+  return minX === Infinity ? null : { minX, minY, maxX, maxY }
+}
+
+function inPaddedBounds(b: Bounds, p: Point) {
+  return (
+    p.x >= b.minX - SELECTION_PAD &&
+    p.x <= b.maxX + SELECTION_PAD &&
+    p.y >= b.minY - SELECTION_PAD &&
+    p.y <= b.maxY + SELECTION_PAD
+  )
+}
+
 function translateStroke(stroke: Point[], dx: number, dy: number) {
   return stroke.map((p) => ({ x: p.x + dx, y: p.y + dy }))
 }
@@ -184,6 +221,22 @@ export function MapCanvas() {
   const isErasingRef = useRef(false)
   const [slide, setSlide] = useState(false)
   const [held, setHeld] = useState<Point | null>(null)
+  const [selection, setSelection] = useState<SlideSelection | null>(null)
+  const [box, setBox] = useState<{ start: Point; end: Point } | null>(null)
+  const selectedMarkers = useMemo(
+    () => (selection ? markers.filter((m) => selection.markerIds.has(m.id)) : []),
+    [markers, selection],
+  )
+  const selectedStrokes = useMemo(
+    () => (selection ? drawings.filter((_, i) => selection.strokeIdx.has(i)) : []),
+    [drawings, selection],
+  )
+  const [canvasPx, setCanvasPx] = useState(MAP_SIZE * 4)
+  const scale = canvasPx / MAP_SIZE
+  const selectionBounds = useMemo(
+    () => itemBounds(selectedMarkers, selectedStrokes, scale),
+    [selectedMarkers, selectedStrokes, scale],
+  )
   const [sprites, setSprites] = useState<Partial<Record<SpriteName, HTMLImageElement>>>({})
 
   useEffect(() => {
@@ -200,11 +253,8 @@ export function MapCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const offscreenRef = useRef<HTMLCanvasElement | null>(null)
 
-  const [canvasPx, setCanvasPx] = useState(MAP_SIZE * 4)
   const [hover, setHover] = useState<Point | null>(null)
   const [flash, setFlash] = useState<Point | null>(null)
-
-  const scale = canvasPx / MAP_SIZE
 
   const exploredPct = useMemo(() => {
     let count = 0
@@ -302,8 +352,14 @@ export function MapCanvas() {
       ctx.stroke()
     }
 
-    const shift = held && hover ? clampShift(markers, drawings, hover.x - held.x, hover.y - held.y) : null
-    const placedStrokes = shift ? drawings.map((s) => translateStroke(s, shift.x, shift.y)) : drawings
+    const shift =
+      held && hover && selection
+        ? clampShift(selectedMarkers, selectedStrokes, hover.x - held.x, hover.y - held.y)
+        : null
+    const placedStrokes =
+      shift && selection
+        ? drawings.map((s, i) => (selection.strokeIdx.has(i) ? translateStroke(s, shift.x, shift.y) : s))
+        : drawings
     const strokes = activeStroke ? [...placedStrokes, activeStroke] : placedStrokes
     if (strokes.length > 0) {
       ctx.lineCap = 'round'
@@ -332,7 +388,10 @@ export function MapCanvas() {
       ctx.strokeRect(hover.x * scale, hover.y * scale, scale, scale)
     }
 
-    const displayMarkers = shift ? markers.map((m) => ({ ...m, x: m.x + shift.x, y: m.y + shift.y })) : markers
+    const displayMarkers =
+      shift && selection
+        ? markers.map((m) => (selection.markerIds.has(m.id) ? { ...m, x: m.x + shift.x, y: m.y + shift.y } : m))
+        : markers
 
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
@@ -389,6 +448,35 @@ export function MapCanvas() {
       }
     }
 
+    if (slide && selectionBounds) {
+      const dx = shift?.x ?? 0
+      const dy = shift?.y ?? 0
+      ctx.strokeStyle = '#F8B800'
+      ctx.lineWidth = 2
+      ctx.setLineDash([6, 4])
+      ctx.strokeRect(
+        (selectionBounds.minX - SELECTION_PAD + dx) * scale,
+        (selectionBounds.minY - SELECTION_PAD + dy) * scale,
+        (selectionBounds.maxX - selectionBounds.minX + SELECTION_PAD * 2) * scale,
+        (selectionBounds.maxY - selectionBounds.minY + SELECTION_PAD * 2) * scale,
+      )
+      ctx.setLineDash([])
+    }
+
+    if (box) {
+      const x = Math.min(box.start.x, box.end.x) * scale
+      const y = Math.min(box.start.y, box.end.y) * scale
+      const w = Math.abs(box.end.x - box.start.x) * scale
+      const h = Math.abs(box.end.y - box.start.y) * scale
+      ctx.fillStyle = 'rgba(248,184,0,0.12)'
+      ctx.fillRect(x, y, w, h)
+      ctx.strokeStyle = '#FCFCFC'
+      ctx.lineWidth = 1
+      ctx.setLineDash([4, 3])
+      ctx.strokeRect(x + 0.5, y + 0.5, w, h)
+      ctx.setLineDash([])
+    }
+
     if (flash) {
       ctx.strokeStyle = '#F8B800'
       ctx.lineWidth = 3
@@ -396,7 +484,7 @@ export function MapCanvas() {
       ctx.arc(flash.x * scale + scale / 2, flash.y * scale + scale / 2, markerSize(scale) * 1.4, 0, Math.PI * 2)
       ctx.stroke()
     }
-  }, [tiles, markers, visited, canvasPx, scale, showGrid, hover, flash, bridgeImg, sprites, drawings, activeStroke, mode, slide, held])
+  }, [tiles, markers, visited, canvasPx, scale, showGrid, hover, flash, bridgeImg, sprites, drawings, activeStroke, mode, slide, held, selection, selectedMarkers, selectedStrokes, selectionBounds, box])
 
   useEffect(() => {
     if (!focusRequest) return
@@ -467,23 +555,57 @@ export function MapCanvas() {
 
   function handleSlideClick(e: React.PointerEvent<HTMLCanvasElement>) {
     const tile = pointerToTile(e)
-    if (held) {
-      const shift = clampShift(markers, drawings, tile.x - held.x, tile.y - held.y)
+    if (held && selection) {
+      const shift = clampShift(selectedMarkers, selectedStrokes, tile.x - held.x, tile.y - held.y)
       if (shift.x !== 0 || shift.y !== 0) {
-        shiftMarkers(shift.x, shift.y)
-        setDrawings((prev) => prev.map((s) => translateStroke(s, shift.x, shift.y)))
+        if (selection.markerIds.size > 0) shiftMarkers(shift.x, shift.y, selection.markerIds)
+        if (selection.strokeIdx.size > 0) {
+          setDrawings((prev) =>
+            prev.map((s, i) => (selection.strokeIdx.has(i) ? translateStroke(s, shift.x, shift.y) : s)),
+          )
+        }
       }
       setHeld(null)
       return
     }
-    if (markers.length === 0 && drawings.length === 0) return
-    setHeld(tile)
-    setHover(tile)
+    const point = pointerToMapPoint(e)
+    if (selectionBounds && inPaddedBounds(selectionBounds, point)) {
+      setHeld(tile)
+      setHover(tile)
+      return
+    }
+    e.currentTarget.setPointerCapture(e.pointerId)
+    setSelection(null)
+    setBox({ start: point, end: point })
+  }
+
+  function finishBox() {
+    if (!box) return
+    const x0 = Math.min(box.start.x, box.end.x)
+    const x1 = Math.max(box.start.x, box.end.x)
+    const y0 = Math.min(box.start.y, box.end.y)
+    const y1 = Math.max(box.start.y, box.end.y)
+    const markerIds = new Set(
+      markers.filter((m) => m.x + 1 >= x0 && m.x <= x1 && m.y + 1 >= y0 && m.y <= y1).map((m) => m.id),
+    )
+    const strokeIdx = new Set<number>()
+    drawings.forEach((stroke, i) => {
+      if (stroke.some((p) => p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1)) strokeIdx.add(i)
+    })
+    setSelection(markerIds.size > 0 || strokeIdx.size > 0 ? { markerIds, strokeIdx } : null)
+    setBox(null)
+  }
+
+  function handlePointerUp() {
+    if (box) finishBox()
+    else finishStroke()
   }
 
   function toggleSlide() {
     setSlide((on) => !on)
     setHeld(null)
+    setSelection(null)
+    setBox(null)
     setActiveStroke(null)
     isErasingRef.current = false
     setMode('place')
@@ -541,6 +663,10 @@ export function MapCanvas() {
   }
 
   function handlePointerMove(e: React.PointerEvent<HTMLCanvasElement>) {
+    if (box) {
+      setBox({ start: box.start, end: pointerToMapPoint(e) })
+      return
+    }
     if (activeStroke) {
       const p = pointerToMapPoint(e)
       const last = activeStroke[activeStroke.length - 1]
@@ -558,7 +684,11 @@ export function MapCanvas() {
   function handleContextMenu(e: React.MouseEvent<HTMLCanvasElement>) {
     e.preventDefault()
     if (slide) {
-      setHeld(null)
+      if (held) setHeld(null)
+      else {
+        setBox(null)
+        setSelection(null)
+      }
       return
     }
     if (mode !== 'place') {
@@ -577,7 +707,9 @@ export function MapCanvas() {
   }
 
   const modeLabel = slide ? ', slide mode' : mode === 'pen' ? ', pen mode' : mode === 'eraser' ? ', eraser mode' : ''
-  const cursor = slide ? (held ? 'grabbing' : 'grab') : MODE_CURSOR[mode]
+  const overSelection =
+    !!selectionBounds && !!hover && inPaddedBounds(selectionBounds, { x: hover.x + 0.5, y: hover.y + 0.5 })
+  const cursor = slide ? (held ? 'grabbing' : overSelection ? 'grab' : 'crosshair') : MODE_CURSOR[mode]
 
   return (
   <section aria-label="Overworld map" className="dw-window relative flex flex-none flex-col self-center overflow-hidden">
@@ -593,8 +725,8 @@ export function MapCanvas() {
           className="block"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
-          onPointerUp={finishStroke}
-          onPointerCancel={finishStroke}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
           onPointerLeave={() => setHover(null)}
           onContextMenu={handleContextMenu}
           onAuxClick={(e) => e.preventDefault()}
