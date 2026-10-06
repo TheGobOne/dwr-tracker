@@ -751,7 +751,7 @@ export function MapCanvas() {
         role="switch"
         aria-checked={slide}
         onClick={toggleSlide}
-        className="font-display absolute bottom-1.5 left-1.5 z-10 flex items-center gap-1.5 rounded-sm bg-black/60 px-1.5 py-1 text-[10px] leading-none text-foreground outline-none hover:text-primary focus-visible:ring-2 focus-visible:ring-primary"
+        className="font-display absolute right-1.5 bottom-1.5 z-10 flex items-center gap-1.5 rounded-sm bg-black/60 px-1.5 py-1 text-[10px] leading-none text-foreground outline-none hover:text-primary focus-visible:ring-2 focus-visible:ring-primary"
       >
         <span
           aria-hidden="true"
@@ -763,10 +763,10 @@ export function MapCanvas() {
         </span>
         Move
       </button>
-      <div className="absolute right-1.5 bottom-1.5 z-10 rounded-sm bg-black/60">
+      <div className="absolute bottom-1.5 left-1.5 z-10 rounded-sm bg-black/60">
         <ExperienceWizard />
       </div>
-      <div className="absolute top-1.5 right-1.5 z-10 rounded-sm bg-black/60">
+      <div className="absolute top-1.5 left-1.5 z-10 rounded-sm bg-black/60">
         <DragonlordSimButton />
       </div>
       <CaveMapViewer locationId={caveMapId} onClose={closeCaveMap} />

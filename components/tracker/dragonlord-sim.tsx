@@ -1,9 +1,13 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
-import { effectiveStats, type Initiative, type SimInput } from '@/lib/dragonlord-sim'
+import { runSimulation, type Initiative, type SimInput } from '@/lib/dragonlord-sim'
+
+const TRIALS = 10000
+
+const pct = (v: number | null) => (v === null ? '-' : `${(v * 100).toFixed(1)}%`)
 
 const DEFAULT_INPUT: SimInput = {
   maxHp: 150,
@@ -68,7 +72,8 @@ function SimWindow({
     closeRef.current?.focus({ preventScroll: true })
   }, [])
 
-  const { maxHp } = effectiveStats(input)
+  const deferredInput = useDeferredValue(input)
+  const summary = useMemo(() => runSimulation(deferredInput, TRIALS, 1), [deferredInput])
 
   const setNumber = (key: NumberKey, raw: string, max: number) => {
     const n = Math.max(0, Math.min(max, Math.floor(Number(raw) || 0)))
@@ -122,16 +127,11 @@ function SimWindow({
           </div>
 
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-            <div className="flex items-center gap-1.5">
-              <Toggle
-                label="Death Necklace"
-                checked={input.deathNecklace}
-                onChange={(v) => setInput((p) => ({ ...p, deathNecklace: v }))}
-              />
-              <span className={cn('tabular-nums', input.deathNecklace ? 'text-primary' : 'text-muted-foreground')}>
-                HP {maxHp}
-              </span>
-            </div>
+            <Toggle
+              label="Death Necklace"
+              checked={input.deathNecklace}
+              onChange={(v) => setInput((p) => ({ ...p, deathNecklace: v }))}
+            />
             <Toggle
               label="Erdrick's Armor"
               checked={input.erdrickArmor}
@@ -159,6 +159,29 @@ function SimWindow({
             ))}
           </div>
 
+          <dl className="grid grid-cols-2 gap-x-3 gap-y-1.5 border-t border-border pt-2.5">
+            <dt className="text-muted-foreground">Win rate</dt>
+            <dd
+              className={cn(
+                'text-right tabular-nums',
+                summary.winRate >= 0.9 ? 'text-[#58D854]' : summary.winRate < 0.5 ? 'text-[#F83800]' : 'text-foreground',
+              )}
+            >
+              {pct(summary.winRate)}
+            </dd>
+            <dt className="text-muted-foreground">Ambushed</dt>
+            <dd className="text-right tabular-nums text-foreground">{pct(summary.ambushRate)}</dd>
+            <dt className="text-muted-foreground">Win, first</dt>
+            <dd className="text-right tabular-nums text-foreground">{pct(summary.winWhenFirst)}</dd>
+            <dt className="text-muted-foreground">Win, ambushed</dt>
+            <dd className="text-right tabular-nums text-foreground">{pct(summary.winWhenAmbushed)}</dd>
+            <dt className="text-muted-foreground">Avg rounds</dt>
+            <dd className="text-right tabular-nums text-foreground">{summary.avgRounds.toFixed(1)}</dd>
+            <dt className="text-muted-foreground">Avg HP left</dt>
+            <dd className="text-right tabular-nums text-foreground">{summary.avgHpLeftOnWin.toFixed(0)}</dd>
+            <dt className="text-muted-foreground">Out of heals</dt>
+            <dd className="text-right tabular-nums text-foreground">{pct(summary.outOfHealingRate)}</dd>
+          </dl>
         </div>
       </div>
     </div>,
@@ -179,7 +202,7 @@ export function DragonlordSimButton() {
         onClick={() => setOpen(true)}
         className="shrink-0 rounded-sm p-0.5 transition-transform hover:scale-110 focus-visible:outline-2 focus-visible:outline-primary"
       >
-        <img src="/sprites/dragonlord2.png" alt="" width={36} height={36} className="size-9 [image-rendering:pixelated]" />
+        <img src="/dragonlord-icon.png" alt="" width={36} height={36} className="size-9 object-contain [image-rendering:pixelated]" />
       </button>
       {open && <SimWindow input={input} setInput={setInput} onClose={() => setOpen(false)} />}
     </>
