@@ -34,14 +34,6 @@ const CONTROL_SECTIONS: { title: string; controls: { input: string; action: stri
     ],
   },
   {
-    title: 'Items & Spells',
-    controls: [
-      { input: 'Click', action: 'Toggle an item or spell as found' },
-      { input: 'Coords', action: "Record the token's search coordinates" },
-      { input: 'Monsters', action: 'Look up monster stats and grind potential' },
-    ],
-  },
-  {
     title: 'Other',
     controls: [
   { input: 'King', action: 'Show the experience level table' },
