@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CAVE_MAPS, CaveMapViewer } from './cave-map-viewer'
 import { ExperienceWizard } from './experience-table'
+import { DragonlordSimButton } from './dragonlord-sim'
 import { cn } from '@/lib/utils'
 import { KIND_META, LOCATION_BY_ID, LOCATION_EXTRAS, MAP_SIZE, PIN_COLOR, SPLIT_COLORS, TERRAIN_RGB } from '@/lib/dw-data'
 import { useTracker, type Marker } from './tracker-context'
@@ -764,6 +765,9 @@ export function MapCanvas() {
       </button>
       <div className="absolute right-1.5 bottom-1.5 z-10 rounded-sm bg-black/60">
         <ExperienceWizard />
+      </div>
+      <div className="absolute top-1.5 right-1.5 z-10 rounded-sm bg-black/60">
+        <DragonlordSimButton />
       </div>
       <CaveMapViewer locationId={caveMapId} onClose={closeCaveMap} />
     </section>
