@@ -14,7 +14,6 @@ const DEFAULT_INPUT: SimInput = {
   mp: 120,
   attack: 120,
   defense: 90,
-  agility: 110,
   herbs: 0,
   fairyWater: 0,
   healAt: 48,
@@ -23,23 +22,21 @@ const DEFAULT_INPUT: SimInput = {
   initiative: 'random',
 }
 
-type NumberKey = 'maxHp' | 'mp' | 'attack' | 'defense' | 'agility' | 'herbs' | 'fairyWater' | 'healAt'
+type NumberKey = 'maxHp' | 'mp' | 'attack' | 'defense' | 'fairyWater' | 'healAt'
 
 const NUMBER_FIELDS: { key: NumberKey; label: string; max: number }[] = [
   { key: 'maxHp', label: 'Max HP', max: 999 },
   { key: 'mp', label: 'MP', max: 999 },
   { key: 'attack', label: 'Attack', max: 999 },
   { key: 'defense', label: 'Defense', max: 999 },
-  { key: 'agility', label: 'Agility', max: 255 },
   { key: 'healAt', label: 'Heal at', max: 999 },
-  { key: 'herbs', label: 'Herbs', max: 6 },
   { key: 'fairyWater', label: 'Fairy', max: 6 },
 ]
 
 const INITIATIVE_OPTIONS: { value: Initiative; label: string }[] = [
   { value: 'random', label: 'Random' },
-  { value: 'first', label: 'Go first' },
-  { value: 'ambushed', label: 'Ambushed' },
+  { value: 'first', label: 'You first' },
+  { value: 'dlFirst', label: 'DL2 first' },
 ]
 
 
@@ -186,12 +183,12 @@ function SimWindow({
             <dd className={cn('text-right tabular-nums', winRateColor(summary.winRate))}>
               {pct(summary.winRate)}
             </dd>
-            <dt className="text-muted-foreground">Ambushed</dt>
-            <dd className="text-right tabular-nums text-foreground">{pct(summary.ambushRate)}</dd>
-            <dt className="text-muted-foreground">Win, first</dt>
+            <dt className="text-muted-foreground">DL2 first</dt>
+            <dd className="text-right tabular-nums text-foreground">{pct(summary.dlFirstRate)}</dd>
+            <dt className="text-muted-foreground">Win, you first</dt>
             <dd className="text-right tabular-nums text-foreground">{pct(summary.winWhenFirst)}</dd>
-            <dt className="text-muted-foreground">Win, ambushed</dt>
-            <dd className="text-right tabular-nums text-foreground">{pct(summary.winWhenAmbushed)}</dd>
+            <dt className="text-muted-foreground">Win, DL2 first</dt>
+            <dd className="text-right tabular-nums text-foreground">{pct(summary.winWhenDlFirst)}</dd>
             <dt className="text-muted-foreground">Avg rounds</dt>
             <dd className="text-right tabular-nums text-foreground">{summary.avgRounds.toFixed(1)}</dd>
             <dt className="text-muted-foreground">Avg HP left</dt>

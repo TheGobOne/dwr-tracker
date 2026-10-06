@@ -20,16 +20,16 @@ export const DL2 = {
 export const HEALMORE = { cost: 8, min: 85, max: 100 }
 export const HERB = { min: 23, max: 30 }
 export const DEATH_NECKLACE_AP = 10
+export const DL2_FIRST_CHANCE = 0.3
 const MAX_ROUNDS = 300
 
-export type Initiative = 'random' | 'first' | 'ambushed'
+export type Initiative = 'random' | 'first' | 'dlFirst'
 
 export type SimInput = {
   maxHp: number
   mp: number
   attack: number
   defense: number
-  agility: number
   herbs: number
   fairyWater: number
   healAt: number
@@ -40,7 +40,7 @@ export type SimInput = {
 
 export type FightResult = {
   won: boolean
-  ambushed: boolean
+  dlFirst: boolean
   rounds: number
   hpLeft: number
   outOfHealing: boolean
@@ -50,9 +50,9 @@ export type FightResult = {
 export type SimSummary = {
   trials: number
   winRate: number
-  ambushRate: number
+  dlFirstRate: number
   winWhenFirst: number | null
-  winWhenAmbushed: number | null
+  winWhenDlFirst: number | null
   avgRounds: number
   avgHpLeftOnWin: number
   outOfHealingRate: number
@@ -94,10 +94,6 @@ function enemyAttackDamage(rng: Rng, defense: number) {
   return Math.floor((base * (byte(rng) + 256)) / 1024)
 }
 
-function rollAmbush(rng: Rng, agility: number) {
-  return agility * byte(rng) < (DL2.agi * byte(rng)) / 4
-}
-
 export function simulateFight(input: SimInput, rng: Rng, withLog = false): FightResult {
   const { maxHp, attack } = effectiveStats(input)
   const log: string[] = []
@@ -112,11 +108,11 @@ export function simulateFight(input: SimInput, rng: Rng, withLog = false): Fight
   const fairyAvg = (DL2.fairyMin + DL2.fairyMax) / 2
   const attackAvg = (Math.max(0, attack - DL2.agi / 2) * 3) / 8
 
-  const ambushed =
-    input.initiative === 'ambushed' || (input.initiative === 'random' && rollAmbush(rng, input.agility))
+  const dlFirst =
+    input.initiative === 'dlFirst' || (input.initiative === 'random' && rng() < DL2_FIRST_CHANCE)
 
   say(`Dragonlord 2 appears with ${dlHp} HP.`)
-  if (ambushed) say('The Dragonlord attacked before you were ready!')
+  if (dlFirst) say('The Dragonlord moves first!')
 
   const dragonTurn = () => {
     if (rng() < DL2.breathChance) {
@@ -162,7 +158,7 @@ export function simulateFight(input: SimInput, rng: Rng, withLog = false): Fight
   }
 
   let rounds = 0
-  if (ambushed) dragonTurn()
+  if (dlFirst) dragonTurn()
   while (hp > 0 && dlHp > 0 && rounds < MAX_ROUNDS) {
     rounds += 1
     heroTurn()
@@ -173,14 +169,14 @@ export function simulateFight(input: SimInput, rng: Rng, withLog = false): Fight
   const won = dlHp <= 0 && hp > 0
   say(won ? `You defeated the Dragonlord with ${hp} HP left!` : hp <= 0 ? 'Thou art dead.' : 'The fight dragged on too long.')
 
-  return { won, ambushed, rounds, hpLeft: Math.max(0, hp), outOfHealing, log }
+  return { won, dlFirst, rounds, hpLeft: Math.max(0, hp), outOfHealing, log }
 }
 
 export function runSimulation(input: SimInput, trials: number, seed: number): SimSummary {
   const rng = mulberry32(seed)
   let wins = 0
-  let ambushes = 0
-  let ambushWins = 0
+  let dlFirsts = 0
+  let dlFirstWins = 0
   let roundsTotal = 0
   let hpLeftOnWin = 0
   let outOfHealing = 0
@@ -189,22 +185,22 @@ export function runSimulation(input: SimInput, trials: number, seed: number): Si
     const r = simulateFight(input, rng)
     roundsTotal += r.rounds
     if (r.outOfHealing) outOfHealing += 1
-    if (r.ambushed) ambushes += 1
+    if (r.dlFirst) dlFirsts += 1
     if (r.won) {
       wins += 1
       hpLeftOnWin += r.hpLeft
-      if (r.ambushed) ambushWins += 1
+      if (r.dlFirst) dlFirstWins += 1
     }
   }
 
-  const firsts = trials - ambushes
+  const firsts = trials - dlFirsts
   const { maxHp, attack } = effectiveStats(input)
   return {
     trials,
     winRate: wins / trials,
-    ambushRate: ambushes / trials,
-    winWhenFirst: firsts ? (wins - ambushWins) / firsts : null,
-    winWhenAmbushed: ambushes ? ambushWins / ambushes : null,
+    dlFirstRate: dlFirsts / trials,
+    winWhenFirst: firsts ? (wins - dlFirstWins) / firsts : null,
+    winWhenDlFirst: dlFirsts ? dlFirstWins / dlFirsts : null,
     avgRounds: roundsTotal / trials,
     avgHpLeftOnWin: wins ? hpLeftOnWin / wins : 0,
     outOfHealingRate: outOfHealing / trials,
