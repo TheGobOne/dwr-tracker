@@ -158,28 +158,26 @@ function SimWindow({
       }}
     >
       <div className="dw-window absolute top-1.5 right-1.5 left-1/2 flex max-h-[calc(100%-0.75rem)] flex-col gap-2 p-2.5 font-display text-[9px] leading-none">
-        <div className="flex items-center justify-between gap-4">
-          <h2 id="dl2-sim-title" className="text-[10px] text-primary">
-            Dragonlord 2
-          </h2>
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setInput(DEFAULT_FORM)}
-              className="text-[10px] text-foreground hover:text-primary focus-visible:outline-2 focus-visible:outline-primary"
-            >
-              CLEAR
-            </button>
-            <button
-              ref={closeRef}
-              type="button"
-              onClick={onClose}
-              className="text-[10px] text-foreground hover:text-primary focus-visible:outline-2 focus-visible:outline-primary"
-            >
-              CLOSE
-            </button>
-          </div>
-        </div>
+  <div className="flex items-center justify-between gap-4">
+  <h2 id="dl2-sim-title" className="whitespace-nowrap text-[10px] text-primary">
+  Dragonlord 2
+  </h2>
+  <button
+  type="button"
+  onClick={() => setInput(DEFAULT_FORM)}
+  className="text-[10px] text-[#F83800] hover:text-[#FF7759] focus-visible:outline-2 focus-visible:outline-[#F83800]"
+  >
+  CLEAR
+  </button>
+  <button
+  ref={closeRef}
+  type="button"
+  onClick={onClose}
+  className="text-[10px] text-foreground hover:text-primary focus-visible:outline-2 focus-visible:outline-primary"
+  >
+  CLOSE
+  </button>
+  </div>
 
         <div className="flex min-h-0 flex-col gap-2.5 overflow-y-auto pr-0.5">
           <div className="grid grid-cols-4 items-end gap-1.5">
