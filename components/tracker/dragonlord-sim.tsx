@@ -57,6 +57,34 @@ function Toggle({ label, checked, onChange }: { label: string; checked: boolean;
   )
 }
 
+function NumberBox({ value, max, onCommit }: { value: number; max: number; onCommit: (raw: string) => void }) {
+  const [draft, setDraft] = useState<string | null>(null)
+
+  return (
+    <input
+      type="text"
+      inputMode="numeric"
+      pattern="[0-9]*"
+      maxLength={String(max).length}
+      value={draft ?? String(value)}
+      onFocus={(e) => e.currentTarget.select()}
+      onChange={(e) => {
+        const digits = e.target.value.replace(/\D/g, '')
+        setDraft(digits)
+        if (digits !== '') onCommit(digits)
+      }}
+      onBlur={() => {
+        if (draft === '') onCommit('0')
+        setDraft(null)
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') e.currentTarget.blur()
+      }}
+      className="w-full rounded-sm border border-border bg-black px-1 py-1 text-[9px] text-foreground tabular-nums outline-none focus-visible:border-primary"
+    />
+  )
+}
+
 const winRateColor = (rate: number) =>
   rate >= 0.9 ? 'text-[#58D854]' : rate < 0.5 ? 'text-[#F83800]' : 'text-foreground'
 
@@ -115,15 +143,7 @@ function SimWindow({
             {NUMBER_FIELDS.map((f) => (
               <label key={f.key} className="flex flex-col gap-1 text-muted-foreground">
                 {f.label}
-                <input
-                  type="number"
-                  inputMode="numeric"
-                  min={0}
-                  max={f.max}
-                  value={input[f.key]}
-                  onChange={(e) => setNumber(f.key, e.target.value, f.max)}
-                  className="w-full rounded-sm border border-border bg-black px-1 py-1 text-[9px] text-foreground tabular-nums outline-none focus-visible:border-primary"
-                />
+                <NumberBox value={input[f.key]} max={f.max} onCommit={(raw) => setNumber(f.key, raw, f.max)} />
               </label>
             ))}
           </div>
