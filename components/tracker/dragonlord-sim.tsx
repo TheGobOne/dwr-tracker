@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
-import { DL2, effectiveStats, type Initiative, type SimInput } from '@/lib/dragonlord-sim'
+import { effectiveStats, type Initiative, type SimInput } from '@/lib/dragonlord-sim'
 
 const DEFAULT_INPUT: SimInput = {
   maxHp: 150,
@@ -68,7 +68,7 @@ function SimWindow({
     closeRef.current?.focus({ preventScroll: true })
   }, [])
 
-  const { maxHp, attack } = effectiveStats(input)
+  const { maxHp } = effectiveStats(input)
 
   const setNumber = (key: NumberKey, raw: string, max: number) => {
     const n = Math.max(0, Math.min(max, Math.floor(Number(raw) || 0)))
@@ -104,10 +104,6 @@ function SimWindow({
         </div>
 
         <div className="flex min-h-0 flex-col gap-2.5 overflow-y-auto pr-0.5">
-          <p className="text-muted-foreground">
-            HP {DL2.hpMin}-{DL2.hpMax} · STR {DL2.str} · AGI {DL2.agi}
-          </p>
-
           <div className="grid grid-cols-4 gap-1.5">
             {NUMBER_FIELDS.map((f) => (
               <label key={f.key} className="flex flex-col gap-1 text-muted-foreground">
@@ -125,12 +121,17 @@ function SimWindow({
             ))}
           </div>
 
-          <div className="flex flex-wrap gap-x-3 gap-y-1.5">
-            <Toggle
-              label="Death Necklace"
-              checked={input.deathNecklace}
-              onChange={(v) => setInput((p) => ({ ...p, deathNecklace: v }))}
-            />
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+            <div className="flex items-center gap-1.5">
+              <Toggle
+                label="Death Necklace"
+                checked={input.deathNecklace}
+                onChange={(v) => setInput((p) => ({ ...p, deathNecklace: v }))}
+              />
+              <span className={cn('tabular-nums', input.deathNecklace ? 'text-primary' : 'text-muted-foreground')}>
+                HP {maxHp}
+              </span>
+            </div>
             <Toggle
               label="Erdrick's Armor"
               checked={input.erdrickArmor}
@@ -158,11 +159,6 @@ function SimWindow({
             ))}
           </div>
 
-          {input.deathNecklace && (
-            <p className="text-muted-foreground">
-              Necklace: {maxHp} max HP, {attack} attack
-            </p>
-          )}
         </div>
       </div>
     </div>,
