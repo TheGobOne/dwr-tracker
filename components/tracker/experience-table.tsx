@@ -80,6 +80,12 @@ function ExperienceWindow({ onClose }: { onClose: () => void }) {
   const trackerRoot = document.querySelector('[data-tracker-root]')
   if (!trackerRoot) return null
 
+  const rootRect = trackerRoot.getBoundingClientRect()
+  const panelRect = trackerRoot.querySelector('section[aria-label="Run progress"]')?.getBoundingClientRect()
+  const anchor = panelRect
+    ? { bottom: rootRect.bottom - panelRect.bottom, right: rootRect.right - panelRect.right }
+    : { bottom: 6, right: 6 }
+
   return createPortal(
     <div
       role="dialog"
@@ -90,7 +96,10 @@ function ExperienceWindow({ onClose }: { onClose: () => void }) {
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className="dw-window absolute right-1.5 bottom-1.5 left-1/2 flex max-h-[calc(100%-0.75rem)] flex-col gap-2 p-2.5">
+      <div
+        style={anchor}
+        className="dw-window absolute left-1/2 flex max-h-[calc(100%-0.75rem)] flex-col gap-2 p-2.5"
+      >
         <div className="flex items-center justify-between gap-4">
           <h2 id="exp-table-title" className="font-display text-[10px] text-primary">
             Experience Levels
