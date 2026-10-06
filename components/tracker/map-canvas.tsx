@@ -759,7 +759,7 @@ export function MapCanvas() {
             className={`absolute top-1/2 size-1.5 -translate-y-1/2 rounded-full bg-foreground transition-[left] ${slide ? 'left-[11px]' : 'left-[1px]'}`}
           />
         </span>
-        Slide
+        Move
       </button>
       <div className="absolute right-1.5 bottom-1.5 z-10 rounded-sm bg-black/60">
         <TrackerMenu />
