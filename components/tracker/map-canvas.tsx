@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CAVE_MAPS, CaveMapViewer } from './cave-map-viewer'
 import { TrackerMenu } from './tracker-menu'
+import { cn } from '@/lib/utils'
 import { KIND_META, LOCATION_BY_ID, LOCATION_EXTRAS, MAP_SIZE, PIN_COLOR, SPLIT_COLORS, TERRAIN_RGB } from '@/lib/dw-data'
 import { useTracker, type Marker } from './tracker-context'
 
@@ -196,6 +197,8 @@ function strokeHits(stroke: Point[], p: Point, radius: number) {
   return false
 }
 
+const KNOWN_LOCATION_COUNT = Object.values(LOCATION_BY_ID).filter((l) => !l.unknown).length
+
 function markerText(marker: Marker) {
   const location = marker.locationId ? LOCATION_BY_ID[marker.locationId] : null
   return location ? location.abbr : '!'
@@ -216,6 +219,10 @@ export function MapCanvas() {
     drawings,
     setDrawings,
   } = useTracker()
+  const placedLocationCount = new Set(
+    markers.flatMap((m) => (m.locationId && !LOCATION_BY_ID[m.locationId]?.unknown ? [m.locationId] : [])),
+  ).size
+  const allLocationsPlaced = placedLocationCount >= KNOWN_LOCATION_COUNT
   const [mode, setMode] = useState<MapMode>('place')
   const [activeStroke, setActiveStroke] = useState<Point[] | null>(null)
   const isErasingRef = useRef(false)
@@ -713,8 +720,13 @@ export function MapCanvas() {
 
   return (
   <section aria-label="Overworld map" className="dw-window relative flex flex-none flex-col self-center overflow-hidden">
-  <h1 className="font-display pointer-events-none absolute inset-x-0 top-1.5 z-10 text-center text-[10px] leading-none text-primary [text-shadow:0_0_3px_#000,0_0_3px_#000]">
-        DWR <span className="text-foreground">Tracker</span>
+      <h1
+        className={cn(
+          'font-display pointer-events-none absolute inset-x-0 top-1.5 z-10 text-center text-[10px] leading-none [text-shadow:0_0_3px_#000,0_0_3px_#000]',
+          allLocationsPlaced ? 'text-[#58D854]' : 'text-foreground',
+        )}
+      >
+        Locations {placedLocationCount}/{KNOWN_LOCATION_COUNT}
       </h1>
       <div ref={containerRef} className="flex items-center justify-center overflow-hidden bg-[#050508]">
         <canvas
