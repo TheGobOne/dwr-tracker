@@ -255,12 +255,7 @@ function SimWindow({
             <dd className="text-right tabular-nums text-foreground">{pct(summary.winWhenFirst)}</dd>
             <dt className="text-muted-foreground">Win, DL2 first</dt>
             <dd className="text-right tabular-nums text-foreground">{pct(summary.winWhenDlFirst)}</dd>
-            <dt className="text-muted-foreground">Avg rounds</dt>
-            <dd className="text-right tabular-nums text-foreground">{summary.avgRounds.toFixed(1)}</dd>
-            <dt className="text-muted-foreground">Avg HP left</dt>
-            <dd className="text-right tabular-nums text-foreground">{summary.avgHpLeftOnWin.toFixed(0)}</dd>
-            <dt className="text-muted-foreground">Out of heals</dt>
-            <dd className="text-right tabular-nums text-foreground">{pct(summary.outOfHealingRate)}</dd>
+
           </dl>
           )}
         </div>
