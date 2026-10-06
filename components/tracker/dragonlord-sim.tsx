@@ -1,19 +1,9 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
-import {
-  DL2,
-  effectiveStats,
-  mulberry32,
-  runSimulation,
-  simulateFight,
-  type Initiative,
-  type SimInput,
-} from '@/lib/dragonlord-sim'
-
-const TRIALS = 10000
+import { DL2, effectiveStats, type Initiative, type SimInput } from '@/lib/dragonlord-sim'
 
 const DEFAULT_INPUT: SimInput = {
   maxHp: 150,
@@ -48,7 +38,6 @@ const INITIATIVE_OPTIONS: { value: Initiative; label: string }[] = [
   { value: 'ambushed', label: 'Ambushed' },
 ]
 
-const pct = (n: number | null) => (n === null ? '--' : `${(n * 100).toFixed(1)}%`)
 
 function Toggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
@@ -74,14 +63,11 @@ function SimWindow({
   onClose: () => void
 }) {
   const closeRef = useRef<HTMLButtonElement>(null)
-  const [fightSeed, setFightSeed] = useState(1)
 
   useEffect(() => {
     closeRef.current?.focus({ preventScroll: true })
   }, [])
 
-  const summary = useMemo(() => runSimulation(input, TRIALS, 20260601), [input])
-  const fight = useMemo(() => simulateFight(input, mulberry32(fightSeed * 7919), true), [input, fightSeed])
   const { maxHp, attack } = effectiveStats(input)
 
   const setNumber = (key: NumberKey, raw: string, max: number) => {
@@ -177,49 +163,6 @@ function SimWindow({
               Necklace: {maxHp} max HP, {attack} attack
             </p>
           )}
-
-          <dl className="grid grid-cols-2 gap-x-3 gap-y-1.5 border-t border-border pt-2.5">
-            <dt className="text-muted-foreground">Win rate</dt>
-            <dd
-              className={cn(
-                'text-right tabular-nums',
-                summary.winRate >= 0.9 ? 'text-[#58D854]' : summary.winRate < 0.5 ? 'text-[#F83800]' : 'text-foreground',
-              )}
-            >
-              {pct(summary.winRate)}
-            </dd>
-            <dt className="text-muted-foreground">Ambushed</dt>
-            <dd className="text-right tabular-nums text-foreground">{pct(summary.ambushRate)}</dd>
-            <dt className="text-muted-foreground">Win, first</dt>
-            <dd className="text-right tabular-nums text-foreground">{pct(summary.winWhenFirst)}</dd>
-            <dt className="text-muted-foreground">Win, ambushed</dt>
-            <dd className="text-right tabular-nums text-foreground">{pct(summary.winWhenAmbushed)}</dd>
-            <dt className="text-muted-foreground">Avg rounds</dt>
-            <dd className="text-right tabular-nums text-foreground">{summary.avgRounds.toFixed(1)}</dd>
-            <dt className="text-muted-foreground">Avg HP left</dt>
-            <dd className="text-right tabular-nums text-foreground">{summary.avgHpLeftOnWin.toFixed(0)}</dd>
-            <dt className="text-muted-foreground">Out of heals</dt>
-            <dd className="text-right tabular-nums text-foreground">{pct(summary.outOfHealingRate)}</dd>
-          </dl>
-          <p className="text-muted-foreground">{TRIALS.toLocaleString()} simulated fights</p>
-
-          <div className="flex flex-col gap-1.5 border-t border-border pt-2.5">
-            <div className="flex items-center justify-between">
-              <h3 className={fight.won ? 'text-[#58D854]' : 'text-[#F83800]'}>Sample fight: {fight.won ? 'Won' : 'Lost'}</h3>
-              <button
-                type="button"
-                onClick={() => setFightSeed((s) => s + 1)}
-                className="text-foreground hover:text-primary focus-visible:outline-2 focus-visible:outline-primary"
-              >
-                REROLL
-              </button>
-            </div>
-            <ol className="flex flex-col gap-1 normal-case leading-snug text-foreground" aria-live="polite">
-              {fight.log.map((line, i) => (
-                <li key={i}>{line}</li>
-              ))}
-            </ol>
-          </div>
         </div>
       </div>
     </div>,
