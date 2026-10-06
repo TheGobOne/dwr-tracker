@@ -3,7 +3,7 @@
 import { MapPin } from 'lucide-react'
 import { KIND_META, LOCATIONS, badgeBackground, type DWLocation, type LocationKind } from '@/lib/dw-data'
 import { cn } from '@/lib/utils'
-import { ExperienceWizard } from './experience-table'
+import { TrackerMenu } from './tracker-menu'
 import {
   EMPTY_COORDS,
   EW_DIRECTIONS,
@@ -214,7 +214,7 @@ export function LocationsPanel() {
         })}
         <li className="col-span-2 flex flex-col items-center sm:col-span-1 sm:col-start-5 sm:row-span-4 sm:row-start-1">
           <div className="flex h-10 items-center justify-center">
-            <ExperienceWizard />
+            <TrackerMenu />
           </div>
           {UNKNOWN_LOCATIONS.map((location) => (
             <UnknownLocationButton key={location.id} location={location} />

@@ -20,8 +20,8 @@ const CONTROL_SECTIONS: { title: string; controls: { input: string; action: stri
       { input: 'Click again', action: 'Right click in pen or middle click in eraser to go back to placing' },
   { input: 'Move toggle', action: 'Bottom left of the map: turn on to move a group of markers and lines' },
   { input: 'Left drag (Move)', action: 'Draw a box to select the markers and lines inside it' },
-  { input: 'Left click (Move)', action: 'Click inside the selection to pick it up, then left click again to drop it' },
-  { input: 'Right click (Move)', action: 'Cancel the move, or clear the selection if nothing is held' },
+{ input: 'Left drag selection (Move)', action: 'Drag the selection and release to drop it' },
+      { input: 'Right click (Move)', action: 'Clear the selection' },
     ],
   },
   {

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CAVE_MAPS, CaveMapViewer } from './cave-map-viewer'
-import { TrackerMenu } from './tracker-menu'
+import { ExperienceWizard } from './experience-table'
 import { cn } from '@/lib/utils'
 import { KIND_META, LOCATION_BY_ID, LOCATION_EXTRAS, MAP_SIZE, PIN_COLOR, SPLIT_COLORS, TERRAIN_RGB } from '@/lib/dw-data'
 import { useTracker, type Marker } from './tracker-context'
@@ -560,23 +560,25 @@ export function MapCanvas() {
     isErasingRef.current = false
   }
 
+  function dropHeld(tile: Point) {
+    if (!held || !selection) return
+    const shift = clampShift(selectedMarkers, selectedStrokes, tile.x - held.x, tile.y - held.y)
+    if (shift.x !== 0 || shift.y !== 0) {
+      if (selection.markerIds.size > 0) shiftMarkers(shift.x, shift.y, selection.markerIds)
+      if (selection.strokeIdx.size > 0) {
+        setDrawings((prev) =>
+          prev.map((s, i) => (selection.strokeIdx.has(i) ? translateStroke(s, shift.x, shift.y) : s)),
+        )
+      }
+    }
+    setHeld(null)
+  }
+
   function handleSlideClick(e: React.PointerEvent<HTMLCanvasElement>) {
     const tile = pointerToTile(e)
-    if (held && selection) {
-      const shift = clampShift(selectedMarkers, selectedStrokes, tile.x - held.x, tile.y - held.y)
-      if (shift.x !== 0 || shift.y !== 0) {
-        if (selection.markerIds.size > 0) shiftMarkers(shift.x, shift.y, selection.markerIds)
-        if (selection.strokeIdx.size > 0) {
-          setDrawings((prev) =>
-            prev.map((s, i) => (selection.strokeIdx.has(i) ? translateStroke(s, shift.x, shift.y) : s)),
-          )
-        }
-      }
-      setHeld(null)
-      return
-    }
     const point = pointerToMapPoint(e)
     if (selectionBounds && inPaddedBounds(selectionBounds, point)) {
+      e.currentTarget.setPointerCapture(e.pointerId)
       setHeld(tile)
       setHover(tile)
       return
@@ -603,8 +605,9 @@ export function MapCanvas() {
     setBox(null)
   }
 
-  function handlePointerUp() {
-    if (box) finishBox()
+  function handlePointerUp(e: React.PointerEvent<HTMLCanvasElement>) {
+    if (held) dropHeld(pointerToTile(e))
+    else if (box) finishBox()
     else finishStroke()
   }
 
@@ -691,11 +694,9 @@ export function MapCanvas() {
   function handleContextMenu(e: React.MouseEvent<HTMLCanvasElement>) {
     e.preventDefault()
     if (slide) {
-      if (held) setHeld(null)
-      else {
-        setBox(null)
-        setSelection(null)
-      }
+      setHeld(null)
+      setBox(null)
+      setSelection(null)
       return
     }
     if (mode !== 'place') {
@@ -762,7 +763,7 @@ export function MapCanvas() {
         Move
       </button>
       <div className="absolute right-1.5 bottom-1.5 z-10 rounded-sm bg-black/60">
-        <TrackerMenu />
+        <ExperienceWizard />
       </div>
       <CaveMapViewer locationId={caveMapId} onClose={closeCaveMap} />
     </section>
