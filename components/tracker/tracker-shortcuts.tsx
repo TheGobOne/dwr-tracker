@@ -17,7 +17,7 @@ export function TrackerShortcuts() {
     const blockKey = (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey) return
       const inTypingField =
-        e.target instanceof HTMLElement && e.target.matches('[data-coords-field], [data-notes-field]')
+        e.target instanceof HTMLElement && e.target.matches('[data-coords-field], [data-notes-field], [data-sim-field]')
       if (inTypingField && e.key !== 'Tab') return
       e.preventDefault()
       e.stopImmediatePropagation()

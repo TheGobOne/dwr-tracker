@@ -78,6 +78,7 @@ function NumberBox({ value, max, onCommit }: { value: number; max: number; onCom
   return (
     <input
       type="text"
+      data-sim-field
       inputMode="numeric"
       pattern="[0-9]*"
       maxLength={String(max).length}
