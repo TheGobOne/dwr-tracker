@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CAVE_MAPS, CaveMapViewer } from './cave-map-viewer'
 import { ExperienceWizard } from './experience-table'
-import { LocationsPanel } from './locations-panel'
 import { cn } from '@/lib/utils'
 import { KIND_META, LOCATION_BY_ID, LOCATION_EXTRAS, MAP_SIZE, PIN_COLOR, SPLIT_COLORS, TERRAIN_RGB } from '@/lib/dw-data'
 import { useTracker, type Marker } from './tracker-context'
@@ -724,7 +723,7 @@ export function MapCanvas() {
   <section aria-label="Overworld map" className="dw-window relative flex flex-none flex-col self-center overflow-hidden">
       <h1
         className={cn(
-          'font-display pointer-events-none absolute inset-x-0 top-1.5 z-10 text-center text-[10px] leading-none [text-shadow:0_0_3px_#000,0_0_3px_#000]',
+          'font-display pointer-events-none absolute inset-x-0 bottom-2.5 z-10 text-center text-[10px] leading-none [text-shadow:0_0_3px_#000,0_0_3px_#000]',
           allLocationsPlaced ? 'text-[#58D854]' : 'text-foreground',
         )}
       >
@@ -746,14 +745,12 @@ export function MapCanvas() {
           onAuxClick={(e) => e.preventDefault()}
         />
       </div>
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex flex-col">
-      <div className="flex items-end justify-between px-1.5 pb-1.5">
       <button
         type="button"
         role="switch"
         aria-checked={slide}
         onClick={toggleSlide}
-        className="font-display pointer-events-auto flex items-center gap-1.5 rounded-sm bg-black/60 px-1.5 py-1 text-[8px] leading-none text-foreground outline-none hover:text-primary focus-visible:ring-2 focus-visible:ring-primary"
+        className="font-display absolute bottom-1.5 left-1.5 z-10 flex items-center gap-1.5 rounded-sm bg-black/60 px-1.5 py-1 text-[8px] leading-none text-foreground outline-none hover:text-primary focus-visible:ring-2 focus-visible:ring-primary"
       >
         <span
           aria-hidden="true"
@@ -765,13 +762,8 @@ export function MapCanvas() {
         </span>
         Move
       </button>
-      <div className="pointer-events-auto rounded-sm bg-black/60">
+      <div className="absolute right-1.5 bottom-1.5 z-10 rounded-sm bg-black/60">
         <ExperienceWizard />
-      </div>
-      </div>
-      <div className="pointer-events-auto border-t border-border bg-black/80 px-2 py-1">
-        <LocationsPanel />
-      </div>
       </div>
       <CaveMapViewer locationId={caveMapId} onClose={closeCaveMap} />
     </section>
