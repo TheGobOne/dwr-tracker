@@ -45,9 +45,8 @@ const CONTROL_SECTIONS: { title: string; controls: { input: string; action: stri
     title: 'Other',
     controls: [
       { input: 'King', action: 'Show the experience level table' },
-      { input: 'Notes', action: 'Free text for anything else in your run' },
-      { input: 'Gear > Install', action: 'Install the tracker as an app in Chrome' },
-      { input: 'Gear > Clear', action: 'Reset the entire tracker' },
+  { input: 'Notes', action: 'Free text for anything else in your run' },
+
     ],
   },
 ]
