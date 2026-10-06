@@ -9,6 +9,22 @@ const TRIALS = 10000
 
 const pct = (v: number | null) => (v === null ? '-' : `${(v * 100).toFixed(1)}%`)
 
+// Visible width of the DL2 sprite (74x92 art contained in a 36px box). The pixel
+// font's glyphs are 1em wide, so font-size = width / characters fills it exactly.
+const SPRITE_VISIBLE_WIDTH = 29
+
+function MapWinRate({ winRate }: { winRate: number }) {
+  const label = `${Math.round(winRate * 100)}%`
+  return (
+    <span
+      className={cn('block whitespace-nowrap font-display leading-none tabular-nums', winRateColor(winRate))}
+      style={{ fontSize: `${SPRITE_VISIBLE_WIDTH / label.length}px` }}
+    >
+      {label}
+    </span>
+  )
+}
+
 type NumberKey = 'maxHp' | 'mp' | 'attack' | 'defense' | 'agility' | 'fairyWater'
 
 const HEAL_AT = 48
@@ -283,11 +299,7 @@ export function DragonlordSimButton() {
           height={36}
           className="size-9 object-contain transition-transform [image-rendering:pixelated] group-hover:scale-110"
         />
-        {summary && (
-          <span className={cn('font-display text-[9px] leading-none tabular-nums', winRateColor(summary.winRate))}>
-            {pct(summary.winRate)}
-          </span>
-        )}
+        {summary && <MapWinRate winRate={summary.winRate} />}
       </button>
       {open && <SimWindow input={input} setInput={setInput} summary={summary} onClose={() => setOpen(false)} />}
     </>
