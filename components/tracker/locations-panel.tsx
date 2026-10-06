@@ -129,14 +129,6 @@ function UnknownLocationButton({ location }: { location: DWLocation }) {
   )
 }
 
-export function PanelTitle({ children, aside }: { children: React.ReactNode; aside?: React.ReactNode }) {
-  return (
-  <div aria-hidden="true" className="invisible flex items-baseline justify-center gap-2">
-  <h2 className="font-display text-center text-[9px] uppercase tracking-wider text-primary">{children}</h2>
-      {aside && <span className="text-xs text-muted-foreground">{aside}</span>}
-    </div>
-  )
-}
 
 export function LocationsPanel() {
   const { markers, visited, selectedLocation, setSelectedLocation, setTool, requestFocus } = useTracker()
@@ -148,8 +140,7 @@ export function LocationsPanel() {
       <h2 id="locations-heading" className="sr-only">
         Locations
       </h2>
-      <PanelTitle>Locations</PanelTitle>
-      <ul className="grid grid-cols-2 gap-x-1 sm:grid-cols-[repeat(4,auto)_4.5rem] sm:justify-evenly">
+          <ul className="grid grid-cols-2 gap-x-1 sm:grid-cols-[repeat(4,auto)_4.5rem] sm:justify-evenly">
         {ORDERED_LOCATIONS.flatMap((location) => {
           const marker = markerByLocation.get(location.id)
           const isSelected = selectedLocation === location.id

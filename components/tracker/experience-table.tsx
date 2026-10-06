@@ -90,7 +90,7 @@ function ExperienceWindow({ onClose }: { onClose: () => void }) {
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className="dw-window absolute top-1/2 right-1.5 bottom-1.5 left-1/2 flex flex-col gap-2 p-2.5">
+      <div className="dw-window absolute right-1.5 bottom-1.5 left-1/2 flex max-h-[calc(100%-0.75rem)] flex-col gap-2 p-2.5">
         <div className="flex items-center justify-between gap-4">
           <h2 id="exp-table-title" className="font-display text-[10px] text-primary">
             Experience Levels

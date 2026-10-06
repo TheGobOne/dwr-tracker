@@ -2,7 +2,7 @@
 
 import { ITEM_GROUPS, SPELLS } from '@/lib/dw-data'
 import { cn } from '@/lib/utils'
-import { COORDS_LOCATION_ID, CoordsInput, PanelTitle } from './locations-panel'
+import { COORDS_LOCATION_ID, CoordsInput } from './locations-panel'
 import { MonsterLookupButton } from './monster-lookup'
 import { useTracker } from './tracker-context'
 
@@ -19,8 +19,7 @@ export function ItemsPanel() {
       <h2 id="items-heading" className="sr-only">
         Items
       </h2>
-      <PanelTitle>Items</PanelTitle>
-      <div className="flex items-stretch gap-1.5">
+          <div className="flex items-stretch gap-1.5">
         {ITEM_GROUPS.map((group, groupIndex) => (
           <div key={group.label} className="flex min-w-0 flex-1 items-stretch gap-1.5">
             {groupIndex > 0 && <div aria-hidden="true" className="w-px self-stretch bg-border" />}
@@ -66,8 +65,7 @@ export function SpellsPanel() {
       <h2 id="spells-heading" className="sr-only">
         Spells
       </h2>
-      <PanelTitle>Spells</PanelTitle>
-      <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5">
         <ul className="grid flex-1 grid-cols-2 gap-1 sm:grid-cols-5">
           {SPELLS.map((name) => {
             const state = spells[name] ?? { learned: false, level: '' }
@@ -98,9 +96,8 @@ export function NotesPanel() {
   const { notes, setNotes } = useTracker()
   return (
   <section className="flex shrink-0 flex-col gap-1">
-  <label htmlFor="run-notes">
-  <span className="sr-only">Notes</span>
-  <PanelTitle>Notes</PanelTitle>
+  <label htmlFor="run-notes" className="sr-only">
+  Notes
   </label>
         <textarea
           data-notes-field
