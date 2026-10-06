@@ -40,17 +40,35 @@ const INITIATIVE_OPTIONS: { value: Initiative; label: string }[] = [
 ]
 
 
-function Toggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
+function Toggle({
+  label,
+  title,
+  checked,
+  onChange,
+}: {
+  label: string
+  title: string
+  checked: boolean
+  onChange: (v: boolean) => void
+}) {
   return (
-    <label className="flex cursor-pointer items-center gap-1.5 text-foreground hover:text-primary">
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-        className="size-3 accent-[var(--primary)]"
-      />
-      {label}
-    </label>
+    <div className="flex flex-col justify-end">
+      <button
+        type="button"
+        aria-pressed={checked}
+        aria-label={title}
+        title={title}
+        onClick={() => onChange(!checked)}
+        className={cn(
+          'w-full rounded-sm border px-1 py-1 text-[9px] transition-colors focus-visible:outline-2 focus-visible:outline-primary',
+          checked
+            ? 'border-primary bg-primary text-primary-foreground'
+            : 'border-foreground/25 text-muted-foreground hover:border-foreground hover:text-foreground',
+        )}
+      >
+        {label}
+      </button>
+    </div>
   )
 }
 
@@ -143,16 +161,15 @@ function SimWindow({
                 <NumberBox value={input[f.key]} max={f.max} onCommit={(raw) => setNumber(f.key, raw, f.max)} />
               </label>
             ))}
-          </div>
-
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
             <Toggle
-              label="Death Necklace"
+              label="Neck"
+              title="Death Necklace"
               checked={input.deathNecklace}
               onChange={(v) => setInput((p) => ({ ...p, deathNecklace: v }))}
             />
             <Toggle
-              label="Erdrick's Armor"
+              label="Armor"
+              title="Erdrick's Armor"
               checked={input.erdrickArmor}
               onChange={(v) => setInput((p) => ({ ...p, erdrickArmor: v }))}
             />
