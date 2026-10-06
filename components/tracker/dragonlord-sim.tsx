@@ -162,14 +162,23 @@ function SimWindow({
           <h2 id="dl2-sim-title" className="text-[10px] text-primary">
             Dragonlord 2
           </h2>
-          <button
-            ref={closeRef}
-            type="button"
-            onClick={onClose}
-            className="text-[10px] text-foreground hover:text-primary focus-visible:outline-2 focus-visible:outline-primary"
-          >
-            CLOSE
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setInput(DEFAULT_FORM)}
+              className="text-[10px] text-foreground hover:text-primary focus-visible:outline-2 focus-visible:outline-primary"
+            >
+              CLEAR
+            </button>
+            <button
+              ref={closeRef}
+              type="button"
+              onClick={onClose}
+              className="text-[10px] text-foreground hover:text-primary focus-visible:outline-2 focus-visible:outline-primary"
+            >
+              CLOSE
+            </button>
+          </div>
         </div>
 
         <div className="flex min-h-0 flex-col gap-2.5 overflow-y-auto pr-0.5">
