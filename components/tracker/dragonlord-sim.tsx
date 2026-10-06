@@ -57,13 +57,18 @@ function Toggle({ label, checked, onChange }: { label: string; checked: boolean;
   )
 }
 
+const winRateColor = (rate: number) =>
+  rate >= 0.9 ? 'text-[#58D854]' : rate < 0.5 ? 'text-[#F83800]' : 'text-foreground'
+
 function SimWindow({
   input,
   setInput,
+  summary,
   onClose,
 }: {
   input: SimInput
   setInput: React.Dispatch<React.SetStateAction<SimInput>>
+  summary: ReturnType<typeof runSimulation>
   onClose: () => void
 }) {
   const closeRef = useRef<HTMLButtonElement>(null)
@@ -71,9 +76,6 @@ function SimWindow({
   useEffect(() => {
     closeRef.current?.focus({ preventScroll: true })
   }, [])
-
-  const deferredInput = useDeferredValue(input)
-  const summary = useMemo(() => runSimulation(deferredInput, TRIALS, 1), [deferredInput])
 
   const setNumber = (key: NumberKey, raw: string, max: number) => {
     const n = Math.max(0, Math.min(max, Math.floor(Number(raw) || 0)))
@@ -161,12 +163,7 @@ function SimWindow({
 
           <dl className="grid grid-cols-2 gap-x-3 gap-y-1.5 border-t border-border pt-2.5">
             <dt className="text-muted-foreground">Win rate</dt>
-            <dd
-              className={cn(
-                'text-right tabular-nums',
-                summary.winRate >= 0.9 ? 'text-[#58D854]' : summary.winRate < 0.5 ? 'text-[#F83800]' : 'text-foreground',
-              )}
-            >
+            <dd className={cn('text-right tabular-nums', winRateColor(summary.winRate))}>
               {pct(summary.winRate)}
             </dd>
             <dt className="text-muted-foreground">Ambushed</dt>
@@ -192,19 +189,30 @@ function SimWindow({
 export function DragonlordSimButton() {
   const [open, setOpen] = useState(false)
   const [input, setInput] = useState<SimInput>(DEFAULT_INPUT)
+  const deferredInput = useDeferredValue(input)
+  const summary = useMemo(() => runSimulation(deferredInput, TRIALS, 1), [deferredInput])
 
   return (
     <>
       <button
         type="button"
-        aria-label="Open Dragonlord 2 fight simulator"
+        aria-label={`Open Dragonlord 2 fight simulator, win rate ${pct(summary.winRate)}`}
         aria-haspopup="dialog"
         onClick={() => setOpen(true)}
-        className="shrink-0 rounded-sm p-0.5 transition-transform hover:scale-110 focus-visible:outline-2 focus-visible:outline-primary"
+        className="group flex shrink-0 flex-col items-center gap-0.5 rounded-sm p-0.5 focus-visible:outline-2 focus-visible:outline-primary"
       >
-        <img src="/dragonlord-icon.png" alt="" width={36} height={36} className="size-9 object-contain [image-rendering:pixelated]" />
+        <img
+          src="/dragonlord-icon.png"
+          alt=""
+          width={36}
+          height={36}
+          className="size-9 object-contain transition-transform [image-rendering:pixelated] group-hover:scale-110"
+        />
+        <span className={cn('font-display text-[9px] leading-none tabular-nums', winRateColor(summary.winRate))}>
+          {pct(summary.winRate)}
+        </span>
       </button>
-      {open && <SimWindow input={input} setInput={setInput} onClose={() => setOpen(false)} />}
+      {open && <SimWindow input={input} setInput={setInput} summary={summary} onClose={() => setOpen(false)} />}
     </>
   )
 }
