@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from 'react'
-import { LOCATION_BY_ID, MAP_SIZE, TANTEGEL_EXTRA_IDS, TERRAINS } from '@/lib/dw-data'
+import { LOCATION_BY_ID, LOCATION_EXTRAS, MAP_SIZE, TERRAINS } from '@/lib/dw-data'
 
 export type Tool = 'paint' | 'fill' | 'marker' | 'pan'
 
@@ -326,8 +326,8 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     (id: string) =>
       setVisited((prev) => {
         const next = { ...prev, [id]: !prev[id] }
-        if (id === 'tantegel' && next[id]) {
-          for (const extraId of TANTEGEL_EXTRA_IDS) next[extraId] = true
+        if (next[id]) {
+          for (const extra of LOCATION_EXTRAS[id] ?? []) next[extra.id] = true
         }
         return next
       }),

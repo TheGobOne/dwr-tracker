@@ -127,10 +127,38 @@ export const SPELLS = [
   'Hurtmore',
 ] as const
 
-export const TANTEGEL_EXTRA_IDS = [
-  'tantegel-chest-1',
-  'tantegel-chest-2',
-  'tantegel-chest-3',
-  'tantegel-chest-4',
-  'tantegel-stairs',
-] as const
+export interface LocationExtra {
+  id: string
+  sprite: 'chest' | 'stairs' | 'key'
+  label: string
+  side?: 'left'
+}
+
+function keyShop(locationId: string, name: string): LocationExtra {
+  return { id: `${locationId}-key`, sprite: 'key', label: `${name} magic key`, side: 'left' }
+}
+
+function chests(locationId: string, name: string, count: number): LocationExtra[] {
+  return Array.from({ length: count }, (_, i) => ({
+    id: `${locationId}-chest-${i + 1}`,
+    sprite: 'chest' as const,
+    label: count > 1 ? `${name} chest ${i + 1}` : `${name} chest`,
+  }))
+}
+
+export const LOCATION_EXTRAS: Record<string, LocationExtra[]> = {
+  tantegel: [
+    ...chests('tantegel', 'Tantegel', 4),
+    { id: 'tantegel-stairs', sprite: 'stairs', label: 'Tantegel basement stairs' },
+    keyShop('tantegel', 'Tantegel'),
+  ],
+  garinham: [...chests('garinham', 'Garinham', 3), { id: 'garinham-stairs', sprite: 'stairs', label: 'Garinham stairs' }],
+  hauksness: chests('hauksness', 'Hauksness', 1),
+  kol: chests('kol', 'Kol', 1),
+  'erdricks-cave': chests('erdricks-cave', "Erdrick's Cave", 1),
+  'garins-grave': chests('garins-grave', 'Grave', 5),
+  'mountain-cave': chests('mountain-cave', 'Mountain Cave', 5),
+  'freebie-cave': chests('freebie-cave', 'Freebie Cave', 1),
+  rimuldar: [...chests('rimuldar', 'Rimuldar', 1), keyShop('rimuldar', 'Rimuldar')],
+  cantlin: [keyShop('cantlin', 'Cantlin')],
+}
