@@ -1,7 +1,7 @@
 'use client'
 
 import { MapPin } from 'lucide-react'
-import { KIND_META, LOCATIONS, type DWLocation, type LocationKind } from '@/lib/dw-data'
+import { KIND_META, LOCATIONS, badgeBackground, type DWLocation, type LocationKind } from '@/lib/dw-data'
 import { cn } from '@/lib/utils'
 import { ExperienceWizard } from './experience-table'
 import {
@@ -120,7 +120,7 @@ function UnknownLocationButton({ location }: { location: DWLocation }) {
       <span
         aria-hidden="true"
         className="flex h-4 w-6 shrink-0 items-center justify-center rounded-[2px] font-mono text-[7px] leading-none text-black"
-        style={{ backgroundColor: KIND_META[location.kind].color }}
+        style={{ background: badgeBackground(location.id, KIND_META[location.kind].color) }}
       >
         {location.abbr}
       </span>

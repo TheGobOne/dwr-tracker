@@ -34,6 +34,15 @@ export const KIND_META: Record<LocationKind, { label: string; color: string }> =
   special: { label: 'Special Spots', color: '#F878F8' },
 }
 
+export const SPLIT_COLORS: Record<string, [string, string]> = {
+  'unknown-cave': ['#F87858', '#3CBCFC'],
+}
+
+export function badgeBackground(locationId: string, fallback: string) {
+  const split = SPLIT_COLORS[locationId]
+  return split ? `linear-gradient(90deg, ${split[0]} 50%, ${split[1]} 50%)` : fallback
+}
+
 export const PIN_COLOR = '#FCA044'
 
 export interface DWLocation {

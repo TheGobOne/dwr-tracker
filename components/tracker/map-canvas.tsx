@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CAVE_MAPS, CaveMapViewer } from './cave-map-viewer'
 import { TrackerMenu } from './tracker-menu'
-import { KIND_META, LOCATION_BY_ID, MAP_SIZE, PIN_COLOR, TERRAIN_RGB } from '@/lib/dw-data'
+import { KIND_META, LOCATION_BY_ID, MAP_SIZE, PIN_COLOR, SPLIT_COLORS, TERRAIN_RGB } from '@/lib/dw-data'
 import { useTracker, type Marker } from './tracker-context'
 
 const MAX_TRACKER_WIDTH = 640
@@ -24,7 +24,60 @@ function markerColor(marker: Marker) {
   return location ? KIND_META[location.kind].color : PIN_COLOR
 }
 
-const BRIDGE_SPRITE_SRC = '/sprites/bridge.png'
+const SPRITE_SRC = {
+  bridge: '/sprites/bridge.png',
+  chest: '/sprites/chest.png',
+  stairs: '/sprites/stairs.png',
+} as const
+
+type SpriteName = keyof typeof SPRITE_SRC
+
+const TANTEGEL_EXTRAS: { id: string; sprite: SpriteName; label: string }[] = [
+  { id: 'tantegel-chest-1', sprite: 'chest', label: 'Tantegel chest 1' },
+  { id: 'tantegel-chest-2', sprite: 'chest', label: 'Tantegel chest 2' },
+  { id: 'tantegel-chest-3', sprite: 'chest', label: 'Tantegel chest 3' },
+  { id: 'tantegel-chest-4', sprite: 'chest', label: 'Tantegel chest 4' },
+  { id: 'tantegel-stairs', sprite: 'stairs', label: 'Tantegel basement stairs' },
+]
+
+interface ExtraIcon {
+  id: string
+  sprite: SpriteName
+  x: number
+  y: number
+  size: number
+}
+
+function tantegelExtraIcons(marker: Marker, scale: number, canvasSize: number): ExtraIcon[] {
+  const ms = markerSize(scale, marker)
+  const size = Math.max(10, Math.round(ms * 0.6))
+  const gap = 2
+  const total = TANTEGEL_EXTRAS.length * size + (TANTEGEL_EXTRAS.length - 1) * gap
+  const cx = marker.x * scale + scale / 2
+  const cy = marker.y * scale + scale / 2
+  const startX = Math.max(1, Math.min(canvasSize - total - 1, cx - total / 2))
+  let y = cy + ms / 2 + 4
+  if (y + size > canvasSize - 1) y = cy - ms / 2 - 4 - size
+  return TANTEGEL_EXTRAS.map((extra, i) => ({ id: extra.id, sprite: extra.sprite, x: startX + i * (size + gap), y, size }))
+}
+
+function markerFill(ctx: CanvasRenderingContext2D, marker: Marker, x: number, y: number, size: number) {
+  const split = marker.locationId ? SPLIT_COLORS[marker.locationId] : undefined
+  ctx.beginPath()
+  ctx.roundRect(x, y, size, size, 3)
+  if (!split) {
+    ctx.fillStyle = markerColor(marker)
+    ctx.fill()
+    return
+  }
+  ctx.save()
+  ctx.clip()
+  ctx.fillStyle = split[0]
+  ctx.fillRect(x, y, size / 2, size)
+  ctx.fillStyle = split[1]
+  ctx.fillRect(x + size / 2, y, size / 2, size)
+  ctx.restore()
+}
 
 type MapMode = 'place' | 'pen' | 'eraser'
 
@@ -120,14 +173,17 @@ export function MapCanvas() {
   const isErasingRef = useRef(false)
   const [slide, setSlide] = useState(false)
   const [held, setHeld] = useState<Point | null>(null)
-  const [bridgeImg, setBridgeImg] = useState<HTMLImageElement | null>(null)
+  const [sprites, setSprites] = useState<Partial<Record<SpriteName, HTMLImageElement>>>({})
 
   useEffect(() => {
-    const img = new Image()
-    img.crossOrigin = 'anonymous'
-    img.onload = () => setBridgeImg(img)
-    img.src = BRIDGE_SPRITE_SRC
+    for (const [name, src] of Object.entries(SPRITE_SRC) as [SpriteName, string][]) {
+      const img = new Image()
+      img.crossOrigin = 'anonymous'
+      img.onload = () => setSprites((prev) => ({ ...prev, [name]: img }))
+      img.src = src
+    }
   }, [])
+  const bridgeImg = sprites.bridge ?? null
 
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -289,10 +345,7 @@ export function MapCanvas() {
       ctx.beginPath()
       ctx.roundRect(cx - ms / 2 - 2, cy - ms / 2 - 2, ms + 4, ms + 4, 4)
       ctx.fill()
-      ctx.fillStyle = markerColor(marker)
-      ctx.beginPath()
-      ctx.roundRect(cx - ms / 2, cy - ms / 2, ms, ms, 3)
-      ctx.fill()
+      markerFill(ctx, marker, cx - ms / 2, cy - ms / 2, ms)
       ctx.fillStyle = '#000000'
       ctx.fillText(markerText(marker), cx, cy + 1)
       if (done) {
@@ -304,6 +357,25 @@ export function MapCanvas() {
         ctx.stroke()
       }
       ctx.globalAlpha = 1
+      if (marker.locationId === 'tantegel') {
+        for (const icon of tantegelExtraIcons(marker, scale, size)) {
+          const opened = visited[icon.id]
+          ctx.fillStyle = '#000000'
+          ctx.fillRect(icon.x - 1, icon.y - 1, icon.size + 2, icon.size + 2)
+          ctx.globalAlpha = opened ? 0.3 : 1
+          const img = sprites[icon.sprite]
+          if (img) ctx.drawImage(img, icon.x, icon.y, icon.size, icon.size)
+          ctx.globalAlpha = 1
+          if (opened) {
+            ctx.strokeStyle = '#FCFCFC'
+            ctx.lineWidth = 1.5
+            ctx.beginPath()
+            ctx.moveTo(icon.x + 1, icon.y + icon.size - 1)
+            ctx.lineTo(icon.x + icon.size - 1, icon.y + 1)
+            ctx.stroke()
+          }
+        }
+      }
     }
 
     if (flash) {
@@ -313,7 +385,7 @@ export function MapCanvas() {
       ctx.arc(flash.x * scale + scale / 2, flash.y * scale + scale / 2, markerSize(scale) * 1.4, 0, Math.PI * 2)
       ctx.stroke()
     }
-  }, [tiles, markers, visited, canvasPx, scale, showGrid, hover, flash, bridgeImg, drawings, activeStroke, mode, slide, held])
+  }, [tiles, markers, visited, canvasPx, scale, showGrid, hover, flash, bridgeImg, sprites, drawings, activeStroke, mode, slide, held])
 
   useEffect(() => {
     if (!focusRequest) return
@@ -345,6 +417,19 @@ export function MapCanvas() {
       if (Math.abs(px - cx) <= half && Math.abs(py - cy) <= half) return m
     }
     return null
+  }
+
+  function extraAtPointer(e: React.MouseEvent) {
+    const tantegel = markers.find((m) => m.locationId === 'tantegel')
+    if (!tantegel) return null
+    const rect = (e.currentTarget as HTMLCanvasElement).getBoundingClientRect()
+    const px = e.clientX - rect.left
+    const py = e.clientY - rect.top
+    return (
+      tantegelExtraIcons(tantegel, scale, canvasPx).find(
+        (icon) => px >= icon.x - 1 && px <= icon.x + icon.size + 1 && py >= icon.y - 1 && py <= icon.y + icon.size + 1,
+      ) ?? null
+    )
   }
 
   function pointerToMapPoint(e: React.PointerEvent | React.MouseEvent): Point {
@@ -428,6 +513,11 @@ export function MapCanvas() {
       eraseAt(pointerToMapPoint(e))
       return
     }
+    const extra = extraAtPointer(e)
+    if (extra) {
+      toggleVisited(extra.id)
+      return
+    }
     if (!selectedLocation) {
       const hit = markerAtPointer(e)
       if (hit) {
@@ -465,6 +555,7 @@ export function MapCanvas() {
       setMode('place')
       return
     }
+    if (extraAtPointer(e)) return
     const marker = markerAtPointer(e)
     if (marker) {
       removeMarker(marker.id)
