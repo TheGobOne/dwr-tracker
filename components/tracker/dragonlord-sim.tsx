@@ -11,14 +11,12 @@ const pct = (v: number | null) => (v === null ? '-' : `${(v * 100).toFixed(1)}%`
 
 // Visible width of the DL2 sprite (74x92 art contained in a 36px box). The pixel
 // font's glyphs are 1em wide, so font-size = width / characters fills it exactly.
-const SPRITE_VISIBLE_WIDTH = 29
 
 function MapWinRate({ winRate }: { winRate: number }) {
   const label = `${Math.round(winRate * 100)}%`
   return (
     <span
-      className={cn('block whitespace-nowrap font-display leading-none tabular-nums', winRateColor(winRate))}
-      style={{ fontSize: `${SPRITE_VISIBLE_WIDTH / label.length}px` }}
+      className={cn('block whitespace-nowrap font-display text-[10px] leading-none tabular-nums', winRateColor(winRate))}
     >
       {label}
     </span>
@@ -285,7 +283,7 @@ export function DragonlordSimButton() {
         }
         aria-haspopup="dialog"
         onClick={() => setOpen(true)}
-        className="group flex shrink-0 flex-col items-center gap-0.5 rounded-sm p-0.5 focus-visible:outline-2 focus-visible:outline-primary"
+        className="group flex shrink-0 flex-row items-center gap-1 rounded-sm p-0.5 focus-visible:outline-2 focus-visible:outline-primary"
       >
         <img
           src="/dragonlord-icon.png"
