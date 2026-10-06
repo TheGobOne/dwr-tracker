@@ -82,6 +82,10 @@ export function effectiveStats(input: SimInput) {
   }
 }
 
+export function dl2AmbushChance(agility: number) {
+  return Math.min(1, 50 / Math.max(1, agility) / 2)
+}
+
 function heroAttackDamage(rng: Rng, attack: number) {
   const base = attack - Math.floor(DL2.agi / 2)
   if (base < 1) return byte(rng) < 128 ? 0 : 1
@@ -110,7 +114,7 @@ export function simulateFight(input: SimInput, rng: Rng, withLog = false): Fight
 
   const dlFirst =
     input.initiative === 'dlFirst' ||
-    (input.initiative === 'random' && Math.floor(DL2.agi / 4) * byte(rng) > input.agility * byte(rng))
+    (input.initiative === 'random' && rng() < dl2AmbushChance(input.agility))
 
   say(`Dragonlord 2 appears with ${dlHp} HP.`)
   if (dlFirst) say('The Dragonlord moves first!')
