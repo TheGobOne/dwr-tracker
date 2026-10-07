@@ -236,13 +236,9 @@ function SimWindow({
             ))}
           </div>
 
-          <p className="text-muted-foreground">{`Heals below ${HEAL_AT} HP or DL2's max hit`}</p>
+          <p className="text-center text-muted-foreground">{`Heals at ${HEAL_AT} HP or below`}</p>
 
-          {summary === null ? (
-            <p className="border-t border-border pt-2.5 leading-relaxed text-muted-foreground">
-              Enter Max HP, MP, Attack, Defense and Agility to simulate.
-            </p>
-          ) : (
+          {summary !== null && (
           <dl className="grid grid-cols-2 gap-x-3 gap-y-1.5 border-t border-border pt-2.5">
             <dt className="text-muted-foreground">Win rate</dt>
             <dd className={cn('text-right tabular-nums', winRateColor(summary.winRate))}>
