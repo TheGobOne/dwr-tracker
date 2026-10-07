@@ -26,7 +26,7 @@ const CONTROL_SECTIONS: { title: string; controls: { input: string; action: stri
   {
     title: 'Locations, Items, and Spells',
     controls: [
-      { input: 'Location, then map', action: 'Place it' },
+      { input: 'Locations', action: 'Left click to highlight, then left click to place on map' },
       { input: '? Town / ? Cave', action: 'Place as many as needed' },
       { input: 'Pin', action: 'Move a placed marker' },
       { input: 'Belt count', action: 'Left click +1, right click -1' },
