@@ -7,37 +7,38 @@ const CONTROL_SECTIONS: { title: string; controls: { input: string; action: stri
   {
     title: 'Map',
     controls: [
-      { input: 'Left click', action: 'Place a marker, or check off a placed location' },
-      { input: 'Right click marker', action: 'Remove the marker' },
-      { input: 'Middle click marker', action: 'Open the cave or castle map for that location' },
+      { input: 'Left click marker', action: 'Check off the location' },
+      { input: 'Right click marker', action: 'Remove it' },
+      { input: 'Middle click marker', action: 'Open its cave or castle map' },
+      { input: 'Right click empty', action: 'Pen: left drag to draw' },
+      { input: 'Middle click empty', action: 'Eraser: left drag to erase' },
+      { input: 'Same click again', action: 'Back to placing markers' },
     ],
   },
   {
-    title: 'Drawing',
+    title: 'Move mode',
     controls: [
-      { input: 'Right click empty', action: 'Switch to the pen, then left drag to draw green lines' },
-      { input: 'Middle click', action: 'Switch to the eraser, then left drag over lines to erase' },
-      { input: 'Click again', action: 'Right click in pen or middle click in eraser to go back to placing' },
-  { input: 'Move toggle', action: 'Bottom left of the map: turn on to move a group of markers and lines' },
-  { input: 'Left drag (Move)', action: 'Draw a box to select the markers and lines inside it' },
-{ input: 'Left drag selection (Move)', action: 'Drag the selection and release to drop it' },
-      { input: 'Right click (Move)', action: 'Clear the selection' },
+      { input: 'Left drag', action: 'Box-select markers and lines' },
+      { input: 'Drag selection', action: 'Move it' },
+      { input: 'Right click', action: 'Clear the selection' },
     ],
   },
   {
-    title: 'Locations',
+    title: 'Sidebar',
     controls: [
-      { input: 'Click unplaced', action: 'Select it, then click the map to place it' },
-      { input: 'Click placed', action: 'Highlight its marker on the map' },
-      { input: 'Pin button', action: 'Move a placed marker to a new spot' },
-      { input: '? Town / ? Cave', action: 'Select, then click the map to mark unidentified spots. Place as many as you need' },
+      { input: 'Location, then map', action: 'Place it' },
+      { input: '? Town / ? Cave', action: 'Place as many as needed' },
+      { input: 'Pin', action: 'Move a placed marker' },
+      { input: 'Belt count', action: 'Left click +1, right click -1' },
+      { input: 'Tab', action: 'Cycle the coord or DL2 boxes' },
     ],
   },
   {
-    title: 'Other',
+    title: 'Corners',
     controls: [
-  { input: 'King', action: 'Show the experience level table' },
-  ],
+      { input: 'King', action: 'Experience table' },
+      { input: 'DL2', action: 'Fight sim (heals at 48 HP)' },
+    ],
   },
 ]
 
@@ -69,7 +70,7 @@ export function ControlsWindow({ onClose }: { onClose: () => void }) {
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className="dw-window absolute top-1.5 right-1.5 bottom-1.5 left-1/2 flex flex-col gap-2 p-2.5">
+      <div className="dw-window absolute top-1.5 right-1.5 left-1/2 flex max-h-[calc(100%-0.75rem)] flex-col gap-2 p-2.5">
         <div className="flex items-center justify-between gap-4">
           <h2 id="controls-title" className="font-display text-[10px] text-primary">
             Controls

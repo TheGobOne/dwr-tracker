@@ -15,7 +15,7 @@ export function ClearTrackerButton() {
         type="button"
         onClick={() => setConfirmOpen(true)}
         aria-haspopup="dialog"
-        className="font-display rounded-sm border border-destructive bg-black/60 px-2 py-1 text-[10px] leading-none text-destructive uppercase outline-none transition-colors hover:bg-destructive hover:text-white focus-visible:ring-2 focus-visible:ring-primary"
+        className="font-display rounded-sm border border-destructive bg-black/60 px-1.5 py-[3px] text-[10px] leading-none text-destructive uppercase outline-none transition-colors hover:bg-destructive hover:text-white focus-visible:ring-2 focus-visible:ring-primary"
       >
         Clear
       </button>

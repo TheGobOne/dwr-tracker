@@ -782,7 +782,7 @@ export function MapCanvas() {
       <div className="absolute right-1.5 bottom-1.5 z-10 rounded-sm bg-black/60">
         <DragonlordSimButton />
       </div>
-      <div className="absolute top-1.5 left-1.5 z-10">
+      <div className="absolute top-1.5 left-1.5 z-10 flex">
         <ClearTrackerButton />
       </div>
       <CaveMapViewer locationId={caveMapId} onClose={closeCaveMap} />
