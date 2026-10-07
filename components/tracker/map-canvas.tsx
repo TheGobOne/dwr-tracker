@@ -42,6 +42,7 @@ interface ExtraIcon {
   x: number
   y: number
   size: number
+  price?: string
 }
 
 function locationExtraIcons(marker: Marker, scale: number, canvasSize: number): ExtraIcon[] {
@@ -69,7 +70,7 @@ function locationExtraIcons(marker: Marker, scale: number, canvasSize: number): 
     let x = cx - ms / 2 - 4 - size
     if (x < 1) x = cx + ms / 2 + 4
     const startY = Math.max(1, Math.min(canvasSize - total - 1, cy - total / 2))
-    left.forEach((extra, i) => icons.push({ id: extra.id, sprite: extra.sprite, x, y: startY + i * (size + gap), size }))
+    left.forEach((extra, i) => icons.push({ id: extra.id, sprite: extra.sprite, x, y: startY + i * (size + gap), size, price: extra.price }))
   }
 
   return icons
@@ -445,6 +446,17 @@ export function MapCanvas() {
           const img = sprites[icon.sprite]
           if (img) ctx.drawImage(img, icon.x, icon.y, icon.size, icon.size)
           ctx.globalAlpha = 1
+          if (icon.price) {
+            const fontPx = Math.max(7, Math.round(icon.size * 0.5))
+            ctx.font = `${fontPx}px ${nesFont}`
+            const tw = ctx.measureText(icon.price).width
+            const tx = Math.max(tw / 2 + 2, Math.min(size - tw / 2 - 2, icon.x + icon.size / 2))
+            const ty = Math.max(fontPx / 2 + 2, icon.y - fontPx / 2 - 3)
+            ctx.fillStyle = '#000000'
+            ctx.fillRect(tx - tw / 2 - 2, ty - fontPx / 2 - 2, tw + 4, fontPx + 4)
+            ctx.fillStyle = '#F8B800'
+            ctx.fillText(icon.price, tx, ty + 1)
+          }
           if (opened) {
             ctx.strokeStyle = '#FCFCFC'
             ctx.lineWidth = 1.5

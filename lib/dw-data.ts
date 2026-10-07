@@ -132,10 +132,11 @@ export interface LocationExtra {
   sprite: 'chest' | 'stairs' | 'key'
   label: string
   side?: 'left'
-}
-
-function keyShop(locationId: string, name: string): LocationExtra {
-  return { id: `${locationId}-key`, sprite: 'key', label: `${name} magic key`, side: 'left' }
+  price?: string
+  }
+  
+  function keyShop(locationId: string, name: string, price: string): LocationExtra {
+  return { id: `${locationId}-key`, sprite: 'key', label: `${name} magic key`, side: 'left', price }
 }
 
 function chests(locationId: string, name: string, count: number): LocationExtra[] {
@@ -150,7 +151,7 @@ export const LOCATION_EXTRAS: Record<string, LocationExtra[]> = {
   tantegel: [
     ...chests('tantegel', 'Tantegel', 4),
     { id: 'tantegel-stairs', sprite: 'stairs', label: 'Tantegel basement stairs' },
-    keyShop('tantegel', 'Tantegel'),
+    keyShop('tantegel', 'Tantegel', '85g'),
   ],
   garinham: [...chests('garinham', 'Garinham', 3), { id: 'garinham-stairs', sprite: 'stairs', label: 'Garinham stairs' }],
   hauksness: chests('hauksness', 'Hauksness', 1),
@@ -159,6 +160,6 @@ export const LOCATION_EXTRAS: Record<string, LocationExtra[]> = {
   'garins-grave': chests('garins-grave', 'Grave', 5),
   'mountain-cave': chests('mountain-cave', 'Mountain Cave', 5),
   'freebie-cave': chests('freebie-cave', 'Freebie Cave', 1),
-  rimuldar: [...chests('rimuldar', 'Rimuldar', 1), keyShop('rimuldar', 'Rimuldar')],
-  cantlin: [keyShop('cantlin', 'Cantlin')],
+  rimuldar: [...chests('rimuldar', 'Rimuldar', 1), keyShop('rimuldar', 'Rimuldar', '53g')],
+  cantlin: [keyShop('cantlin', 'Cantlin', '98g')],
 }
