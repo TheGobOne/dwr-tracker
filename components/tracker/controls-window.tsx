@@ -24,7 +24,7 @@ const CONTROL_SECTIONS: { title: string; controls: { input: string; action: stri
     ],
   },
   {
-    title: 'Sidebar',
+    title: 'Locations, Items, and Spells',
     controls: [
       { input: 'Location, then map', action: 'Place it' },
       { input: '? Town / ? Cave', action: 'Place as many as needed' },
