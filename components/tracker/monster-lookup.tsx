@@ -195,6 +195,14 @@ export function MonsterLookupButton({ className }: { className?: string }) {
         className={className}
       >
         <span className="truncate">Monsters</span>
+        <img
+          src="/sprites/red-slime.png"
+          alt=""
+          aria-hidden="true"
+          width={19}
+          height={18}
+          className="pixelated ml-1.5 h-[1em] w-auto shrink-0"
+        />
       </button>
       {open && <MonsterWindow onClose={() => setOpen(false)} />}
     </>
