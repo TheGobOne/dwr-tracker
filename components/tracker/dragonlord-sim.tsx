@@ -290,7 +290,7 @@ export function DragonlordSimButton() {
         }
         aria-haspopup="dialog"
         onClick={() => setOpen(true)}
-        className="group flex shrink-0 flex-row items-center gap-1 rounded-sm p-0.5 focus-visible:outline-2 focus-visible:outline-primary"
+        className="group flex shrink-0 flex-row-reverse items-center gap-1 rounded-sm p-0.5 focus-visible:outline-2 focus-visible:outline-primary"
       >
         <img
           src="/dragonlord-icon.png"
