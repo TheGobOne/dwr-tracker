@@ -73,11 +73,10 @@ export function mulberry32(seed: number) {
 
 type Rng = () => number
 const randInt = (rng: Rng, min: number, max: number) => min + Math.floor(rng() * (max - min + 1))
-const byte = (rng: Rng) => randInt(rng, 0, 255)
 
 export function effectiveStats(input: SimInput) {
   return {
-    maxHp: Math.max(1, input.deathNecklace ? Math.floor((input.maxHp * 3) / 4) : input.maxHp),
+    maxHp: Math.max(1, input.deathNecklace ? input.maxHp * 0.75 : input.maxHp),
     attack: input.attack + (input.deathNecklace ? DEATH_NECKLACE_AP : 0),
   }
 }
@@ -86,16 +85,22 @@ export function dl2AmbushChance(agility: number) {
   return Math.min(1, 50 / Math.max(1, agility) / 2)
 }
 
-function heroAttackDamage(rng: Rng, attack: number) {
-  const base = attack - Math.floor(DL2.agi / 2)
-  if (base < 1) return byte(rng) < 128 ? 0 : 1
-  return Math.floor((base * (byte(rng) + 256)) / 1024)
+export function heroDamageRange(attack: number) {
+  const base = attack - DL2.agi / 2
+  return { min: Math.max(0, Math.floor(base / 4)), max: Math.max(1, Math.floor(base / 2)) }
 }
 
-function enemyAttackDamage(rng: Rng, defense: number) {
-  const base = DL2.str - Math.floor(defense / 2)
-  if (base < Math.floor(DL2.str / 2) + 1) return Math.floor((byte(rng) * Math.floor((DL2.str + 4) / 6)) / 256)
-  return Math.floor((base * (byte(rng) + 256)) / 1024)
+export function enemyDamageRange(defense: number) {
+  const base = DL2.str - defense / 2
+  return { min: Math.floor(base / 4), max: Math.floor(base / 2) }
+}
+
+// Weighted 1:3:3:1 to favor the middle values, matching dwrguide.com/dragonlordfight.
+const ARMORED_BREATH = [42, 44, 44, 44, 46, 46, 46, 48]
+
+function breathDamage(rng: Rng, erdrickArmor: boolean) {
+  if (erdrickArmor) return ARMORED_BREATH[randInt(rng, 0, ARMORED_BREATH.length - 1)]
+  return randInt(rng, DL2.breathMin, DL2.breathMax)
 }
 
 export function simulateFight(input: SimInput, rng: Rng, withLog = false): FightResult {
@@ -109,8 +114,9 @@ export function simulateFight(input: SimInput, rng: Rng, withLog = false): Fight
   let fairy = input.fairyWater
   let dlHp = randInt(rng, DL2.hpMin, DL2.hpMax)
   let outOfHealing = false
-  const fairyAvg = (DL2.fairyMin + DL2.fairyMax) / 2
-  const attackAvg = (Math.max(0, attack - DL2.agi / 2) * 3) / 8
+  const hero = heroDamageRange(attack)
+  const enemy = enemyDamageRange(input.defense)
+  const throwFairy = hero.max <= DL2.fairyMax
 
   const dlFirst =
     input.initiative === 'dlFirst' ||
@@ -121,19 +127,18 @@ export function simulateFight(input: SimInput, rng: Rng, withLog = false): Fight
 
   const dragonTurn = () => {
     if (rng() < DL2.breathChance) {
-      let dmg = randInt(rng, DL2.breathMin, DL2.breathMax)
-      if (input.erdrickArmor) dmg = Math.floor((dmg * 2) / 3)
+      const dmg = breathDamage(rng, input.erdrickArmor)
       hp -= dmg
       say(`The Dragonlord breathes fire! ${dmg} damage. (HP ${Math.max(0, hp)})`)
     } else {
-      const dmg = enemyAttackDamage(rng, input.defense)
+      const dmg = randInt(rng, enemy.min, enemy.max)
       hp -= dmg
       say(`The Dragonlord attacks! ${dmg} damage. (HP ${Math.max(0, hp)})`)
     }
   }
 
   const heroTurn = () => {
-    if (hp <= input.healAt && hp < maxHp) {
+    if (hp < input.healAt || hp < enemy.max) {
       if (mp >= HEALMORE.cost) {
         mp -= HEALMORE.cost
         const gain = Math.min(maxHp - hp, randInt(rng, HEALMORE.min, HEALMORE.max))
@@ -150,14 +155,14 @@ export function simulateFight(input: SimInput, rng: Rng, withLog = false): Fight
       }
       outOfHealing = true
     }
-    if (fairy > 0 && fairyAvg > attackAvg) {
+    if (fairy > 0 && throwFairy) {
       fairy -= 1
       const dmg = randInt(rng, DL2.fairyMin, DL2.fairyMax)
       dlHp -= dmg
       say(`You throw Fairy Water. ${dmg} damage. (${fairy} left)`)
       return
     }
-    const dmg = heroAttackDamage(rng, attack)
+    const dmg = randInt(rng, hero.min, hero.max)
     dlHp -= dmg
     say(`You attack! ${dmg} damage.`)
   }

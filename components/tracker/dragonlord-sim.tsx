@@ -236,7 +236,7 @@ function SimWindow({
             ))}
           </div>
 
-          <p className="text-muted-foreground">{`Heals at ${HEAL_AT} HP or below`}</p>
+          <p className="text-muted-foreground">{`Heals below ${HEAL_AT} HP or DL2's max hit`}</p>
 
           {summary === null ? (
             <p className="border-t border-border pt-2.5 leading-relaxed text-muted-foreground">
