@@ -21,10 +21,11 @@ export function TrackerShortcuts() {
       if (inTypingField && e.key !== 'Tab') return
       e.preventDefault()
       e.stopImmediatePropagation()
-      // Tab cycles only among the DL2 sim boxes so focus still can't wander elsewhere.
-      if (e.type === 'keydown' && e.key === 'Tab' && e.target instanceof HTMLElement && e.target.matches('[data-sim-field]')) {
+      // Tab cycles only within its own group (DL2 sim boxes, or the two coords boxes) so focus can't wander elsewhere.
+      if (e.type === 'keydown' && e.key === 'Tab' && e.target instanceof HTMLElement && e.target.matches('[data-sim-field], [data-coords-field]')) {
+        const selector = e.target.matches('[data-sim-field]') ? '[data-sim-field]' : '[data-coords-field]'
         const scope = e.target.closest('[role="dialog"]') ?? document
-        const fields = [...scope.querySelectorAll<HTMLElement>('[data-sim-field]')]
+        const fields = [...scope.querySelectorAll<HTMLElement>(selector)]
         const index = fields.indexOf(e.target)
         const next = fields[(index + (e.shiftKey ? -1 : 1) + fields.length) % fields.length]
         next?.focus()

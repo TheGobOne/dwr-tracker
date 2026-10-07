@@ -3,7 +3,6 @@
 import { MapPin } from 'lucide-react'
 import { KIND_META, LOCATIONS, badgeBackground, type DWLocation, type LocationKind } from '@/lib/dw-data'
 import { cn } from '@/lib/utils'
-import { TrackerMenu } from './tracker-menu'
 import {
   EMPTY_COORDS,
   EW_DIRECTIONS,
@@ -34,11 +33,11 @@ export function CoordsInput({
   <fieldset
     className={cn(
       'flex shrink-0',
-      horizontal ? 'w-full min-w-0 flex-row items-center gap-2' : 'flex-col items-start gap-0.5',
+      horizontal ? 'w-full min-w-0 flex-row items-center gap-2' : 'w-full min-w-0 flex-col items-stretch gap-0.5',
     )}
   >
       <legend className="sr-only">{`${name} coordinates`}</legend>
-      <div className={cn('flex items-center gap-0.5', horizontal && 'min-w-0 flex-1')}>
+      <div className={cn('flex min-w-0 items-center gap-0.5', horizontal && 'flex-1')}>
       <input
         type="text"
         inputMode="numeric"
@@ -47,7 +46,7 @@ export function CoordsInput({
         onChange={(e) => updateCoords(locationId, { first: e.target.value })}
         aria-label="First coordinate"
         data-coords-field
-        className={cn(fieldClass, 'px-0.5 text-center', horizontal ? 'w-0 min-w-0 flex-1' : 'w-7')}
+        className={cn(fieldClass, 'w-0 min-w-0 flex-1 px-0.5 text-center')}
       />
       <select
         value={value.firstDir}
@@ -63,7 +62,7 @@ export function CoordsInput({
         ))}
       </select>
       </div>
-      <div className={cn('flex items-center gap-0.5', horizontal && 'min-w-0 flex-1')}>
+      <div className={cn('flex min-w-0 items-center gap-0.5', horizontal && 'flex-1')}>
       <input
         type="text"
         inputMode="numeric"
@@ -72,7 +71,7 @@ export function CoordsInput({
         onChange={(e) => updateCoords(locationId, { second: e.target.value })}
         aria-label="Second coordinate"
         data-coords-field
-        className={cn(fieldClass, 'px-0.5 text-center', horizontal ? 'w-0 min-w-0 flex-1' : 'w-7')}
+        className={cn(fieldClass, 'w-0 min-w-0 flex-1 px-0.5 text-center')}
       />
       <select
         value={value.secondDir}
@@ -204,8 +203,8 @@ export function LocationsPanel() {
           ]
         })}
         <li className="col-span-2 flex flex-col items-center sm:col-span-1 sm:col-start-5 sm:row-span-4 sm:row-start-1">
-          <div className="flex h-10 items-center justify-center">
-            <TrackerMenu />
+          <div className="flex h-10 w-full items-center px-0.5">
+            <CoordsInput locationId={COORDS_LOCATION_ID} name="Jerk" />
           </div>
           {UNKNOWN_LOCATIONS.map((location) => (
             <UnknownLocationButton key={location.id} location={location} />

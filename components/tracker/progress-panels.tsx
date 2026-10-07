@@ -2,9 +2,9 @@
 
 import { ITEM_GROUPS, SPELLS } from '@/lib/dw-data'
 import { cn } from '@/lib/utils'
-import { COORDS_LOCATION_ID, CoordsInput } from './locations-panel'
 import { MonsterLookupButton } from './monster-lookup'
-import { useTracker } from './tracker-context'
+import { MAX_CURSED_BELTS, useTracker } from './tracker-context'
+import { TrackerMenu } from './tracker-menu'
 
 const toggleBase =
   'inline-flex h-4 items-center justify-center rounded-sm border px-1.5 text-[8px] leading-none transition-colors focus-visible:outline-2 focus-visible:outline-primary'
@@ -39,11 +39,7 @@ export function ItemsPanel() {
                   </li>
                 )
               })}
-              {group.label === "Erdrick's Gear" && (
-                <li className="col-span-2 flex min-w-0 items-center">
-                  <CoordsInput locationId={COORDS_LOCATION_ID} name="Jerk" horizontal />
-                </li>
-              )}
+              {group.label === "Erdrick's Gear" && <CursedBelts />}
               {groupIndex === ITEM_GROUPS.length - 1 && (
               <li className="col-span-2 row-span-2 flex">
                 <MonsterLookupButton className={cn(toggleBase, toggleOff, 'h-full min-w-0 flex-1 px-1')} />
@@ -54,6 +50,36 @@ export function ItemsPanel() {
         ))}
       </div>
     </section>
+  )
+}
+
+function CursedBelts() {
+  const { cursedBelts, adjustCursedBelts } = useTracker()
+  const active = cursedBelts > 0
+
+  return (
+    <li className="col-span-2 flex gap-1">
+        <span id="cursed-belts-label" className={cn(toggleBase, toggleOff, 'pointer-events-none min-w-0 flex-1 px-1')}>
+          <span className="truncate">Cursed Belts</span>
+        </span>
+        <button
+          type="button"
+          aria-labelledby="cursed-belts-label"
+          aria-describedby="cursed-belts-hint"
+          title="Left click: +1 · Right click: -1"
+          onClick={() => adjustCursedBelts(1)}
+          onContextMenu={(e) => {
+            e.preventDefault()
+            adjustCursedBelts(-1)
+          }}
+          className={cn(toggleBase, 'w-7 shrink-0 px-1 tabular-nums', active ? toggleOn : toggleOff)}
+        >
+          {cursedBelts}
+        </button>
+        <span id="cursed-belts-hint" className="sr-only">
+          {`${cursedBelts} of ${MAX_CURSED_BELTS}. Click to add, right click to remove.`}
+        </span>
+    </li>
   )
 }
 
@@ -95,20 +121,20 @@ export function SpellsPanel() {
 export function NotesPanel() {
   const { notes, setNotes } = useTracker()
   return (
-  <section className="flex shrink-0 flex-col gap-1">
-  <label htmlFor="run-notes" className="sr-only">
-  Notes
-  </label>
-        <textarea
-          data-notes-field
-
-  id="run-notes"
-  value={notes}
-  onChange={(e) => setNotes(e.target.value)}
-  placeholder="Notes"
-  rows={2}
-  className="h-[3.25rem] shrink-0 resize-none overflow-y-auto rounded-sm border border-foreground/25 bg-transparent px-1.5 py-1 text-[9px] leading-5 text-foreground placeholder:text-foreground/35 [scrollbar-width:none] focus-visible:border-primary focus-visible:outline-none [&::-webkit-scrollbar]:hidden"
+    <section className="flex shrink-0 items-center gap-2">
+      <label htmlFor="run-notes" className="sr-only">
+        Notes
+      </label>
+      <textarea
+        data-notes-field
+        id="run-notes"
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
+        placeholder="Notes"
+        rows={2}
+        className="h-[3.25rem] min-w-0 flex-1 resize-none overflow-y-auto rounded-sm border border-foreground/25 bg-transparent px-1.5 py-1 text-[9px] leading-5 text-foreground placeholder:text-foreground/35 [scrollbar-width:none] focus-visible:border-primary focus-visible:outline-none [&::-webkit-scrollbar]:hidden"
       />
+      <TrackerMenu />
     </section>
   )
 }

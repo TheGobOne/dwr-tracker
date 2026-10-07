@@ -66,7 +66,10 @@ export interface SaveFile {
   spells: Record<string, SpellState>
   notes: string
   coords?: Record<string, ManualCoords>
+  cursedBelts?: number
 }
+
+export const MAX_CURSED_BELTS = 3
 
 const HISTORY_LIMIT = 100
 export const MIN_ZOOM = 3
@@ -147,6 +150,7 @@ interface TrackerContextValue {
   spells: Record<string, SpellState>
   notes: string
   coords: Record<string, ManualCoords>
+  cursedBelts: number
   seed: string
   tool: Tool
   terrain: number
@@ -170,6 +174,7 @@ interface TrackerContextValue {
   setNotes: (notes: string) => void
   setSeed: (seed: string) => void
   toggleItem: (id: string) => void
+  adjustCursedBelts: (delta: number) => void
   toggleVisited: (id: string) => void
   updateSpell: (name: string, patch: Partial<SpellState>) => void
   clearSpells: () => void
@@ -201,6 +206,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
   const [spells, setSpells] = useState<Record<string, SpellState>>({})
   const [notes, setNotes] = useState('')
   const [coords, setCoords] = useState<Record<string, ManualCoords>>({})
+  const [cursedBelts, setCursedBelts] = useState(0)
   const [seed, setSeed] = useState('')
   const [tool, setTool] = useState<Tool>('paint')
   const [terrain, setTerrain] = useState(2)
@@ -325,6 +331,10 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const toggleItem = useCallback((id: string) => setItems((prev) => ({ ...prev, [id]: !prev[id] })), [])
+  const adjustCursedBelts = useCallback(
+    (delta: number) => setCursedBelts((n) => Math.min(MAX_CURSED_BELTS, Math.max(0, n + delta))),
+    [],
+  )
   const toggleVisited = useCallback(
     (id: string) =>
       setVisited((prev) => {
@@ -360,6 +370,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     setSpells({})
     setNotes('')
     setCoords({})
+    setCursedBelts(0)
     setSeed('')
     setSelectedLocation(null)
     setDrawings([])
@@ -377,8 +388,9 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       spells,
       notes,
       coords,
+      cursedBelts,
     }),
-    [seed, visited, items, spells, notes, coords],
+    [seed, visited, items, spells, notes, coords, cursedBelts],
   )
 
   const importSave = useCallback(
@@ -411,6 +423,8 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       setSpells(save.spells ?? {})
       setNotes(String(save.notes ?? ''))
       setCoords(sanitizeCoords(save.coords))
+      const belts = Number(save.cursedBelts)
+      setCursedBelts(Number.isInteger(belts) ? Math.min(MAX_CURSED_BELTS, Math.max(0, belts)) : 0)
       setSeed(String(save.seed ?? ''))
     },
     [commitTiles, commitMarkers],
@@ -425,6 +439,8 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       spells,
       notes,
       coords,
+      cursedBelts,
+      adjustCursedBelts,
       seed,
       tool,
       terrain,
@@ -474,6 +490,8 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       spells,
       notes,
       coords,
+      cursedBelts,
+      adjustCursedBelts,
       seed,
       tool,
       terrain,
