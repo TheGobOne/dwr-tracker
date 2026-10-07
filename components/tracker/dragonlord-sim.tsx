@@ -3,6 +3,7 @@
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
+import { useTracker } from '@/components/tracker/tracker-context'
 import { runSimulation, type Initiative, type SimInput } from '@/lib/dragonlord-sim'
 
 const TRIALS = 10000
@@ -266,6 +267,12 @@ function SimWindow({
 export function DragonlordSimButton() {
   const [open, setOpen] = useState(false)
   const [input, setInput] = useState<FormState>(DEFAULT_FORM)
+  const { resetCount } = useTracker()
+  const [seenResetCount, setSeenResetCount] = useState(resetCount)
+  if (seenResetCount !== resetCount) {
+    setSeenResetCount(resetCount)
+    setInput(DEFAULT_FORM)
+  }
   const deferredInput = useDeferredValue(input)
   const summary = useMemo(() => {
     const simInput = toSimInput(deferredInput)

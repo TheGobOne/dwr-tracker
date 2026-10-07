@@ -185,6 +185,7 @@ interface TrackerContextValue {
   removeMarkerAt: (x: number, y: number) => boolean
   undo: () => void
   reset: () => void
+  resetCount: number
   requestFocus: (x: number, y: number) => void
   exportSave: () => SaveFile
   importSave: (data: unknown) => void
@@ -211,6 +212,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
   const [historyLength, setHistoryLength] = useState(0)
   const [focusRequest, setFocusRequest] = useState<TrackerContextValue['focusRequest']>(null)
   const [drawings, setDrawings] = useState<DrawingStroke[]>([])
+  const [resetCount, setResetCount] = useState(0)
 
   const tilesRef = useRef(tiles)
   const markersRef = useRef(markers)
@@ -361,6 +363,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     setSeed('')
     setSelectedLocation(null)
     setDrawings([])
+    setResetCount((n) => n + 1)
   }, [commitTiles, commitMarkers])
 
   const exportSave = useCallback(
@@ -458,6 +461,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       removeMarkerAt,
       undo,
       reset,
+      resetCount,
       requestFocus,
       exportSave,
       importSave,
@@ -497,6 +501,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       removeMarkerAt,
       undo,
       reset,
+      resetCount,
       requestFocus,
       exportSave,
       importSave,
