@@ -23,19 +23,19 @@ export const CAVE_MAPS: Record<string, MapInfo> = {
   charlock: { title: 'Charlock Castle', src: '/cave-maps/charlock.png?v=1' },
   tantegel: {
     title: 'Tantegel Castle',
-    src: '/cave-maps/tantegel.png?v=1',
-    width: 547,
-    height: 514,
+    src: '/cave-maps/tantegel.png?v=2',
+    width: 96,
+    height: 80,
     goldChests: [
-      { id: 'chest-1', x: 57.5, y: 248 },
-      { id: 'chest-2', x: 73, y: 264.5 },
-      { id: 'chest-3', x: 57.5, y: 280.5 },
-      { id: 'chest-4', x: 89, y: 280.5 },
+      { id: 'chest-1', x: 23.5, y: 24 },
+      { id: 'chest-2', x: 39, y: 40.5 },
+      { id: 'chest-3', x: 23.5, y: 56.5 },
+      { id: 'chest-4', x: 55, y: 56.5 },
     ],
   },
 }
 
-const CHEST_RING_PX = 22
+const CHEST_RING_PX = 17
 
 export function CaveMapViewer({ locationId, onClose }: { locationId: string | null; onClose: () => void }) {
   const closeRef = useRef<HTMLButtonElement>(null)
@@ -101,7 +101,7 @@ export function CaveMapViewer({ locationId, onClose }: { locationId: string | nu
                     aria-pressed={hasGold}
                     aria-label={`Treasury chest ${i + 1}${hasGold ? ', has gold' : ''}`}
                     onClick={() => toggleShopItem(goldKey, chest.id)}
-                    className="absolute flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-primary hover:bg-primary/20 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-foreground"
+                    className="absolute flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-4 border-primary hover:bg-primary/20 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-foreground"
                     style={{
                       left: `${(chest.x / map.width!) * 100}%`,
                       top: `${(chest.y / map.height!) * 100}%`,
@@ -112,7 +112,7 @@ export function CaveMapViewer({ locationId, onClose }: { locationId: string | nu
                     {hasGold && (
                       <span
                         aria-hidden="true"
-                        className="block size-[55%] rounded-full border border-[#8a5a00] bg-[#f8c800] shadow-[inset_-1px_-1px_0_#c08000,inset_1px_1px_0_#fff3a0]"
+                        className="block size-[40%] rounded-full border-2 border-[#8a5a00] bg-[#f8c800] shadow-[inset_-1px_-1px_0_#c08000,inset_1px_1px_0_#fff3a0]"
                       />
                     )}
                   </button>

@@ -183,11 +183,16 @@ function svgCursor(svg: string, hotX: number, hotY: number, fallback: string) {
 }
 
 const MODE_CURSOR: Record<MapMode, string> = {
-  place: 'crosshair',
+  place: svgCursor(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"><path d="M9 1v16M1 9h16" stroke="#000" stroke-width="3"/><path d="M9 1v16M1 9h16" stroke="#FCFCFC" stroke-width="1"/></svg>`,
+    9,
+    9,
+    'crosshair',
+  ),
   pen: svgCursor(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M3 21l1.5-5.5L16 4l4 4L8.5 19.5z" fill="${PEN_COLOR}" stroke="#000" stroke-width="1.5" stroke-linejoin="round"/><path d="M3 21l1.5-5.5 4 4z" fill="#FCFCFC" stroke="#000" stroke-width="1.5" stroke-linejoin="round"/></svg>`,
-    3,
-    21,
+    `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path d="M3 21l1.5-5.5L16 4l4 4L8.5 19.5z" fill="${PEN_COLOR}" stroke="#000" stroke-width="1.5" stroke-linejoin="round"/><path d="M3 21l1.5-5.5 4 4z" fill="#FCFCFC" stroke="#000" stroke-width="1.5" stroke-linejoin="round"/></svg>`,
+    2,
+    16,
     'crosshair',
   ),
   eraser: svgCursor(
