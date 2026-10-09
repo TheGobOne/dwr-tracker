@@ -9,7 +9,8 @@ const CONTROL_SECTIONS: { title: string; controls: { input: string; action: stri
     controls: [
       { input: 'Left click marker', action: 'Check off the location' },
       { input: 'Right click marker', action: 'Remove it' },
-      { input: 'Middle click marker', action: 'Open its cave or castle map' },
+      { input: 'Middle click marker', action: 'Cave/castle map or town shop' },
+    { input: 'Left click chest circle', action: 'Mark gold chest' },
       { input: 'Right click empty space', action: 'Pen: left drag to draw' },
       { input: 'Middle click empty', action: 'Eraser: left drag to erase' },
       { input: 'Same click again', action: 'Back to placing markers' },

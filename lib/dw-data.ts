@@ -77,6 +77,45 @@ export const LOCATIONS: DWLocation[] = [
 
 export const LOCATION_BY_ID = Object.fromEntries(LOCATIONS.map((l) => [l.id, l])) as Record<string, DWLocation>
 
+const TOWNS_WITHOUT_SHOPS = new Set(['hauksness'])
+
+export function hasEquipmentShop(locationId: string | null) {
+  return !!locationId && LOCATION_BY_ID[locationId]?.kind === 'town' && !TOWNS_WITHOUT_SHOPS.has(locationId)
+}
+
+export const SHOP_GEAR: { label: string; items: { id: string; name: string }[] }[] = [
+  {
+    label: 'Weapons',
+    items: [
+      { id: 'bamboo-pole', name: 'Bamboo Pole' },
+      { id: 'club', name: 'Club' },
+      { id: 'copper-sword', name: 'Copper Sword' },
+      { id: 'hand-axe', name: 'Hand Axe' },
+      { id: 'broad-sword', name: 'Broad Sword' },
+      { id: 'flame-sword', name: 'Flame Sword' },
+    ],
+  },
+  {
+    label: 'Armor',
+    items: [
+      { id: 'clothes', name: 'Clothes' },
+      { id: 'leather-armor', name: 'Leather Armor' },
+      { id: 'chain-mail', name: 'Chain Mail' },
+      { id: 'half-plate', name: 'Half Plate' },
+      { id: 'full-plate', name: 'Full Plate' },
+      { id: 'magic-armor', name: 'Magic Armor' },
+    ],
+  },
+  {
+    label: 'Shields',
+    items: [
+      { id: 'small-shield', name: 'Small Shield' },
+      { id: 'large-shield', name: 'Large Shield' },
+      { id: 'silver-shield', name: 'Silver Shield' },
+    ],
+  },
+]
+
 export interface ItemDef {
   id: string
   name: string

@@ -6,7 +6,17 @@ import { ExperienceWizard } from './experience-table'
 import { DragonlordSimButton } from './dragonlord-sim'
 import { ClearTrackerButton } from './clear-tracker-button'
 import { cn } from '@/lib/utils'
-import { KIND_META, LOCATION_BY_ID, LOCATION_EXTRAS, MAP_SIZE, PIN_COLOR, SPLIT_COLORS, TERRAIN_RGB } from '@/lib/dw-data'
+import { ShopWindow, type ShopTown } from './shop-window'
+import {
+  KIND_META,
+  LOCATION_BY_ID,
+  LOCATION_EXTRAS,
+  MAP_SIZE,
+  PIN_COLOR,
+  SPLIT_COLORS,
+  TERRAIN_RGB,
+  hasEquipmentShop,
+} from '@/lib/dw-data'
 import { useTracker, type Marker } from './tracker-context'
 
 const MAX_TRACKER_WIDTH = 640
@@ -19,8 +29,10 @@ interface Point {
 function markerSize(scale: number, marker?: Marker) {
   const base = Math.max(16, Math.round(scale * 2))
   const isCharlock = marker?.locationId && LOCATION_BY_ID[marker.locationId]?.name === 'Charlock'
-  return isCharlock ? base * 2 : Math.round(base * 1.33)
+  return Math.round((isCharlock ? base * 2 : base * 1.33) * MARKER_SCALE)
 }
+
+const MARKER_SCALE = 0.75
 
 function markerColor(marker: Marker) {
   const location = marker.locationId ? LOCATION_BY_ID[marker.locationId] : null
@@ -516,6 +528,8 @@ export function MapCanvas() {
 
   const [caveMapId, setCaveMapId] = useState<string | null>(null)
   const closeCaveMap = useCallback(() => setCaveMapId(null), [])
+  const [shopTown, setShopTown] = useState<ShopTown | null>(null)
+  const closeShop = useCallback(() => setShopTown(null), [])
 
   function pointerToTile(e: React.PointerEvent | React.MouseEvent): Point {
     const rect = (e.currentTarget as HTMLCanvasElement).getBoundingClientRect()
@@ -653,6 +667,15 @@ export function MapCanvas() {
           setCaveMapId(hit.locationId)
           return
         }
+        if (hit && hasEquipmentShop(hit.locationId)) {
+          const location = LOCATION_BY_ID[hit.locationId as string]
+          setShopTown(
+            location.unknown
+              ? { key: `unknown:${hit.x},${hit.y}`, name: '? Town' }
+              : { key: location.id, name: location.name },
+          )
+          return
+        }
       }
       setActiveStroke(null)
       setMode('eraser')
@@ -786,6 +809,7 @@ export function MapCanvas() {
         <ClearTrackerButton />
       </div>
       <CaveMapViewer locationId={caveMapId} onClose={closeCaveMap} />
+      <ShopWindow town={shopTown} onClose={closeShop} />
     </section>
   )
 }
