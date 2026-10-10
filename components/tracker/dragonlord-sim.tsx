@@ -168,7 +168,11 @@ function SimWindow({
 
   const setNumber = (key: NumberKey, raw: string, max: number) => {
     const n = raw === '' ? null : Math.max(0, Math.min(max, Math.floor(Number(raw))))
-    setInput((prev) => ({ ...prev, [key]: n }))
+    setInput((prev) => ({
+  ...prev,
+  [key]: n,
+  ...(key === 'dl2Hp' && n !== null ? { divemore: false } : {}),
+  }))
   }
 
   const renderField = (f: (typeof NUMBER_FIELDS)[number]) => (
