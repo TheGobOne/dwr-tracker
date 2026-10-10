@@ -1,7 +1,7 @@
 'use client'
 
 import { MapPin } from 'lucide-react'
-import { KIND_META, LOCATIONS, badgeBackground, type DWLocation, type LocationKind } from '@/lib/dw-data'
+import { KIND_META, LOCATIONS, badgeBackground, locationColor, type DWLocation, type LocationKind } from '@/lib/dw-data'
 import { cn } from '@/lib/utils'
 import {
   EMPTY_COORDS,
@@ -130,7 +130,7 @@ function UnknownLocationButton({ location }: { location: DWLocation }) {
 
 
 export function LocationsPanel() {
-  const { markers, visited, selectedLocation, setSelectedLocation, setTool, requestFocus } = useTracker()
+  const { markers, visited, items, selectedLocation, setSelectedLocation, setTool, requestFocus } = useTracker()
 
   const markerByLocation = new Map(markers.filter((m) => m.locationId).map((m) => [m.locationId as string, m]))
 
@@ -170,7 +170,7 @@ export function LocationsPanel() {
                     'flex h-4 w-6 shrink-0 items-center justify-center rounded-[2px] font-mono text-[7px] leading-none text-black',
                     !marker && 'opacity-40',
                   )}
-                  style={{ backgroundColor: KIND_META[location.kind].color }}
+                  style={{ backgroundColor: locationColor(location, items) }}
                 >
                   {location.abbr}
                 </span>

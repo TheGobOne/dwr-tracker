@@ -16,6 +16,7 @@ import {
   SPLIT_COLORS,
   TERRAIN_RGB,
   hasEquipmentShop,
+  locationColor,
 } from '@/lib/dw-data'
 import { useTracker, type Marker } from './tracker-context'
 
@@ -34,9 +35,9 @@ function markerSize(scale: number, marker?: Marker) {
 
 const MARKER_SCALE = 0.75
 
-function markerColor(marker: Marker) {
+function markerColor(marker: Marker, items: Record<string, boolean>) {
   const location = marker.locationId ? LOCATION_BY_ID[marker.locationId] : null
-  return location ? KIND_META[location.kind].color : PIN_COLOR
+  return location ? locationColor(location, items) : PIN_COLOR
 }
 
 const SPRITE_SRC = {
@@ -88,12 +89,19 @@ function locationExtraIcons(marker: Marker, scale: number, canvasSize: number): 
   return icons
 }
 
-function markerFill(ctx: CanvasRenderingContext2D, marker: Marker, x: number, y: number, size: number) {
+function markerFill(
+  ctx: CanvasRenderingContext2D,
+  marker: Marker,
+  x: number,
+  y: number,
+  size: number,
+  items: Record<string, boolean>,
+) {
   const split = marker.locationId ? SPLIT_COLORS[marker.locationId] : undefined
   ctx.beginPath()
   ctx.roundRect(x, y, size, size, 3)
   if (!split) {
-    ctx.fillStyle = markerColor(marker)
+    ctx.fillStyle = markerColor(marker, items)
     ctx.fill()
     return
   }
@@ -229,6 +237,7 @@ export function MapCanvas() {
     tiles,
     markers,
     visited,
+    items,
     showGrid,
     placeMarker,
     removeMarker,
@@ -442,18 +451,27 @@ export function MapCanvas() {
       ctx.beginPath()
       ctx.roundRect(cx - ms / 2 - 2, cy - ms / 2 - 2, ms + 4, ms + 4, 4)
       ctx.fill()
-      markerFill(ctx, marker, cx - ms / 2, cy - ms / 2, ms)
+      markerFill(ctx, marker, cx - ms / 2, cy - ms / 2, ms, items)
       ctx.fillStyle = '#000000'
       ctx.fillText(markerText(marker), cx, cy + 1)
-      if (done) {
-        ctx.strokeStyle = '#000000'
-        ctx.lineWidth = 2
-        ctx.beginPath()
-        ctx.moveTo(cx - ms / 2 + 2, cy + ms / 2 - 2)
-        ctx.lineTo(cx + ms / 2 - 2, cy - ms / 2 + 2)
-        ctx.stroke()
-      }
       ctx.globalAlpha = 1
+      if (done) {
+        const h = ms / 2
+        ctx.lineCap = 'round'
+        ctx.lineJoin = 'round'
+        ctx.beginPath()
+        ctx.moveTo(cx - h * 0.6, cy + h * 0.05)
+        ctx.lineTo(cx - h * 0.15, cy + h * 0.5)
+        ctx.lineTo(cx + h * 0.7, cy - h * 0.55)
+        ctx.strokeStyle = '#000000'
+        ctx.lineWidth = Math.max(4, ms * 0.24)
+        ctx.stroke()
+        ctx.strokeStyle = '#30F030'
+        ctx.lineWidth = Math.max(2, ms * 0.13)
+        ctx.stroke()
+        ctx.lineCap = 'butt'
+        ctx.lineJoin = 'miter'
+      }
       {
         for (const icon of locationExtraIcons(marker, scale, size)) {
           const opened = icon.sprite !== 'key' && visited[icon.id]
@@ -522,7 +540,7 @@ export function MapCanvas() {
       ctx.arc(flash.x * scale + scale / 2, flash.y * scale + scale / 2, markerSize(scale) * 1.4, 0, Math.PI * 2)
       ctx.stroke()
     }
-  }, [tiles, markers, visited, canvasPx, scale, showGrid, hover, flash, bridgeImg, sprites, drawings, activeStroke, mode, slide, held, selection, selectedMarkers, selectedStrokes, selectionBounds, box])
+  }, [tiles, markers, visited, items, canvasPx, scale, showGrid, hover, flash, bridgeImg, sprites, drawings, activeStroke, mode, slide, held, selection, selectedMarkers, selectedStrokes, selectionBounds, box])
 
   useEffect(() => {
     if (!focusRequest) return

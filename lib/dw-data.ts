@@ -29,13 +29,21 @@ export type LocationKind = 'castle' | 'town' | 'cave' | 'shrine' | 'special'
 export const KIND_META: Record<LocationKind, { label: string; color: string }> = {
   castle: { label: 'Castles', color: '#F8B800' },
   town: { label: 'Towns', color: '#FCFCFC' },
-  cave: { label: 'Caves & Dungeons', color: '#F87858' },
+  cave: { label: 'Caves & Dungeons', color: '#FCA044' },
   shrine: { label: 'Shrines', color: '#3CBCFC' },
   special: { label: 'Special Spots', color: '#F878F8' },
 }
 
 export const SPLIT_COLORS: Record<string, [string, string]> = {
-  'unknown-cave': ['#F87858', '#3CBCFC'],
+  'unknown-cave': ['#FCA044', '#3CBCFC'],
+}
+
+export const CHARLOCK_LOCKED_COLOR = '#FF2020'
+export const CHARLOCK_OPEN_COLOR = '#30F030'
+
+export function locationColor(location: { id: string; kind: LocationKind }, items: Record<string, boolean>) {
+  if (location.id === 'charlock') return items['rainbow-drop'] ? CHARLOCK_OPEN_COLOR : CHARLOCK_LOCKED_COLOR
+  return KIND_META[location.kind].color
 }
 
 export function badgeBackground(locationId: string, fallback: string) {
@@ -43,7 +51,7 @@ export function badgeBackground(locationId: string, fallback: string) {
   return split ? `linear-gradient(90deg, ${split[0]} 50%, ${split[1]} 50%)` : fallback
 }
 
-export const PIN_COLOR = '#FCA044'
+export const PIN_COLOR = '#F87858'
 
 export interface DWLocation {
   id: string
