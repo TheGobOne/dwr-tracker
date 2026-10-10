@@ -334,7 +334,7 @@ function SimWindow({
   Dangerous Dive (D Dive) - If you expect to use 1 healmore to get to DL, check this off
   </p>
   <p className="text-pretty pt-2">
-  +X MP is how much spare MP you can use and stay above a 90% win rate on DL
+  +X MP is how much spare MP you can use and stay above a 90% win chance on DL
   </p>
           </div>
         </div>
