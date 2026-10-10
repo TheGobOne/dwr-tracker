@@ -409,7 +409,7 @@ export function MapCanvas() {
       }
     }
 
-    if (hover && !slide && mode === 'place') {
+    if (hover && !slide && (mode === 'place' || (mode === 'pen' && selectedLocation))) {
       ctx.strokeStyle = '#FCFCFC'
       ctx.lineWidth = 2
       ctx.strokeRect(hover.x * scale, hover.y * scale, scale, scale)
@@ -687,6 +687,11 @@ export function MapCanvas() {
       return
     }
     if (e.button !== 0) return
+    if (mode === 'pen' && selectedLocation) {
+      const tile = pointerToTile(e)
+      placeMarker(tile.x, tile.y)
+      return
+    }
     if (mode === 'pen') {
       e.currentTarget.setPointerCapture(e.pointerId)
       setActiveStroke([pointerToMapPoint(e)])
