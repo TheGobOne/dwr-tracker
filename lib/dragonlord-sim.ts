@@ -160,14 +160,14 @@ export function simulateFight(input: SimInput, rng: Rng, withLog = false): Fight
   const heal = () => {
     if (mp >= HEALMORE.cost) {
       mp -= HEALMORE.cost
-      const gain = Math.min(maxHp - hp, randInt(rng, HEALMORE.min, HEALMORE.max))
+      const gain = Math.max(0, Math.min(maxHp - hp, randInt(rng, HEALMORE.min, HEALMORE.max)))
       hp += gain
       say(`You cast Healmore. +${gain} HP. (HP ${hp}, MP ${mp})`)
       return true
     }
     if (herbs > 0) {
       herbs -= 1
-      const gain = Math.min(maxHp - hp, randInt(rng, HERB.min, HERB.max))
+      const gain = Math.max(0, Math.min(maxHp - hp, randInt(rng, HERB.min, HERB.max)))
       hp += gain
       say(`You use an Herb. +${gain} HP. (HP ${hp}, ${herbs} left)`)
       return true
@@ -227,9 +227,9 @@ export function simulateFight(input: SimInput, rng: Rng, withLog = false): Fight
     return { won: false, beatDl1, dl1First, dlFirst: false, rounds, hpLeft, dl1DamageTaken, hpAfterDl1: hpLeft, outOfHealing, log }
   }
   if (dl2MaxHp < maxHp) {
+    // Current HP isn't clamped: any HP above the new max carries into DL2 until it drops below.
     maxHp = dl2MaxHp
-    hp = Math.min(hp, maxHp)
-    say(`The Death Necklace's curse takes hold. Max HP drops to ${maxHp}.`)
+    say(`The Death Necklace's curse takes hold. Max HP drops to ${maxHp}. (HP ${hp}/${maxHp})`)
   }
   const hpAfterDl1 = hp
 
