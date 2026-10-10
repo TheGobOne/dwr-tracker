@@ -280,7 +280,7 @@ function SimWindow({
           )}
 
           <p className="text-pretty border-t border-border pt-2.5 text-center text-[9px] leading-relaxed text-muted-foreground">
-            Manually enter DL2 HP or leave blank to sim DL1 damage taken
+            Manually enter DL2 HP after you fight DL1 or leave blank to sim DL1 damage taken
           </p>
         </div>
       </div>
