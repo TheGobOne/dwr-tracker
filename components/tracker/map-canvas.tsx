@@ -32,7 +32,7 @@ function markerSize(scale: number, marker?: Marker) {
   return Math.round((isCharlock ? base * 2 : base * 1.33) * MARKER_SCALE)
 }
 
-const MARKER_SCALE = 0.75
+const MARKER_SCALE = 0.9375
 
 function markerColor(marker: Marker, items: Record<string, boolean>) {
   const location = marker.locationId ? LOCATION_BY_ID[marker.locationId] : null
