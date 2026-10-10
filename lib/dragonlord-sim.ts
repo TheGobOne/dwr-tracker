@@ -41,6 +41,7 @@ export const DL2 = {
 export const HEALMORE = { cost: 8, min: 85, max: 100 }
 export const DEATH_NECKLACE_AP = 10
 const MAX_ROUNDS = 300
+const SWING_CHOICE_MAX = 48
 
 export type Initiative = 'random' | 'first' | 'dlFirst'
 
@@ -254,7 +255,9 @@ export function simulateFight(input: SimInput, rng: Rng, withLog = false): Fight
   }
 
   const heroTurn = () => {
-    if ((hp <= input.healAt || hp < enemy.max) && heal()) return
+    // The swing choice alone decides 47/48 HP; above that, still heal if a max melee hit would kill.
+    const mustHeal = hp <= input.healAt || (hp > SWING_CHOICE_MAX && hp <= enemy.max)
+    if (mustHeal && heal()) return
     if (fairy > 0 && throwFairy) {
       fairy -= 1
       const dmg = randInt(rng, DL2.fairyMin, DL2.fairyMax)
