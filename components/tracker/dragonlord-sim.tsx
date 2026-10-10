@@ -35,7 +35,7 @@ const ATTACK_AT_OPTIONS = [
 type AttackAt = (typeof ATTACK_AT_OPTIONS)[number]['value']
 
 type FormState = Omit<SimInput, NumberKey | 'healAt'> &
-  Record<NumberKey, number | null> & { attackAt: AttackAt }
+  Record<NumberKey, number | null> & { attackAt: AttackAt; divemore: boolean }
 
 const DEFAULT_FORM: FormState = {
   attackAt: 49,
@@ -48,19 +48,25 @@ const DEFAULT_FORM: FormState = {
   fairyWater: null,
   deathNecklace: false,
   erdrickArmor: true,
+  divemore: false,
   initiative: 'random',
+}
+
+function fightMp(form: Pick<FormState, 'mp' | 'divemore'>) {
+  if (form.mp === null) return null
+  return Math.max(0, form.mp - (form.divemore ? HEALMORE.cost : 0))
 }
 
 const REQUIRED_KEYS: NumberKey[] = ['maxHp', 'mp', 'attack', 'defense', 'agility']
 
 function toSimInput(form: FormState): SimInput | null {
   if (REQUIRED_KEYS.some((k) => form[k] === null)) return null
-  const { attackAt, ...rest } = form
+  const { attackAt, divemore: _divemore, ...rest } = form
   return {
     ...rest,
     maxHp: form.maxHp ?? 0,
     dl2Hp: form.dl2Hp,
-    mp: form.mp ?? 0,
+    mp: fightMp(form) ?? 0,
     attack: form.attack ?? 0,
     defense: form.defense ?? 0,
     agility: form.agility ?? 0,
@@ -216,7 +222,7 @@ function SimWindow({
                 aria-label="Healmores castable"
                 className="w-full rounded-sm border border-border/60 px-1 py-1 text-center text-[9px] text-foreground tabular-nums"
               >
-                {input.mp === null ? '\u00A0' : Math.floor(input.mp / HEALMORE.cost)}
+                {input.mp === null ? '\u00A0' : Math.floor((fightMp(input) ?? 0) / HEALMORE.cost)}
               </output>
             </div>
             {NUMBER_FIELDS.slice(3).map(renderField)}
@@ -263,6 +269,12 @@ function SimWindow({
               title="Erdrick's Armor"
               checked={input.erdrickArmor}
               onChange={(v) => setInput((p) => ({ ...p, erdrickArmor: v }))}
+            />
+            <Toggle
+              label="Dive HM"
+              title="Cast 1 Healmore on the way to DL (1 fewer for the fight)"
+              checked={input.divemore}
+              onChange={(v) => setInput((p) => ({ ...p, divemore: v }))}
             />
           </div>
 
