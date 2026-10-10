@@ -39,7 +39,6 @@ export const DL2 = {
 }
 
 export const HEALMORE = { cost: 8, min: 85, max: 100 }
-export const HERB = { min: 23, max: 30 }
 export const DEATH_NECKLACE_AP = 10
 const MAX_ROUNDS = 300
 
@@ -53,7 +52,6 @@ export type SimInput = {
   attack: number
   defense: number
   agility: number
-  herbs: number
   fairyWater: number
   healAt: number
   deathNecklace: boolean
@@ -155,7 +153,6 @@ export function simulateFight(input: SimInput, rng: Rng, withLog = false): Fight
   let maxHp = Math.max(1, input.maxHp)
   let hp = maxHp
   let mp = input.mp
-  let herbs = input.herbs
   let fairy = input.fairyWater
   let outOfHealing = false
 
@@ -165,13 +162,6 @@ export function simulateFight(input: SimInput, rng: Rng, withLog = false): Fight
       const gain = Math.max(0, Math.min(maxHp - hp, randInt(rng, HEALMORE.min, HEALMORE.max)))
       hp += gain
       say(`You cast Healmore. +${gain} HP. (HP ${hp}, MP ${mp})`)
-      return true
-    }
-    if (herbs > 0) {
-      herbs -= 1
-      const gain = Math.max(0, Math.min(maxHp - hp, randInt(rng, HERB.min, HERB.max)))
-      hp += gain
-      say(`You use an Herb. +${gain} HP. (HP ${hp}, ${herbs} left)`)
       return true
     }
     outOfHealing = true

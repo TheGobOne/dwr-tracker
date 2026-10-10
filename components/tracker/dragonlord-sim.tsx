@@ -34,7 +34,7 @@ const ATTACK_AT_OPTIONS = [
 
 type AttackAt = (typeof ATTACK_AT_OPTIONS)[number]['value']
 
-type FormState = Omit<SimInput, NumberKey | 'herbs' | 'healAt'> &
+type FormState = Omit<SimInput, NumberKey | 'healAt'> &
   Record<NumberKey, number | null> & { attackAt: AttackAt }
 
 const DEFAULT_FORM: FormState = {
@@ -67,7 +67,6 @@ function toSimInput(form: FormState): SimInput | null {
     fairyWater: form.fairyWater ?? 0,
     // Attacking at N HP means healing at anything below it.
     healAt: attackAt - 1,
-    herbs: 0,
   }
 }
 
