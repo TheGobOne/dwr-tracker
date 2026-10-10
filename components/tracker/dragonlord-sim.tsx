@@ -24,6 +24,22 @@ function MapWinRate({ winRate }: { winRate: number }) {
   )
 }
 
+const SAFE_WIN_RATE = 0.95
+
+/** MP you could spend elsewhere and still win at least SAFE_WIN_RATE. Healmore is the only spell used, so search by cast count. */
+function findSpareMp(input: SimInput, fullWinRate: number): number {
+  if (fullWinRate < SAFE_WIN_RATE) return 0
+  let lo = 0
+  let hi = Math.floor(input.mp / HEALMORE.cost)
+  while (lo < hi) {
+    const mid = Math.floor((lo + hi) / 2)
+    const rate = runSimulation({ ...input, mp: mid * HEALMORE.cost }, TRIALS, 1).winRate
+    if (rate >= SAFE_WIN_RATE) hi = mid
+    else lo = mid + 1
+  }
+  return input.mp - lo * HEALMORE.cost
+}
+
 type NumberKey = 'maxHp' | 'dl2Hp' | 'mp' | 'attack' | 'defense' | 'agility' | 'fairyWater'
 
 const ATTACK_AT_OPTIONS = [
@@ -335,9 +351,11 @@ export function DragonlordSimButton() {
     setInput(DEFAULT_FORM)
   }
   const deferredInput = useDeferredValue(input)
-  const summary = useMemo(() => {
+  const { summary, spareMp } = useMemo(() => {
     const simInput = toSimInput(deferredInput)
-    return simInput ? runSimulation(simInput, TRIALS, 1) : null
+    if (!simInput) return { summary: null, spareMp: null }
+    const summary = runSimulation(simInput, TRIALS, 1)
+    return { summary, spareMp: findSpareMp(simInput, summary.winRate) }
   }, [deferredInput])
 
   return (
@@ -353,13 +371,20 @@ export function DragonlordSimButton() {
         onClick={() => setOpen(true)}
         className="group flex shrink-0 flex-row-reverse items-center gap-1 rounded-sm p-0.5 focus-visible:outline-2 focus-visible:outline-primary"
       >
-        <img
-          src="/dragonlord-icon.png"
-          alt=""
-          width={36}
-          height={36}
-          className="size-9 object-contain transition-transform [image-rendering:pixelated] group-hover:scale-110"
-        />
+        <span className="flex flex-col items-center gap-0.5">
+          {spareMp !== null && (
+            <span className="block whitespace-nowrap font-display text-[10px] leading-none tabular-nums text-sky-400">
+              {`+${spareMp} MP`}
+            </span>
+          )}
+          <img
+            src="/dragonlord-icon.png"
+            alt=""
+            width={36}
+            height={36}
+            className="size-9 object-contain transition-transform [image-rendering:pixelated] group-hover:scale-110"
+          />
+        </span>
         {summary && <MapWinRate winRate={summary.winRate} />}
       </button>
       {open && <SimWindow input={input} setInput={setInput} summary={summary} onClose={() => setOpen(false)} />}
