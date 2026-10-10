@@ -24,7 +24,7 @@ function MapWinRate({ winRate }: { winRate: number }) {
   )
 }
 
-const SAFE_WIN_RATE = 0.95
+const SAFE_WIN_RATE = 0.9
 
 /** MP you could spend elsewhere and still win at least SAFE_WIN_RATE. Healmore is the only spell used, so search by cast count. */
 function findSpareMp(input: SimInput, fullWinRate: number): number {
