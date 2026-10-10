@@ -135,7 +135,7 @@ function NumberBox({
       onKeyDown={(e) => {
         if (e.key === 'Enter') e.currentTarget.blur()
       }}
-      className="w-full rounded-sm border border-border bg-black px-1 py-1 text-[9px] text-foreground tabular-nums outline-none focus-visible:border-primary"
+      className="w-full rounded-sm border border-border bg-black px-1 py-1 text-center text-[9px] text-foreground tabular-nums outline-none focus-visible:border-primary"
     />
   )
 }
@@ -214,7 +214,7 @@ function SimWindow({
               <span>HM</span>
               <output
                 aria-label="Healmores castable"
-                className="w-full rounded-sm border border-border/60 px-1 py-1 text-left text-[9px] text-foreground tabular-nums"
+                className="w-full rounded-sm border border-border/60 px-1 py-1 text-center text-[9px] text-foreground tabular-nums"
               >
                 {input.mp === null ? '\u00A0' : Math.floor(input.mp / HEALMORE.cost)}
               </output>
