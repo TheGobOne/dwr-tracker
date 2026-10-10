@@ -28,9 +28,10 @@ export interface ManualCoords {
   firstDir: NSDirection
   second: string
   secondDir: EWDirection
+  done: boolean
 }
 
-export const EMPTY_COORDS: ManualCoords = { first: '', firstDir: '', second: '', secondDir: '' }
+export const EMPTY_COORDS: ManualCoords = { first: '', firstDir: '', second: '', secondDir: '', done: false }
 
 function pickDirection<T extends string>(value: unknown, allowed: readonly T[]): T | '' {
   return typeof value === 'string' && (allowed as readonly string[]).includes(value) ? (value as T) : ''
@@ -46,6 +47,7 @@ function sanitizeCoords(raw: unknown): Record<string, ManualCoords> {
       firstDir: pickDirection(value.firstDir, NS_DIRECTIONS),
       second: String(value.second ?? '').slice(0, 4),
       secondDir: pickDirection(value.secondDir, EW_DIRECTIONS),
+      done: value.done === true,
     }
   }
   return result

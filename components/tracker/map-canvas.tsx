@@ -18,6 +18,7 @@ import {
   locationColor,
 } from '@/lib/dw-data'
 import { useTracker, type Marker } from './tracker-context'
+import { COORDS_LOCATION_ID } from './locations-panel'
 
 const MAX_TRACKER_WIDTH = 640
 
@@ -225,6 +226,8 @@ function strokeHits(stroke: Point[], p: Point, radius: number) {
 }
 
 const KNOWN_LOCATION_COUNT = Object.values(LOCATION_BY_ID).filter((l) => !l.unknown).length
+const KOL_ID = 'kol'
+const HAUKSNESS_ID = 'hauksness'
 
 function markerText(marker: Marker) {
   const location = marker.locationId ? LOCATION_BY_ID[marker.locationId] : null
@@ -237,6 +240,8 @@ export function MapCanvas() {
     markers,
     visited,
     items,
+    coords,
+    cursedBelts,
     showGrid,
     placeMarker,
     removeMarker,
@@ -251,6 +256,16 @@ export function MapCanvas() {
     markers.flatMap((m) => (m.locationId && !LOCATION_BY_ID[m.locationId]?.unknown ? [m.locationId] : [])),
   ).size
   const allLocationsPlaced = placedLocationCount >= KNOWN_LOCATION_COUNT
+  const placedIds = new Set(markers.flatMap((m) => (m.locationId ? [m.locationId] : [])))
+  const coordsEntry = coords[COORDS_LOCATION_ID]
+  const coordsKnown = !!(coordsEntry?.first || coordsEntry?.second || coordsEntry?.done)
+  const knownSearchSpots = [
+    { known: placedIds.has(KOL_ID) || !!visited[KOL_ID], done: !!visited[KOL_ID] },
+    { known: placedIds.has(HAUKSNESS_ID) || !!visited[HAUKSNESS_ID], done: !!visited[HAUKSNESS_ID] },
+    { known: coordsKnown, done: !!coordsEntry?.done },
+  ].filter((spot) => spot.known)
+  const searchSpotsDone = knownSearchSpots.filter((spot) => spot.done).length
+  const searchSpotsTotal = knownSearchSpots.length + cursedBelts
   const [mode, setMode] = useState<MapMode>('place')
   const [activeStroke, setActiveStroke] = useState<Point[] | null>(null)
   const isErasingRef = useRef(false)
@@ -785,14 +800,14 @@ export function MapCanvas() {
 
   return (
   <section aria-label="Overworld map" className="dw-window relative flex flex-none flex-col self-center overflow-hidden">
-      <h1
-        className={cn(
-          'font-display pointer-events-none absolute inset-x-0 bottom-2.5 z-10 text-center text-[10px] leading-none [text-shadow:0_0_3px_#000,0_0_3px_#000]',
-          allLocationsPlaced ? 'text-[#58D854]' : 'text-foreground',
-        )}
-      >
-        Locations {placedLocationCount}/{KNOWN_LOCATION_COUNT}
-      </h1>
+      <div className="font-display pointer-events-none absolute inset-x-0 bottom-2.5 z-10 flex flex-col items-center gap-1 text-center text-[10px] leading-none [text-shadow:0_0_3px_#000,0_0_3px_#000]">
+        <p className="text-[#F8D878]">
+          Search spots {searchSpotsDone}/{searchSpotsTotal}
+        </p>
+        <h1 className={allLocationsPlaced ? 'text-[#58D854]' : 'text-foreground'}>
+          Locations {placedLocationCount}/{KNOWN_LOCATION_COUNT}
+        </h1>
+      </div>
       <div ref={containerRef} className="flex items-center justify-center overflow-hidden bg-[#050508]">
         <canvas
           ref={canvasRef}

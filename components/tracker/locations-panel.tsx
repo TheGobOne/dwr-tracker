@@ -129,6 +129,26 @@ function UnknownLocationButton({ location }: { location: DWLocation }) {
 }
 
 
+function CoordsDoneCheckbox() {
+  const { coords, updateCoords } = useTracker()
+  const done = !!coords[COORDS_LOCATION_ID]?.done
+  return (
+    <button
+      type="button"
+      role="checkbox"
+      aria-checked={done}
+      aria-label="Coordinates search spot complete"
+      onClick={() => updateCoords(COORDS_LOCATION_ID, { done: !done })}
+      className={cn(
+        'flex size-3 shrink-0 items-center justify-center rounded-[2px] border focus-visible:outline-2 focus-visible:outline-primary',
+        done ? 'border-[#22c55e] bg-[#22c55e]/20' : 'border-border bg-input/40',
+      )}
+    >
+      {done && <Check className="size-2.5 text-[#22c55e]" strokeWidth={4} aria-hidden="true" />}
+    </button>
+  )
+}
+
 export function LocationsPanel() {
   const { markers, visited, items, selectedLocation, setSelectedLocation, setTool, requestFocus } = useTracker()
 
@@ -210,7 +230,8 @@ export function LocationsPanel() {
           ]
         })}
         <li className="col-span-2 flex flex-col items-center sm:col-span-1 sm:col-start-5 sm:row-span-4 sm:row-start-1">
-          <div className="flex h-10 w-full items-center px-0.5">
+          <div className="flex h-10 w-full items-center gap-1 px-0.5">
+            <CoordsDoneCheckbox />
             <CoordsInput locationId={COORDS_LOCATION_ID} name="Jerk" />
           </div>
           {UNKNOWN_LOCATIONS.map((location) => (
