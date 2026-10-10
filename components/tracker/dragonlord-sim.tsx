@@ -306,9 +306,14 @@ function SimWindow({
           </dl>
           )}
 
-          <p className="text-pretty border-t border-border pt-2.5 text-center text-[9px] leading-relaxed text-muted-foreground">
-            Manually enter DL2 HP after you fight DL1 or leave blank to sim DL1 damage taken
-          </p>
+          <div className="flex flex-col divide-y divide-border border-t border-border text-center text-[9px] leading-relaxed text-muted-foreground">
+            <p className="text-pretty py-2">
+              Manually enter DL2 HP after you fight DL1 or leave blank to sim DL1 damage taken
+            </p>
+            <p className="text-pretty pt-2">
+              D Dive is for Dangerous Dive. If you expect to use 1 healmore to get to DL, check this off
+            </p>
+          </div>
         </div>
       </div>
     </div>,
