@@ -47,6 +47,8 @@ export type Initiative = 'random' | 'first' | 'dlFirst'
 
 export type SimInput = {
   maxHp: number
+  /** When set, DL2 starts at exactly this HP instead of whatever DL1 left. */
+  dl2Hp?: number | null
   mp: number
   attack: number
   defense: number
@@ -230,6 +232,10 @@ export function simulateFight(input: SimInput, rng: Rng, withLog = false): Fight
     // Current HP isn't clamped: any HP above the new max carries into DL2 until it drops below.
     maxHp = dl2MaxHp
     say(`The Death Necklace's curse takes hold. Max HP drops to ${maxHp}. (HP ${hp}/${maxHp})`)
+  }
+  if (input.dl2Hp != null) {
+    hp = Math.max(1, input.dl2Hp)
+    say(`Entering DL2 with your entered HP. (HP ${hp}/${maxHp})`)
   }
   const hpAfterDl1 = hp
 

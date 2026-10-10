@@ -24,7 +24,7 @@ function MapWinRate({ winRate }: { winRate: number }) {
   )
 }
 
-type NumberKey = 'maxHp' | 'mp' | 'attack' | 'defense' | 'agility' | 'fairyWater'
+type NumberKey = 'maxHp' | 'dl2Hp' | 'mp' | 'attack' | 'defense' | 'agility' | 'fairyWater'
 
 const ATTACK_AT_OPTIONS = [
   { value: 47, label: '47 HP' },
@@ -40,6 +40,7 @@ type FormState = Omit<SimInput, NumberKey | 'herbs' | 'healAt'> &
 const DEFAULT_FORM: FormState = {
   attackAt: 49,
   maxHp: null,
+  dl2Hp: null,
   mp: null,
   attack: null,
   defense: null,
@@ -58,6 +59,7 @@ function toSimInput(form: FormState): SimInput | null {
   return {
     ...rest,
     maxHp: form.maxHp ?? 0,
+    dl2Hp: form.dl2Hp,
     mp: form.mp ?? 0,
     attack: form.attack ?? 0,
     defense: form.defense ?? 0,
@@ -70,7 +72,8 @@ function toSimInput(form: FormState): SimInput | null {
 }
 
 const NUMBER_FIELDS: { key: NumberKey; label: string; title: string; max: number }[] = [
-  { key: 'maxHp', label: 'HP', title: 'Max HP', max: 999 },
+  { key: 'maxHp', label: 'DL1 HP', title: 'HP at DL1 (max HP)', max: 999 },
+  { key: 'dl2Hp', label: 'DL2 HP', title: 'HP at DL2 (optional, blank uses the DL1 sim)', max: 999 },
   { key: 'mp', label: 'MP', title: 'Max MP', max: 999 },
   { key: 'attack', label: 'ATK', title: 'Attack', max: 999 },
   { key: 'defense', label: 'DEF', title: 'Defense', max: 999 },
@@ -206,18 +209,20 @@ function SimWindow({
                 <NumberBox value={input[f.key]} max={f.max} onCommit={(raw) => setNumber(f.key, raw, f.max)} />
               </label>
             ))}
-            <Toggle
-              label="D Neck"
-              title="Death Necklace"
-              checked={input.deathNecklace}
-              onChange={(v) => setInput((p) => ({ ...p, deathNecklace: v }))}
-            />
-            <Toggle
-              label="Armor"
-              title="Erdrick's Armor"
-              checked={input.erdrickArmor}
-              onChange={(v) => setInput((p) => ({ ...p, erdrickArmor: v }))}
-            />
+            <div className="flex flex-col gap-1">
+              <Toggle
+                label="D Neck"
+                title="Death Necklace"
+                checked={input.deathNecklace}
+                onChange={(v) => setInput((p) => ({ ...p, deathNecklace: v }))}
+              />
+              <Toggle
+                label="Armor"
+                title="Erdrick's Armor"
+                checked={input.erdrickArmor}
+                onChange={(v) => setInput((p) => ({ ...p, erdrickArmor: v }))}
+              />
+            </div>
           </div>
 
           <div role="radiogroup" aria-labelledby="dl2-attack-at-label" className="flex items-center gap-1.5">
