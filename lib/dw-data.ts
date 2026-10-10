@@ -135,7 +135,7 @@ export const ITEM_GROUPS: { label: string; items: ItemDef[] }[] = [
   {
     label: 'Accessories',
     items: [
-      { id: 'death-necklace', name: 'Neck' },
+      { id: 'death-necklace', name: 'D Neck' },
       { id: 'fairy-flute', name: 'Flute' },
       { id: 'rainbow-drop', name: 'Rainbow Drop', wide: true },
     ],
