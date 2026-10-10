@@ -14,7 +14,7 @@ const pct = (v: number | null) => (v === null ? '-' : `${(v * 100).toFixed(1)}%`
 // font's glyphs are 1em wide, so font-size = width / characters fills it exactly.
 
 function MapWinRate({ winRate }: { winRate: number }) {
-  const label = `${Math.round(winRate * 100)}%`
+  const label = `${(Math.floor(winRate * 1000) / 10).toFixed(1)}%`
   return (
     <span
       className={cn('block whitespace-nowrap font-display text-[10px] leading-none tabular-nums', winRateColor(winRate))}
