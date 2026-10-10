@@ -105,7 +105,7 @@ const randInt = (rng: Rng, min: number, max: number) => min + Math.floor(rng() *
 
 export function effectiveStats(input: SimInput) {
   return {
-    maxHp: Math.max(1, input.deathNecklace ? input.maxHp * 0.75 : input.maxHp),
+    maxHp: Math.max(1, input.deathNecklace ? Math.floor(input.maxHp * 0.75) : input.maxHp),
     attack: input.attack + (input.deathNecklace ? DEATH_NECKLACE_AP : 0),
   }
 }
@@ -145,10 +145,12 @@ function breathDamage(rng: Rng, erdrickArmor: boolean) {
 }
 
 export function simulateFight(input: SimInput, rng: Rng, withLog = false): FightResult {
-  const { maxHp, attack } = effectiveStats(input)
+  const { maxHp: dl2MaxHp, attack } = effectiveStats(input)
   const log: string[] = []
   const say = (line: string) => withLog && log.push(line)
 
+  // The Death Necklace's max HP penalty doesn't apply until DL1 dies, so DL1 is fought at full max HP.
+  let maxHp = Math.max(1, input.maxHp)
   let hp = maxHp
   let mp = input.mp
   let herbs = input.herbs
@@ -223,6 +225,11 @@ export function simulateFight(input: SimInput, rng: Rng, withLog = false): Fight
     say(hp <= 0 ? 'Thou art dead.' : 'The fight dragged on too long.')
     const hpLeft = Math.max(0, hp)
     return { won: false, beatDl1, dl1First, dlFirst: false, rounds, hpLeft, dl1DamageTaken, hpAfterDl1: hpLeft, outOfHealing, log }
+  }
+  if (dl2MaxHp < maxHp) {
+    maxHp = dl2MaxHp
+    hp = Math.min(hp, maxHp)
+    say(`The Death Necklace's curse takes hold. Max HP drops to ${maxHp}.`)
   }
   const hpAfterDl1 = hp
 
