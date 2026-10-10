@@ -201,7 +201,7 @@ function SimWindow({
   </button>
   </div>
 
-        <div className="flex min-h-0 flex-col gap-2.5 overflow-y-auto pr-0.5">
+        <div className="flex min-h-0 flex-col gap-2.5 overflow-y-auto">
           <div className="grid grid-cols-4 items-end gap-1.5">
             {NUMBER_FIELDS.map((f) => (
               <label key={f.key} title={f.title} className="flex flex-col gap-1 whitespace-nowrap text-muted-foreground">
@@ -225,8 +225,8 @@ function SimWindow({
             </div>
           </div>
 
-          <div role="radiogroup" aria-labelledby="dl2-attack-at-label" className="grid grid-cols-4 items-center gap-1.5">
-            <span id="dl2-attack-at-label" className="whitespace-nowrap text-muted-foreground">
+          <div role="radiogroup" aria-labelledby="dl2-attack-at-label" className="mt-1.5 grid grid-cols-4 items-center gap-1.5">
+            <span id="dl2-attack-at-label" className="whitespace-nowrap text-center text-muted-foreground">
               Swing
             </span>
             {ATTACK_AT_OPTIONS.map((o) => {
@@ -278,6 +278,10 @@ function SimWindow({
 
           </dl>
           )}
+
+          <p className="text-pretty border-t border-border pt-2.5 text-center text-[9px] leading-relaxed text-muted-foreground">
+            Manually enter DL2 HP or leave blank to sim DL1 damage taken
+          </p>
         </div>
       </div>
     </div>,
