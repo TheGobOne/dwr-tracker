@@ -225,9 +225,9 @@ function SimWindow({
             </div>
           </div>
 
-          <div role="radiogroup" aria-labelledby="dl2-attack-at-label" className="flex items-center gap-1.5">
-            <span id="dl2-attack-at-label" className="shrink-0 whitespace-nowrap text-muted-foreground">
-              Attack at
+          <div role="radiogroup" aria-labelledby="dl2-attack-at-label" className="grid grid-cols-4 items-center gap-1.5">
+            <span id="dl2-attack-at-label" className="whitespace-nowrap text-muted-foreground">
+              Swing
             </span>
             {ATTACK_AT_OPTIONS.map((o) => {
               const selected = input.attackAt === o.value
@@ -239,7 +239,7 @@ function SimWindow({
                   aria-checked={selected}
                   onClick={() => setInput((p) => ({ ...p, attackAt: o.value }))}
                   className={cn(
-                    'min-w-0 flex-1 whitespace-nowrap rounded-sm border px-1 py-1 text-[9px] tabular-nums transition-colors focus-visible:outline-2 focus-visible:outline-primary',
+                    'w-full min-w-0 whitespace-nowrap rounded-sm border px-1 py-1 text-[9px] tabular-nums transition-colors focus-visible:outline-2 focus-visible:outline-primary',
                     selected
                       ? 'border-primary bg-primary text-primary-foreground'
                       : 'border-foreground/25 text-muted-foreground hover:border-foreground hover:text-foreground',
