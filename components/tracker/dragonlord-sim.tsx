@@ -4,7 +4,7 @@ import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
 import { useTracker } from '@/components/tracker/tracker-context'
-import { runSimulation, type SimInput } from '@/lib/dragonlord-sim'
+import { HEALMORE, runSimulation, type SimInput } from '@/lib/dragonlord-sim'
 
 const TRIALS = 10000
 
@@ -165,6 +165,13 @@ function SimWindow({
     setInput((prev) => ({ ...prev, [key]: n }))
   }
 
+  const renderField = (f: (typeof NUMBER_FIELDS)[number]) => (
+    <label key={f.key} title={f.title} className="flex flex-col gap-1 whitespace-nowrap text-center text-muted-foreground">
+      {f.label}
+      <NumberBox value={input[f.key]} max={f.max} onCommit={(raw) => setNumber(f.key, raw, f.max)} />
+    </label>
+  )
+
   const trackerRoot = document.querySelector('[data-tracker-root]')
   if (!trackerRoot) return null
 
@@ -202,26 +209,17 @@ function SimWindow({
 
         <div className="flex min-h-0 flex-col gap-2.5 overflow-y-auto">
           <div className="grid grid-cols-4 items-end gap-1.5">
-            {NUMBER_FIELDS.map((f) => (
-              <label key={f.key} title={f.title} className="flex flex-col gap-1 whitespace-nowrap text-center text-muted-foreground">
-                {f.label}
-                <NumberBox value={input[f.key]} max={f.max} onCommit={(raw) => setNumber(f.key, raw, f.max)} />
-              </label>
-            ))}
-            <div className="flex flex-col gap-1">
-              <Toggle
-                label="D Neck"
-                title="Death Necklace"
-                checked={input.deathNecklace}
-                onChange={(v) => setInput((p) => ({ ...p, deathNecklace: v }))}
-              />
-              <Toggle
-                label="Armor"
-                title="Erdrick's Armor"
-                checked={input.erdrickArmor}
-                onChange={(v) => setInput((p) => ({ ...p, erdrickArmor: v }))}
-              />
+            {NUMBER_FIELDS.slice(0, 3).map(renderField)}
+            <div title={`Healmores castable (${HEALMORE.cost} MP each)`} className="flex flex-col gap-1 whitespace-nowrap text-center text-muted-foreground">
+              <span>HM</span>
+              <output
+                aria-label="Healmores castable"
+                className="w-full rounded-sm border border-border/60 px-1 py-1 text-left text-[9px] text-foreground tabular-nums"
+              >
+                {input.mp === null ? '\u00A0' : Math.floor(input.mp / HEALMORE.cost)}
+              </output>
             </div>
+            {NUMBER_FIELDS.slice(3).map(renderField)}
           </div>
 
           <div role="radiogroup" aria-labelledby="dl2-attack-at-label" className="mt-1.5 grid grid-cols-4 items-center gap-1.5">
@@ -248,6 +246,24 @@ function SimWindow({
                 </button>
               )
             })}
+          </div>
+
+          <div role="group" aria-labelledby="dl-sim-use-label" className="grid grid-cols-4 items-center gap-1.5">
+            <span id="dl-sim-use-label" className="whitespace-nowrap text-center text-muted-foreground">
+              Use
+            </span>
+            <Toggle
+              label="D Neck"
+              title="Death Necklace"
+              checked={input.deathNecklace}
+              onChange={(v) => setInput((p) => ({ ...p, deathNecklace: v }))}
+            />
+            <Toggle
+              label="Armor"
+              title="Erdrick's Armor"
+              checked={input.erdrickArmor}
+              onChange={(v) => setInput((p) => ({ ...p, erdrickArmor: v }))}
+            />
           </div>
 
           {summary !== null && (
