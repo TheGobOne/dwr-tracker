@@ -169,7 +169,7 @@ function SimWindow({
       <div className="dw-window absolute top-1.5 right-1.5 left-1/2 flex max-h-[calc(100%-0.75rem)] flex-col gap-2 p-2.5 font-display text-[9px] leading-none">
   <div className="flex items-center justify-between gap-4">
   <h2 id="dl2-sim-title" className="whitespace-nowrap text-[10px] text-primary">
-  Dragonlord 2
+  Dragonlord 1 + 2
   </h2>
   <button
   type="button"
@@ -218,6 +218,18 @@ function SimWindow({
             <dd className={cn('text-right tabular-nums', winRateColor(summary.winRate))}>
               {pct(summary.winRate)}
             </dd>
+            <dt className="text-muted-foreground">Beat DL1</dt>
+            <dd className="text-right tabular-nums text-foreground">{pct(summary.dl1WinRate)}</dd>
+            <dt className="text-muted-foreground">DL1 ambush</dt>
+                <dd className="text-right tabular-nums text-foreground">{pct(summary.dl1FirstRate)}</dd>
+                <dt className="text-muted-foreground">DL1 damage</dt>
+                <dd className="text-right tabular-nums text-foreground">
+                  {Math.round(summary.avgDl1DamageTaken)}
+                </dd>
+                <dt className="text-muted-foreground">HP into DL2</dt>
+                <dd className="text-right tabular-nums text-foreground">
+                  {summary.dl1WinRate ? `${Math.round(summary.avgHpAfterDl1)}/${Math.round(summary.effectiveMaxHp)}` : '—'}
+                </dd>
             <dt className="text-muted-foreground">DL2 ambush</dt>
             <dd className="text-right tabular-nums text-foreground">{pct(summary.dlFirstRate)}</dd>
             <dt className="text-muted-foreground">Win, you first</dt>
@@ -255,8 +267,8 @@ export function DragonlordSimButton() {
         type="button"
         aria-label={
           summary
-            ? `Open Dragonlord 2 fight simulator, win rate ${pct(summary.winRate)}`
-            : 'Open Dragonlord 2 fight simulator'
+            ? `Open Dragonlord fight simulator, win rate ${pct(summary.winRate)}`
+            : 'Open Dragonlord fight simulator'
         }
         aria-haspopup="dialog"
         onClick={() => setOpen(true)}
