@@ -315,7 +315,7 @@ function SimWindow({
               Manually enter DL2 HP after you fight DL1 or leave blank to sim DL1 damage taken
             </p>
             <p className="text-pretty pt-2">
-              D Dive is for Dangerous Dive. If you expect to use 1 healmore to get to DL, check this off
+              Dangerous Dive (D Dive) - If you expect to use 1 healmore to get to DL, check this off
             </p>
           </div>
         </div>
