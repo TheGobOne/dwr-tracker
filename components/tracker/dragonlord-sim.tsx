@@ -271,7 +271,7 @@ function SimWindow({
               onChange={(v) => setInput((p) => ({ ...p, erdrickArmor: v }))}
             />
             <Toggle
-              label="Dive HM"
+              label="D Dive"
               title="Cast 1 Healmore on the way to DL (1 fewer for the fight)"
               checked={input.divemore}
               onChange={(v) => setInput((p) => ({ ...p, divemore: v }))}
