@@ -203,7 +203,7 @@ function SimWindow({
               </label>
             ))}
             <Toggle
-              label="Neck"
+              label="D Neck"
               title="Death Necklace"
               checked={input.deathNecklace}
               onChange={(v) => setInput((p) => ({ ...p, deathNecklace: v }))}
