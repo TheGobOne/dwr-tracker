@@ -10,6 +10,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { ControlsWindow } from './controls-window'
+import { ConfirmClearWindow } from './confirm-clear-window'
+import { useTracker } from './tracker-context'
 import { useInstallPrompt } from '@/hooks/use-install-prompt'
 
 const menuItemClass = 'font-display text-[9px] uppercase tracking-wider'
@@ -18,6 +20,9 @@ export function TrackerMenu() {
   const { canInstall, installed, install } = useInstallPrompt()
   const [controlsOpen, setControlsOpen] = useState(false)
   const closeControls = useCallback(() => setControlsOpen(false), [])
+  const { reset } = useTracker()
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const closeConfirm = useCallback(() => setConfirmOpen(false), [])
 
   return (
     <>
@@ -40,6 +45,13 @@ export function TrackerMenu() {
           <DropdownMenuItem onClick={() => setControlsOpen(true)} className={menuItemClass}>
             Controls
           </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={() => setConfirmOpen(true)}
+            className={`${menuItemClass} text-destructive focus:bg-destructive focus:text-white`}
+          >
+            Clear
+          </DropdownMenuItem>
           {!installed && (
             <>
               <DropdownMenuSeparator />
@@ -56,6 +68,15 @@ export function TrackerMenu() {
         </DropdownMenuContent>
       </DropdownMenu>
       {controlsOpen && <ControlsWindow onClose={closeControls} />}
+      {confirmOpen && (
+        <ConfirmClearWindow
+          onCancel={closeConfirm}
+          onConfirm={() => {
+            reset()
+            setConfirmOpen(false)
+          }}
+        />
+      )}
     </>
   )
 }

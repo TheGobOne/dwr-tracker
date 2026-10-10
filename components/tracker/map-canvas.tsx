@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CAVE_MAPS, CaveMapViewer } from './cave-map-viewer'
 import { ExperienceWizard } from './experience-table'
 import { DragonlordSimButton } from './dragonlord-sim'
-import { ClearTrackerButton } from './clear-tracker-button'
 import { cn } from '@/lib/utils'
 import { ShopWindow, type ShopTown } from './shop-window'
 import {
@@ -832,9 +831,6 @@ export function MapCanvas() {
       </div>
       <div className="absolute right-1.5 bottom-1.5 z-10 rounded-sm bg-black/60">
         <DragonlordSimButton />
-      </div>
-      <div className="absolute top-1.5 left-1.5 z-10 flex">
-        <ClearTrackerButton />
       </div>
       <CaveMapViewer locationId={caveMapId} onClose={closeCaveMap} />
       <ShopWindow town={shopTown} onClose={closeShop} />

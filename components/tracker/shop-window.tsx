@@ -37,7 +37,7 @@ export function ShopWindow({ town, onClose }: { town: ShopTown | null; onClose: 
         if (e.key === 'Escape') onClose()
       }}
     >
-      <div className="dw-window absolute top-1.5 right-1.5 flex w-max max-w-[calc(100%-0.75rem)] max-h-[calc(100%-0.75rem)] flex-col gap-2.5 p-2.5 font-display text-[9px] leading-none">
+      <div className="dw-window absolute top-1.5 left-1.5 flex w-max max-w-[calc(100%-0.75rem)] max-h-[calc(100%-0.75rem)] flex-col gap-2.5 p-2.5 font-display text-[9px] leading-none">
         <div className="flex items-center justify-between gap-4">
           <h2 id="shop-window-title" className="whitespace-nowrap text-[10px] text-primary">
             {town.name} Shop
@@ -64,13 +64,14 @@ export function ShopWindow({ town, onClose }: { town: ShopTown | null; onClose: 
                     aria-pressed={on}
                     onClick={() => toggleShopItem(town.key, item.id)}
                     className={cn(
-                      'w-full truncate whitespace-nowrap rounded-sm border px-1 py-1 text-left text-[9px] transition-colors focus-visible:outline-2 focus-visible:outline-primary',
+                      'flex w-full items-center justify-between gap-2 whitespace-nowrap rounded-sm border px-1 py-1 text-left text-[9px] transition-colors focus-visible:outline-2 focus-visible:outline-primary',
                       on
                         ? 'border-primary bg-primary text-primary-foreground'
                         : 'border-foreground/25 text-muted-foreground hover:border-foreground hover:text-foreground',
                     )}
                   >
-                    {item.name}
+                    <span>{item.name}</span>
+                    <span className="tabular-nums opacity-80">{item.price}g</span>
                   </button>
                 )
               })}

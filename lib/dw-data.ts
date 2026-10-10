@@ -91,35 +91,35 @@ export function hasEquipmentShop(locationId: string | null) {
   return !!locationId && LOCATION_BY_ID[locationId]?.kind === 'town' && !TOWNS_WITHOUT_SHOPS.has(locationId)
 }
 
-export const SHOP_GEAR: { label: string; items: { id: string; name: string }[] }[] = [
+export const SHOP_GEAR: { label: string; items: { id: string; name: string; price: number }[] }[] = [
   {
     label: 'Weapons',
     items: [
-      { id: 'bamboo-pole', name: 'Bamboo Pole' },
-      { id: 'club', name: 'Club' },
-      { id: 'copper-sword', name: 'Copper Sword' },
-      { id: 'hand-axe', name: 'Hand Axe' },
-      { id: 'broad-sword', name: 'Broad Sword' },
-      { id: 'flame-sword', name: 'Flame Sword' },
+      { id: 'bamboo-pole', name: 'Bamboo Pole', price: 10 },
+      { id: 'club', name: 'Club', price: 60 },
+      { id: 'copper-sword', name: 'Copper Sword', price: 180 },
+      { id: 'hand-axe', name: 'Hand Axe', price: 560 },
+      { id: 'broad-sword', name: 'Broad Sword', price: 1500 },
+      { id: 'flame-sword', name: 'Flame Sword', price: 9800 },
     ],
   },
   {
     label: 'Armor',
     items: [
-      { id: 'clothes', name: 'Clothes' },
-      { id: 'leather-armor', name: 'Leather Armor' },
-      { id: 'chain-mail', name: 'Chain Mail' },
-      { id: 'half-plate', name: 'Half Plate' },
-      { id: 'full-plate', name: 'Full Plate' },
-      { id: 'magic-armor', name: 'Magic Armor' },
+      { id: 'clothes', name: 'Clothes', price: 20 },
+      { id: 'leather-armor', name: 'Leather Armor', price: 70 },
+      { id: 'chain-mail', name: 'Chain Mail', price: 300 },
+      { id: 'half-plate', name: 'Half Plate', price: 1000 },
+      { id: 'full-plate', name: 'Full Plate', price: 3000 },
+      { id: 'magic-armor', name: 'Magic Armor', price: 7700 },
     ],
   },
   {
     label: 'Shields',
     items: [
-      { id: 'small-shield', name: 'Small Shield' },
-      { id: 'large-shield', name: 'Large Shield' },
-      { id: 'silver-shield', name: 'Silver Shield' },
+      { id: 'small-shield', name: 'Small Shield', price: 90 },
+      { id: 'large-shield', name: 'Large Shield', price: 800 },
+      { id: 'silver-shield', name: 'Silver Shield', price: 14800 },
     ],
   },
 ]
