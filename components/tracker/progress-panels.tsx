@@ -19,10 +19,9 @@ export function ItemsPanel() {
       <h2 id="items-heading" className="sr-only">
         Items
       </h2>
-          <div className="flex items-stretch gap-1.5">
+      <div className="flex items-stretch gap-1">
         {ITEM_GROUPS.map((group, groupIndex) => (
-          <div key={group.label} className="flex min-w-0 flex-1 items-stretch gap-1.5">
-            {groupIndex > 1 && <div aria-hidden="true" className="w-px self-stretch bg-border" />}
+          <div key={group.label} className="flex min-w-0 flex-1 items-stretch">
             <ul aria-label={group.label} className="grid min-w-0 flex-1 grid-cols-2 grid-rows-[repeat(2,1rem)] content-start gap-1">
               {group.items.map((item) => {
                 const has = !!items[item.id]
