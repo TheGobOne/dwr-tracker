@@ -330,9 +330,12 @@ function SimWindow({
             <p className="text-pretty py-2">
               Manually enter DL2 HP after you fight DL1 or leave blank to sim DL1 damage taken
             </p>
-            <p className="text-pretty pt-2">
-              Dangerous Dive (D Dive) - If you expect to use 1 healmore to get to DL, check this off
-            </p>
+  <p className="text-pretty py-2">
+  Dangerous Dive (D Dive) - If you expect to use 1 healmore to get to DL, check this off
+  </p>
+  <p className="text-pretty pt-2">
+  +X MP is how much spare MP you can use and stay above a 90% win rate on DL
+  </p>
           </div>
         </div>
       </div>
@@ -369,11 +372,11 @@ export function DragonlordSimButton() {
         }
         aria-haspopup="dialog"
         onClick={() => setOpen(true)}
-        className="group flex shrink-0 flex-row-reverse items-center gap-1 rounded-sm p-0.5 focus-visible:outline-2 focus-visible:outline-primary"
+        className="group flex shrink-0 flex-row-reverse items-center gap-1.5 rounded-sm p-0.5 focus-visible:outline-2 focus-visible:outline-primary"
       >
-        <span className="flex flex-col items-center gap-0.5">
+        <span className="relative flex">
           {spareMp !== null && (
-            <span className="block whitespace-nowrap font-display text-[10px] leading-none tabular-nums text-sky-400">
+            <span className="absolute bottom-full right-0 mb-2.5 whitespace-nowrap font-display text-[10px] leading-none tabular-nums text-sky-400">
               {`+${spareMp} MP`}
             </span>
           )}
