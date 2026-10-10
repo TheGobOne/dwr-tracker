@@ -119,6 +119,7 @@ export const SHOP_GEAR: { label: string; items: { id: string; name: string }[] }
 export interface ItemDef {
   id: string
   name: string
+  wide?: boolean
 }
 
 export const ITEM_GROUPS: { label: string; items: ItemDef[] }[] = [
@@ -136,8 +137,7 @@ export const ITEM_GROUPS: { label: string; items: ItemDef[] }[] = [
     items: [
       { id: 'death-necklace', name: 'Neck' },
       { id: 'fairy-flute', name: 'Flute' },
-      { id: 'fighters-ring', name: 'Ring' },
-      { id: 'dragons-scale', name: 'Scale' },
+      { id: 'rainbow-drop', name: 'Rainbow Drop', wide: true },
     ],
   },
   {

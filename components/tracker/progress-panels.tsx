@@ -22,12 +22,12 @@ export function ItemsPanel() {
           <div className="flex items-stretch gap-1.5">
         {ITEM_GROUPS.map((group, groupIndex) => (
           <div key={group.label} className="flex min-w-0 flex-1 items-stretch gap-1.5">
-            {groupIndex > 0 && <div aria-hidden="true" className="w-px self-stretch bg-border" />}
+            {groupIndex > 1 && <div aria-hidden="true" className="w-px self-stretch bg-border" />}
             <ul aria-label={group.label} className="grid min-w-0 flex-1 grid-cols-2 grid-rows-[repeat(2,1rem)] content-start gap-1">
               {group.items.map((item) => {
                 const has = !!items[item.id]
                 return (
-                  <li key={item.id} className="flex">
+                  <li key={item.id} className={cn('flex', item.wide && 'col-span-2')}>
                     <button
                       type="button"
                       aria-pressed={has}
