@@ -230,8 +230,10 @@ export function LocationsPanel() {
           ]
         })}
         <li className="col-span-2 flex flex-col items-center sm:col-span-1 sm:col-start-5 sm:row-span-4 sm:row-start-1">
-          <div className="flex h-10 w-full items-center gap-1 px-0.5">
-            <CoordsDoneCheckbox />
+          <div className="relative flex h-10 w-full items-center px-0.5">
+            <div className="absolute top-1/2 right-full -translate-y-1/2 pr-0.5">
+              <CoordsDoneCheckbox />
+            </div>
             <CoordsInput locationId={COORDS_LOCATION_ID} name="Jerk" />
           </div>
           {UNKNOWN_LOCATIONS.map((location) => (
