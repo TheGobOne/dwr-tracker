@@ -256,6 +256,7 @@ export function MapCanvas() {
     markers.flatMap((m) => (m.locationId && !LOCATION_BY_ID[m.locationId]?.unknown ? [m.locationId] : [])),
   ).size
   const allLocationsPlaced = placedLocationCount >= KNOWN_LOCATION_COUNT
+  const MAX_SEARCH_SPOTS = 3
   const placedIds = new Set(markers.flatMap((m) => (m.locationId ? [m.locationId] : [])))
   const coordsEntry = coords[COORDS_LOCATION_ID]
   const coordsKnown = !!(coordsEntry?.first || coordsEntry?.second || coordsEntry?.done)
@@ -265,7 +266,7 @@ export function MapCanvas() {
     { known: coordsKnown, done: !!coordsEntry?.done },
   ].filter((spot) => spot.known)
   const searchSpotsDone = knownSearchSpots.filter((spot) => spot.done).length
-  const searchSpotsTotal = knownSearchSpots.length + cursedBelts
+  const searchSpotsTotal = Math.min(MAX_SEARCH_SPOTS, knownSearchSpots.length + cursedBelts)
   const [mode, setMode] = useState<MapMode>('place')
   const [activeStroke, setActiveStroke] = useState<Point[] | null>(null)
   const isErasingRef = useRef(false)
