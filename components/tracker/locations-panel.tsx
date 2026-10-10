@@ -1,6 +1,6 @@
 'use client'
 
-import { MapPin } from 'lucide-react'
+import { Check, MapPin } from 'lucide-react'
 import { KIND_META, LOCATIONS, badgeBackground, locationColor, type DWLocation, type LocationKind } from '@/lib/dw-data'
 import { cn } from '@/lib/utils'
 import {
@@ -167,20 +167,27 @@ export function LocationsPanel() {
                 <span
                   aria-hidden="true"
                   className={cn(
-                    'flex h-4 w-6 shrink-0 items-center justify-center rounded-[2px] font-mono text-[7px] leading-none text-black',
+                    'relative flex h-4 w-6 shrink-0 items-center justify-center rounded-[2px] font-mono text-[7px] leading-none text-black',
                     !marker && 'opacity-40',
                   )}
                   style={{ backgroundColor: locationColor(location, items) }}
                 >
                   {location.abbr}
+                  {isVisited && (
+                    <Check
+                      className="absolute inset-0 m-auto size-4 text-[#22c55e] drop-shadow-[0_0_1px_#000]"
+                      strokeWidth={4}
+                    />
+                  )}
                 </span>
                 <span
                   className={cn(
                     'truncate text-[8px] leading-none',
-                    isVisited ? 'text-muted-foreground line-through' : marker ? 'text-foreground' : 'text-muted-foreground',
+                    marker ? 'text-foreground' : 'text-muted-foreground',
                   )}
                 >
                   {location.name}
+                  {isVisited && <span className="sr-only"> (visited)</span>}
                 </span>
               </button>
               {marker && (
