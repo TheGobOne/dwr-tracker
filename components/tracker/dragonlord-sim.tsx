@@ -4,7 +4,7 @@ import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
 import { useTracker } from '@/components/tracker/tracker-context'
-import { runSimulation, type Initiative, type SimInput } from '@/lib/dragonlord-sim'
+import { runSimulation, type SimInput } from '@/lib/dragonlord-sim'
 
 const TRIALS = 10000
 
@@ -65,13 +65,7 @@ const NUMBER_FIELDS: { key: NumberKey; label: string; title: string; max: number
   { key: 'attack', label: 'ATK', title: 'Attack', max: 999 },
   { key: 'defense', label: 'DEF', title: 'Defense', max: 999 },
   { key: 'agility', label: 'AGI', title: 'Agility', max: 255 },
-  { key: 'fairyWater', label: 'Fairy', title: 'Fairy Water', max: 6 },
-]
-
-const INITIATIVE_OPTIONS: { value: Initiative; label: string }[] = [
-  { value: 'random', label: 'Random' },
-  { value: 'first', label: 'You first' },
-  { value: 'dlFirst', label: 'DL2 first' },
+  { key: 'fairyWater', label: 'F Water', title: 'Fairy Water', max: 6 },
 ]
 
 
@@ -216,26 +210,6 @@ function SimWindow({
             />
           </div>
 
-          <div role="radiogroup" aria-label="Initiative" className="flex gap-1">
-            {INITIATIVE_OPTIONS.map((o) => (
-              <button
-                key={o.value}
-                type="button"
-                role="radio"
-                aria-checked={input.initiative === o.value}
-                onClick={() => setInput((p) => ({ ...p, initiative: o.value }))}
-                className={cn(
-                  'flex-1 rounded-sm border px-1 py-1',
-                  input.initiative === o.value
-                    ? 'border-primary text-primary'
-                    : 'border-border text-foreground hover:text-primary',
-                )}
-              >
-                {o.label}
-              </button>
-            ))}
-          </div>
-
           <p className="text-center text-muted-foreground">{`Heals at ${HEAL_AT} HP or below`}</p>
 
           {summary !== null && (
@@ -244,7 +218,7 @@ function SimWindow({
             <dd className={cn('text-right tabular-nums', winRateColor(summary.winRate))}>
               {pct(summary.winRate)}
             </dd>
-            <dt className="text-muted-foreground">DL2 first</dt>
+            <dt className="text-muted-foreground">DL2 ambush</dt>
             <dd className="text-right tabular-nums text-foreground">{pct(summary.dlFirstRate)}</dd>
             <dt className="text-muted-foreground">Win, you first</dt>
             <dd className="text-right tabular-nums text-foreground">{pct(summary.winWhenFirst)}</dd>
