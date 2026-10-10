@@ -439,7 +439,6 @@ export function MapCanvas() {
       const cx = marker.x * scale + scale / 2
       const cy = marker.y * scale + scale / 2
       const done = marker.locationId ? visited[marker.locationId] : false
-      ctx.globalAlpha = done ? 0.55 : 1
       if (!marker.locationId) {
         ctx.fillStyle = '#000000'
         ctx.fillRect(cx - ms / 2 - 2, cy - ms / 2 - 2, ms + 4, ms + 4)
@@ -456,13 +455,14 @@ export function MapCanvas() {
       ctx.fillText(markerText(marker), cx, cy + 1)
       ctx.globalAlpha = 1
       if (done) {
-        const h = ms / 2
+        const h = ms * 0.35
+        const ty = cy - ms / 2 - 4 - h * 0.6
         ctx.lineCap = 'round'
         ctx.lineJoin = 'round'
         ctx.beginPath()
-        ctx.moveTo(cx - h * 0.6, cy + h * 0.05)
-        ctx.lineTo(cx - h * 0.15, cy + h * 0.5)
-        ctx.lineTo(cx + h * 0.7, cy - h * 0.55)
+        ctx.moveTo(cx - h * 0.6, ty + h * 0.05)
+        ctx.lineTo(cx - h * 0.15, ty + h * 0.5)
+        ctx.lineTo(cx + h * 0.7, ty - h * 0.55)
         ctx.strokeStyle = '#000000'
         ctx.lineWidth = Math.max(4, ms * 0.24)
         ctx.stroke()
