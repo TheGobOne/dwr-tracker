@@ -26,11 +26,19 @@ function MapWinRate({ winRate }: { winRate: number }) {
 
 type NumberKey = 'maxHp' | 'mp' | 'attack' | 'defense' | 'agility' | 'fairyWater'
 
-const HEAL_AT = 48
+const ATTACK_AT_OPTIONS = [
+  { value: 47, label: '47 HP' },
+  { value: 48, label: '48 HP' },
+  { value: 49, label: '49+ HP' },
+] as const
 
-type FormState = Omit<SimInput, NumberKey | 'herbs' | 'healAt'> & Record<NumberKey, number | null>
+type AttackAt = (typeof ATTACK_AT_OPTIONS)[number]['value']
+
+type FormState = Omit<SimInput, NumberKey | 'herbs' | 'healAt'> &
+  Record<NumberKey, number | null> & { attackAt: AttackAt }
 
 const DEFAULT_FORM: FormState = {
+  attackAt: 49,
   maxHp: null,
   mp: null,
   attack: null,
@@ -46,15 +54,17 @@ const REQUIRED_KEYS: NumberKey[] = ['maxHp', 'mp', 'attack', 'defense', 'agility
 
 function toSimInput(form: FormState): SimInput | null {
   if (REQUIRED_KEYS.some((k) => form[k] === null)) return null
+  const { attackAt, ...rest } = form
   return {
-    ...form,
+    ...rest,
     maxHp: form.maxHp ?? 0,
     mp: form.mp ?? 0,
     attack: form.attack ?? 0,
     defense: form.defense ?? 0,
     agility: form.agility ?? 0,
     fairyWater: form.fairyWater ?? 0,
-    healAt: HEAL_AT,
+    // Attacking at N HP means healing at anything below it.
+    healAt: attackAt - 1,
     herbs: 0,
   }
 }
@@ -210,7 +220,31 @@ function SimWindow({
             />
           </div>
 
-          <p className="text-center text-muted-foreground">{`Heals at ${HEAL_AT} HP or below`}</p>
+          <div role="radiogroup" aria-labelledby="dl2-attack-at-label" className="flex items-center gap-1.5">
+            <span id="dl2-attack-at-label" className="shrink-0 whitespace-nowrap text-muted-foreground">
+              Attack at
+            </span>
+            {ATTACK_AT_OPTIONS.map((o) => {
+              const selected = input.attackAt === o.value
+              return (
+                <button
+                  key={o.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  onClick={() => setInput((p) => ({ ...p, attackAt: o.value }))}
+                  className={cn(
+                    'min-w-0 flex-1 whitespace-nowrap rounded-sm border px-1 py-1 text-[9px] tabular-nums transition-colors focus-visible:outline-2 focus-visible:outline-primary',
+                    selected
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-foreground/25 text-muted-foreground hover:border-foreground hover:text-foreground',
+                  )}
+                >
+                  {o.label}
+                </button>
+              )
+            })}
+          </div>
 
           {summary !== null && (
           <dl className="grid grid-cols-2 gap-x-3 gap-y-1.5 border-t border-border pt-2.5">
