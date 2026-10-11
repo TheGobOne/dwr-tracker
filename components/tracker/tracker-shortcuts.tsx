@@ -12,12 +12,12 @@ export function TrackerShortcuts() {
   })
 
   useEffect(() => {
-    // Keyboard is intentionally disabled for the whole tracker except typing in the coords and notes boxes.
+    // Keyboard is intentionally disabled for the whole tracker except typing in the coords, notes, sim, and search boxes.
     // Tab stays blocked there too so focus can't wander. Ctrl/Meta combos are left alone for browser shortcuts.
     const blockKey = (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey) return
       const inTypingField =
-        e.target instanceof HTMLElement && e.target.matches('[data-coords-field], [data-notes-field], [data-sim-field]')
+        e.target instanceof HTMLElement && e.target.matches('[data-coords-field], [data-notes-field], [data-sim-field], [data-search-field]')
       if (inTypingField && e.key !== 'Tab') return
       e.preventDefault()
       e.stopImmediatePropagation()

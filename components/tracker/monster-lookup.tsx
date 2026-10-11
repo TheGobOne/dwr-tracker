@@ -135,6 +135,7 @@ function MonsterWindow({ onClose }: { onClose: () => void }) {
           <input
             ref={searchRef}
             id="monster-search"
+            data-search-field
             type="search"
             value={query}
             autoComplete="off"
