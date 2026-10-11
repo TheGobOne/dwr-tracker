@@ -69,11 +69,27 @@ function orderStats(stats: [string, string][]) {
 
 function MonsterWindow({ onClose }: { onClose: () => void }) {
   const [selectedName, setSelectedName] = useState('')
-  const selectRef = useRef<HTMLSelectElement>(null)
+  const [query, setQuery] = useState('')
+  const searchRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    selectRef.current?.focus({ preventScroll: true })
+    searchRef.current?.focus({ preventScroll: true })
   }, [])
+
+  const normalizedQuery = query.trim().toLowerCase()
+  const filteredMonsters = normalizedQuery
+    ? MONSTERS.filter((m) => m.name.toLowerCase().includes(normalizedQuery))
+    : MONSTERS
+
+  const updateQuery = (value: string) => {
+    setQuery(value)
+    const q = value.trim().toLowerCase()
+    if (!q) return
+    const matches = MONSTERS.filter((m) => m.name.toLowerCase().includes(q))
+    const exact = matches.find((m) => m.name.toLowerCase() === q)
+    if (exact) setSelectedName(exact.name)
+    else if (matches.length === 1) setSelectedName(matches[0].name)
+  }
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -112,12 +128,33 @@ function MonsterWindow({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
+        <div>
+          <label htmlFor="monster-search" className="sr-only">
+            Search monsters
+          </label>
+          <input
+            ref={searchRef}
+            id="monster-search"
+            type="search"
+            value={query}
+            autoComplete="off"
+            spellCheck={false}
+            placeholder="Search"
+            onChange={(e) => updateQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key !== 'Enter' || e.nativeEvent.isComposing || e.keyCode === 229) return
+              e.preventDefault()
+              if (filteredMonsters[0]) setSelectedName(filteredMonsters[0].name)
+            }}
+            className="h-6 w-full rounded-sm border border-foreground/25 bg-background px-1.5 font-display text-[9px] uppercase text-foreground placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:outline-none"
+          />
+        </div>
+
         <div className="relative">
           <label htmlFor="monster-select" className="sr-only">
             Choose a monster
           </label>
           <select
-            ref={selectRef}
             id="monster-select"
             value={selectedName}
             onChange={(e) => setSelectedName(e.target.value)}
@@ -129,7 +166,12 @@ function MonsterWindow({ onClose }: { onClose: () => void }) {
             <option value="" disabled>
               Select monster
             </option>
-            {MONSTERS.map((m) => (
+            {selected && !filteredMonsters.includes(selected) && (
+              <option value={selected.name} className="text-foreground">
+                {selected.name}
+              </option>
+            )}
+            {filteredMonsters.map((m) => (
               <option key={m.name} value={m.name} className="text-foreground">
                 {m.name}
               </option>
