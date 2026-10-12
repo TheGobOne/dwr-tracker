@@ -66,7 +66,7 @@ const DEFAULT_FORM: FormState = {
   fairyWater: null,
   deathNecklace: false,
   erdrickArmor: true,
-  showSpareMp: false,
+  showSpareMp: true,
   initiative: 'random',
 }
 
@@ -324,7 +324,7 @@ function SimWindow({
           )}
 
           <div className="flex flex-col divide-y divide-border border-t border-border text-center text-[9px] leading-relaxed text-muted-foreground">
-            <p className="text-pretty py-2">
+            <p className={cn('text-pretty pt-2', input.showSpareMp && 'pb-2')}>
               Manually enter DL2 HP after you fight DL1 or leave blank to sim DL1 damage taken
             </p>
   {input.showSpareMp && (
