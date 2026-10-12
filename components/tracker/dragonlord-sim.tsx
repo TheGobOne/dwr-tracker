@@ -330,7 +330,7 @@ function SimWindow({
   {input.showSpareMp && (
   <div className="flex flex-col gap-1.5 pt-2">
   <p className="text-pretty">
-  {`+X MP is how much spare MP you can use and stay above a ${safeThreshold}% win chance on DL`}
+  {`+X MP is how much spare MP you can use and stay above a ${safeThreshold}% win chance on DL or set your own threshold below`}
   </p>
   <label htmlFor="dl-safe-threshold" className="flex items-center justify-between gap-2 text-foreground">
   <span>Extra MP Safety Threshold</span>
