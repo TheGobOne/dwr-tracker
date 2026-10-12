@@ -217,7 +217,7 @@ function SimWindow({
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className="dw-window absolute top-1.5 right-1.5 left-1/2 flex max-h-[calc(100%-0.75rem)] flex-col gap-2 p-2.5 font-display text-[9px] leading-none">
+      <div className="dw-window absolute top-1.5 right-1.5 left-1/2 flex max-h-[calc(100%-0.75rem)] flex-col gap-2 overflow-y-auto p-2.5 font-display text-[9px] leading-none">
   <div className="flex items-center justify-between gap-4">
   <h2 id="dl2-sim-title" className="whitespace-nowrap text-[10px] text-primary">
   Dragonlord Sim
@@ -239,7 +239,7 @@ function SimWindow({
   </button>
   </div>
 
-        <div className="flex min-h-0 flex-col gap-2.5 overflow-y-auto">
+        <div className="flex flex-col gap-2.5">
           <div className="grid grid-cols-4 items-end gap-1.5">
             {NUMBER_FIELDS.slice(0, 3).map(renderField)}
             <div title={`Healmores castable (${HEALMORE.cost} MP each)`} className="flex flex-col gap-1 whitespace-nowrap text-center text-muted-foreground">
