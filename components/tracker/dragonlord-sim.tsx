@@ -53,7 +53,7 @@ const ATTACK_AT_OPTIONS = [
 type AttackAt = (typeof ATTACK_AT_OPTIONS)[number]['value']
 
 type FormState = Omit<SimInput, NumberKey | 'healAt'> &
-  Record<NumberKey, number | null> & { attackAt: AttackAt; divemore: boolean }
+  Record<NumberKey, number | null> & { attackAt: AttackAt; showSpareMp: boolean }
 
 const DEFAULT_FORM: FormState = {
   attackAt: 49,
@@ -66,25 +66,20 @@ const DEFAULT_FORM: FormState = {
   fairyWater: null,
   deathNecklace: false,
   erdrickArmor: true,
-  divemore: false,
+  showSpareMp: false,
   initiative: 'random',
-}
-
-function fightMp(form: Pick<FormState, 'mp' | 'divemore'>) {
-  if (form.mp === null) return null
-  return Math.max(0, form.mp - (form.divemore ? HEALMORE.cost : 0))
 }
 
 const REQUIRED_KEYS: NumberKey[] = ['maxHp', 'mp', 'attack', 'defense', 'agility']
 
 function toSimInput(form: FormState): SimInput | null {
   if (REQUIRED_KEYS.some((k) => form[k] === null)) return null
-  const { attackAt, divemore: _divemore, ...rest } = form
+  const { attackAt, showSpareMp: _showSpareMp, ...rest } = form
   return {
     ...rest,
     maxHp: form.maxHp ?? 0,
     dl2Hp: form.dl2Hp,
-    mp: fightMp(form) ?? 0,
+    mp: form.mp ?? 0,
     attack: form.attack ?? 0,
     defense: form.defense ?? 0,
     agility: form.agility ?? 0,
@@ -190,11 +185,7 @@ function SimWindow({
 
   const setNumber = (key: NumberKey, raw: string, max: number) => {
     const n = raw === '' ? null : Math.max(0, Math.min(max, Math.floor(Number(raw))))
-    setInput((prev) => ({
-  ...prev,
-  [key]: n,
-  ...(key === 'dl2Hp' && n !== null ? { divemore: false } : {}),
-  }))
+    setInput((prev) => ({ ...prev, [key]: n }))
   }
 
   const renderField = (f: (typeof NUMBER_FIELDS)[number]) => (
@@ -248,7 +239,7 @@ function SimWindow({
                 aria-label="Healmores castable"
                 className="w-full rounded-sm border border-border/60 px-1 py-1 text-center text-[9px] text-foreground tabular-nums"
               >
-                {input.mp === null ? '\u00A0' : Math.floor((fightMp(input) ?? 0) / HEALMORE.cost)}
+                {input.mp === null ? '\u00A0' : Math.floor(input.mp / HEALMORE.cost)}
               </output>
             </div>
             {NUMBER_FIELDS.slice(3).map(renderField)}
@@ -297,10 +288,10 @@ function SimWindow({
               onChange={(v) => setInput((p) => ({ ...p, erdrickArmor: v }))}
             />
             <Toggle
-              label="D Dive"
-              title="Cast 1 Healmore on the way to DL (1 fewer for the fight)"
-              checked={input.divemore}
-              onChange={(v) => setInput((p) => ({ ...p, divemore: v }))}
+              label="+X MP"
+              title="Show spare MP above the Dragonlord icon"
+              checked={input.showSpareMp}
+              onChange={(v) => setInput((p) => ({ ...p, showSpareMp: v }))}
             />
           </div>
 
@@ -336,9 +327,7 @@ function SimWindow({
             <p className="text-pretty py-2">
               Manually enter DL2 HP after you fight DL1 or leave blank to sim DL1 damage taken
             </p>
-  <p className="text-pretty py-2">
-  Dangerous Dive (D Dive) - If you expect to use 1 healmore to get to DL, check this off
-  </p>
+  {input.showSpareMp && (
   <div className="flex flex-col gap-1.5 pt-2">
   <p className="text-pretty">
   {`+X MP is how much spare MP you can use and stay above a ${safeThreshold}% win chance on DL`}
@@ -358,6 +347,7 @@ function SimWindow({
   className="h-1.5 w-full cursor-pointer accent-sky-400"
   />
   </div>
+  )}
           </div>
         </div>
       </div>
@@ -384,7 +374,7 @@ export function DragonlordSimButton() {
   }, [deferredInput])
   const spareMp = useMemo(() => {
     const simInput = toSimInput(deferredInput)
-    if (!simInput || !summary) return null
+    if (!deferredInput.showSpareMp || !simInput || !summary) return null
     return findSpareMp(simInput, summary.winRate, deferredThreshold / 100)
   }, [deferredInput, summary, deferredThreshold])
 
