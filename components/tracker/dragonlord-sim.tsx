@@ -24,17 +24,19 @@ function MapWinRate({ winRate }: { winRate: number }) {
   )
 }
 
-const SAFE_WIN_RATE = 0.9
+const DEFAULT_SAFE_THRESHOLD = 90
+const MIN_SAFE_THRESHOLD = 75
+const MAX_SAFE_THRESHOLD = 99
 
-/** MP you could spend elsewhere and still win at least SAFE_WIN_RATE. Healmore is the only spell used, so search by cast count. */
-function findSpareMp(input: SimInput, fullWinRate: number): number {
-  if (fullWinRate < SAFE_WIN_RATE) return 0
+/** MP you could spend elsewhere and still win at least safeWinRate. Healmore is the only spell used, so search by cast count. */
+function findSpareMp(input: SimInput, fullWinRate: number, safeWinRate: number): number {
+  if (fullWinRate < safeWinRate) return 0
   let lo = 0
   let hi = Math.floor(input.mp / HEALMORE.cost)
   while (lo < hi) {
     const mid = Math.floor((lo + hi) / 2)
     const rate = runSimulation({ ...input, mp: mid * HEALMORE.cost }, TRIALS, 1).winRate
-    if (rate >= SAFE_WIN_RATE) hi = mid
+    if (rate >= safeWinRate) hi = mid
     else lo = mid + 1
   }
   return input.mp - lo * HEALMORE.cost
@@ -169,13 +171,17 @@ function SimWindow({
   input,
   setInput,
   summary,
+  safeThreshold,
+  setSafeThreshold,
   onClose,
-}: {
+  }: {
   input: FormState
   setInput: React.Dispatch<React.SetStateAction<FormState>>
   summary: ReturnType<typeof runSimulation> | null
+  safeThreshold: number
+  setSafeThreshold: (value: number) => void
   onClose: () => void
-}) {
+  }) {
   const closeRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
@@ -333,9 +339,25 @@ function SimWindow({
   <p className="text-pretty py-2">
   Dangerous Dive (D Dive) - If you expect to use 1 healmore to get to DL, check this off
   </p>
-  <p className="text-pretty pt-2">
-  +X MP is how much spare MP you can use and stay above a 90% win chance on DL
+  <div className="flex flex-col gap-1.5 pt-2">
+  <p className="text-pretty">
+  {`+X MP is how much spare MP you can use and stay above a ${safeThreshold}% win chance on DL`}
   </p>
+  <label htmlFor="dl-safe-threshold" className="flex items-center justify-between gap-2 text-foreground">
+  <span>Extra MP Safety Threshold</span>
+  <span className="tabular-nums text-sky-400">{`${safeThreshold}%`}</span>
+  </label>
+  <input
+  id="dl-safe-threshold"
+  type="range"
+  min={MIN_SAFE_THRESHOLD}
+  max={MAX_SAFE_THRESHOLD}
+  step={1}
+  value={safeThreshold}
+  onChange={(e) => setSafeThreshold(Number(e.target.value))}
+  className="h-1.5 w-full cursor-pointer accent-sky-400"
+  />
+  </div>
           </div>
         </div>
       </div>
@@ -353,13 +375,18 @@ export function DragonlordSimButton() {
     setSeenResetCount(resetCount)
     setInput(DEFAULT_FORM)
   }
+  const [safeThreshold, setSafeThreshold] = useState(DEFAULT_SAFE_THRESHOLD)
   const deferredInput = useDeferredValue(input)
-  const { summary, spareMp } = useMemo(() => {
+  const deferredThreshold = useDeferredValue(safeThreshold)
+  const summary = useMemo(() => {
     const simInput = toSimInput(deferredInput)
-    if (!simInput) return { summary: null, spareMp: null }
-    const summary = runSimulation(simInput, TRIALS, 1)
-    return { summary, spareMp: findSpareMp(simInput, summary.winRate) }
+    return simInput ? runSimulation(simInput, TRIALS, 1) : null
   }, [deferredInput])
+  const spareMp = useMemo(() => {
+    const simInput = toSimInput(deferredInput)
+    if (!simInput || !summary) return null
+    return findSpareMp(simInput, summary.winRate, deferredThreshold / 100)
+  }, [deferredInput, summary, deferredThreshold])
 
   return (
     <>
@@ -390,7 +417,11 @@ export function DragonlordSimButton() {
         </span>
         {summary && <MapWinRate winRate={summary.winRate} />}
       </button>
-      {open && <SimWindow input={input} setInput={setInput} summary={summary} onClose={() => setOpen(false)} />}
+      {open && <SimWindow input={input} setInput={setInput} summary={summary}
+          safeThreshold={safeThreshold}
+          setSafeThreshold={setSafeThreshold}
+          onClose={() => setOpen(false)}
+        />}
     </>
   )
 }
