@@ -333,7 +333,7 @@ function SimWindow({
   {`+X MP is how much spare MP you can use and stay above a ${safeThreshold}% win chance on DL - or set your own win chance threshold below`}
   </p>
   <label htmlFor="dl-safe-threshold" className="flex items-center justify-between gap-2 text-foreground">
-  <span>Extra MP Safety Threshold</span>
+  <span>+X MP Win chance threshold</span>
   <span className="tabular-nums text-sky-400">{`${safeThreshold}%`}</span>
   </label>
   <input
