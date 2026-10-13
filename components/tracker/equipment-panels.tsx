@@ -78,7 +78,11 @@ export function EquipmentPanels() {
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
-          {equippedName && (
+          {!equippedName ? (
+            <span aria-hidden="true" className="font-display text-[8px] leading-none tracking-wider text-muted-foreground">
+              -
+            </span>
+          ) : (
             <span aria-hidden="true" className="font-display text-[8px] leading-none tracking-wider text-[#F8D878]">
               {equippedName.toLowerCase() === 'small shield' ? (
                 <>
