@@ -1,10 +1,9 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
 import { ITEM_GROUPS, SPELLS } from '@/lib/dw-data'
 import { cn } from '@/lib/utils'
 import { MonsterLookupButton } from './monster-lookup'
-import { MAX_CURSED_BELTS, useTracker } from './tracker-context'
+import { MAX_CURSED_BELTS, RAINBOW_DROP_ID, RAINBOW_DROP_PREREQS, useTracker } from './tracker-context'
 import { TrackerMenu } from './tracker-menu'
 
 const toggleBase =
@@ -12,29 +11,15 @@ const toggleBase =
 const toggleOn = 'border-primary bg-primary text-primary-foreground'
 const toggleOff = 'border-foreground/25 text-muted-foreground hover:border-foreground hover:text-foreground'
 
-const RAINBOW_DROP_ID = 'rainbow-drop'
-const RAINBOW_DROP_PREREQS = ['erdricks-token', 'stones-of-sunlight', 'silver-harp', 'staff-of-rain']
-const DENIED_HIGHLIGHT_MS = 1000
-
 export function ItemsPanel() {
-  const { items, toggleItem } = useTracker()
-  const [deniedKey, setDeniedKey] = useState(0)
-  const deniedTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  useEffect(() => () => {
-    if (deniedTimer.current) clearTimeout(deniedTimer.current)
-  }, [])
+  const { items, toggleItem, rainbowDropBlocked, rainbowDeniedKey: deniedKey, denyRainbowDrop } = useTracker()
 
   const handleToggle = (id: string) => {
-    const blocked =
-      id === RAINBOW_DROP_ID && !items[id] && RAINBOW_DROP_PREREQS.some((req) => !items[req])
-    if (!blocked) {
-      toggleItem(id)
+    if (id === RAINBOW_DROP_ID && rainbowDropBlocked) {
+      denyRainbowDrop()
       return
     }
-    setDeniedKey((k) => k + 1)
-    if (deniedTimer.current) clearTimeout(deniedTimer.current)
-    deniedTimer.current = setTimeout(() => setDeniedKey(0), DENIED_HIGHLIGHT_MS)
+    toggleItem(id)
   }
 
   const denied = deniedKey > 0

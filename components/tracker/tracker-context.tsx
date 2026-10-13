@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import {
   EQUIPMENT_SLOTS,
   LOCATION_BY_ID,
@@ -220,6 +220,9 @@ interface TrackerContextValue {
   updateSpell: (name: string, patch: Partial<SpellState>) => void
   clearSpells: () => void
   updateCoords: (locationId: string, patch: Partial<ManualCoords>) => void
+  rainbowDropBlocked: boolean
+  rainbowDeniedKey: number
+  denyRainbowDrop: () => void
 
   beginStroke: () => void
   paintLine: (x0: number, y0: number, x1: number, y1: number) => void
@@ -236,6 +239,10 @@ interface TrackerContextValue {
   exportSave: () => SaveFile
   importSave: (data: unknown) => void
 }
+
+export const RAINBOW_DROP_ID = 'rainbow-drop'
+export const RAINBOW_DROP_PREREQS = ['erdricks-token', 'stones-of-sunlight', 'silver-harp', 'staff-of-rain']
+const RAINBOW_DENIED_MS = 1000
 
 const TrackerContext = createContext<TrackerContextValue | null>(null)
 
@@ -393,8 +400,24 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       }),
     [],
   )
+  const [rainbowDeniedKey, setRainbowDeniedKey] = useState(0)
+  const rainbowDeniedTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => () => {
+    if (rainbowDeniedTimer.current) clearTimeout(rainbowDeniedTimer.current)
+  }, [])
+  const denyRainbowDrop = useCallback(() => {
+    setRainbowDeniedKey((k) => k + 1)
+    if (rainbowDeniedTimer.current) clearTimeout(rainbowDeniedTimer.current)
+    rainbowDeniedTimer.current = setTimeout(() => setRainbowDeniedKey(0), RAINBOW_DENIED_MS)
+  }, [])
+  const rainbowDropBlocked = !items[RAINBOW_DROP_ID] && RAINBOW_DROP_PREREQS.some((req) => !items[req])
+
   const toggleVisited = useCallback(
-    (id: string) =>
+    (id: string) => {
+      if (id === 'rainbow-shrine' && !visited[id] && rainbowDropBlocked) {
+        denyRainbowDrop()
+        return
+      }
       setVisited((prev) => {
         const next = { ...prev, [id]: !prev[id] }
         for (const extra of LOCATION_EXTRAS[id] ?? []) {
@@ -403,17 +426,25 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
         // Idempotent, so it's safe if React replays this updater.
         if (id === 'rainbow-shrine' && next[id]) setItems((items) => ({ ...items, 'rainbow-drop': true }))
         return next
-      }),
-    [],
+      })
+    },
+    [visited, rainbowDropBlocked, denyRainbowDrop],
   )
   const updateSpell = useCallback((name: string, patch: Partial<SpellState>) => {
     setSpells((prev) => ({ ...prev, [name]: { ...(prev[name] ?? { learned: false, level: '' }), ...patch } }))
   }, [])
   const clearSpells = useCallback(() => setSpells({}), [])
-  const updateCoords = useCallback((locationId: string, patch: Partial<ManualCoords>) => {
-    setCoords((prev) => ({ ...prev, [locationId]: { ...(prev[locationId] ?? EMPTY_COORDS), ...patch } }))
-    if (locationId === 'rainbow-shrine' && patch.done) setItems((items) => ({ ...items, 'rainbow-drop': true }))
-  }, [])
+  const updateCoords = useCallback(
+    (locationId: string, patch: Partial<ManualCoords>) => {
+      if (locationId === 'rainbow-shrine' && patch.done && rainbowDropBlocked) {
+        denyRainbowDrop()
+        return
+      }
+      setCoords((prev) => ({ ...prev, [locationId]: { ...(prev[locationId] ?? EMPTY_COORDS), ...patch } }))
+      if (locationId === 'rainbow-shrine' && patch.done) setItems((items) => ({ ...items, 'rainbow-drop': true }))
+    },
+    [rainbowDropBlocked, denyRainbowDrop],
+  )
 
   const requestFocus = useCallback((x: number, y: number) => {
     setFocusRequest({ x, y, nonce: Date.now() })
@@ -536,6 +567,9 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       updateSpell,
       clearSpells,
       updateCoords,
+      rainbowDropBlocked,
+      rainbowDeniedKey,
+      denyRainbowDrop,
       beginStroke,
       paintLine,
       fillAt,
@@ -582,6 +616,9 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       updateSpell,
       clearSpells,
       updateCoords,
+      rainbowDropBlocked,
+      rainbowDeniedKey,
+      denyRainbowDrop,
       beginStroke,
       paintLine,
       fillAt,
