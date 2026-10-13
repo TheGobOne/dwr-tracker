@@ -10,6 +10,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { ControlsWindow } from './controls-window'
+import { AiDisclosureWindow } from './ai-disclosure-window'
+import { InstallWindow } from './install-window'
 import { ConfirmClearWindow } from './confirm-clear-window'
 import { useTracker } from './tracker-context'
 import { useInstallPrompt } from '@/hooks/use-install-prompt'
@@ -17,7 +19,7 @@ import { useInstallPrompt } from '@/hooks/use-install-prompt'
 const GEAR_SEEN_STORAGE_KEY = 'dwr-tracker-gear-hint-seen'
 const CONTROLS_SEEN_STORAGE_KEY = 'dwr-tracker-controls-hint-seen'
 
-const menuItemClass = 'font-display text-[9px] uppercase tracking-wider'
+const menuItemClass = 'font-display text-[9px] uppercase tracking-wider whitespace-nowrap'
 
 export function TrackerMenu() {
   const { canInstall, installed, install } = useInstallPrompt()
@@ -26,6 +28,10 @@ export function TrackerMenu() {
   const { reset } = useTracker()
   const [confirmOpen, setConfirmOpen] = useState(false)
   const closeConfirm = useCallback(() => setConfirmOpen(false), [])
+  const [disclosureOpen, setDisclosureOpen] = useState(false)
+  const closeDisclosure = useCallback(() => setDisclosureOpen(false), [])
+  const [installOpen, setInstallOpen] = useState(false)
+  const closeInstall = useCallback(() => setInstallOpen(false), [])
   // Start "seen" so the server render and first paint never flash the hints for returning users.
   const [gearSeen, setGearSeen] = useState(true)
   const [controlsSeen, setControlsSeen] = useState(true)
@@ -67,7 +73,15 @@ export function TrackerMenu() {
               : (document.querySelector('[data-tracker-root]') ?? undefined)
           }
           collisionPadding={6}
+          className="w-max min-w-max"
         >
+          <DropdownMenuItem
+            onClick={() => setConfirmOpen(true)}
+            className={`${menuItemClass} text-destructive focus:bg-destructive focus:text-white`}
+          >
+            Clear
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem onClick={openControls} className={menuItemClass}>
             {!controlsSeen && (
               <span aria-hidden="true" className="animate-dw-hint-blink text-primary">
@@ -81,29 +95,32 @@ export function TrackerMenu() {
               </span>
             )}
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onClick={() => setConfirmOpen(true)}
-            className={`${menuItemClass} text-destructive focus:bg-destructive focus:text-white`}
-          >
-            Clear
-          </DropdownMenuItem>
           {!installed && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={install}
-                disabled={!canInstall}
-                title={canInstall ? 'Install DWR Tracker as an app' : 'Open in Chrome (outside the preview) to install'}
-                className={menuItemClass}
-              >
-                Install
+              <DropdownMenuItem onClick={() => setInstallOpen(true)} className={menuItemClass}>
+                Install as App
               </DropdownMenuItem>
             </>
           )}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => setDisclosureOpen(true)} className={menuItemClass}>
+            AI Disclosure
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
       {controlsOpen && <ControlsWindow onClose={closeControls} />}
+      {disclosureOpen && <AiDisclosureWindow onClose={closeDisclosure} />}
+      {installOpen && (
+        <InstallWindow
+          onClose={closeInstall}
+          canInstall={canInstall}
+          onInstall={() => {
+            install()
+            setInstallOpen(false)
+          }}
+        />
+      )}
       {confirmOpen && (
         <ConfirmClearWindow
           onCancel={closeConfirm}
