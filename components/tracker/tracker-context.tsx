@@ -1,7 +1,14 @@
 'use client'
 
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from 'react'
-import { LOCATION_BY_ID, LOCATION_EXTRAS, MAP_SIZE, TERRAINS } from '@/lib/dw-data'
+import {
+  EQUIPMENT_SLOTS,
+  LOCATION_BY_ID,
+  LOCATION_EXTRAS,
+  MAP_SIZE,
+  TERRAINS,
+  type EquipmentSlotId,
+} from '@/lib/dw-data'
 
 export type Tool = 'paint' | 'fill' | 'marker' | 'pan'
 
@@ -70,9 +77,22 @@ export interface SaveFile {
   coords?: Record<string, ManualCoords>
   cursedBelts?: number
   shopStock?: ShopStock
+  equipment?: Equipment
 }
 
 export type ShopStock = Record<string, Record<string, boolean>>
+
+export type Equipment = Partial<Record<EquipmentSlotId, string>>
+
+function sanitizeEquipment(raw: unknown): Equipment {
+  if (!raw || typeof raw !== 'object') return {}
+  const out: Equipment = {}
+  for (const slot of EQUIPMENT_SLOTS) {
+    const value = (raw as Record<string, unknown>)[slot.id]
+    if (typeof value === 'string' && slot.options.some((o) => o.id === value)) out[slot.id] = value
+  }
+  return out
+}
 
 export const MAX_CURSED_BELTS = 3
 
@@ -170,6 +190,8 @@ interface TrackerContextValue {
   cursedBelts: number
   shopStock: ShopStock
   toggleShopItem: (townKey: string, itemId: string) => void
+  equipment: Equipment
+  setEquipped: (slot: EquipmentSlotId, itemId: string | null) => void
   seed: string
   tool: Tool
   terrain: number
@@ -227,6 +249,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
   const [coords, setCoords] = useState<Record<string, ManualCoords>>({})
   const [cursedBelts, setCursedBelts] = useState(0)
   const [shopStock, setShopStock] = useState<ShopStock>({})
+  const [equipment, setEquipment] = useState<Equipment>({})
   const [seed, setSeed] = useState('')
   const [tool, setTool] = useState<Tool>('paint')
   const [terrain, setTerrain] = useState(2)
@@ -360,6 +383,16 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       setShopStock((prev) => ({ ...prev, [townKey]: { ...prev[townKey], [itemId]: !prev[townKey]?.[itemId] } })),
     [],
   )
+  const setEquipped = useCallback(
+    (slot: EquipmentSlotId, itemId: string | null) =>
+      setEquipment((prev) => {
+        const next = { ...prev }
+        if (itemId) next[slot] = itemId
+        else delete next[slot]
+        return next
+      }),
+    [],
+  )
   const toggleVisited = useCallback(
     (id: string) =>
       setVisited((prev) => {
@@ -395,6 +428,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     setCoords({})
     setCursedBelts(0)
     setShopStock({})
+    setEquipment({})
     setSeed('')
     setSelectedLocation(null)
     setDrawings([])
@@ -414,8 +448,9 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       coords,
       cursedBelts,
       shopStock,
+      equipment,
     }),
-    [seed, visited, items, spells, notes, coords, cursedBelts, shopStock],
+    [seed, visited, items, spells, notes, coords, cursedBelts, shopStock, equipment],
   )
 
   const importSave = useCallback(
@@ -451,6 +486,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       const belts = Number(save.cursedBelts)
       setCursedBelts(Number.isInteger(belts) ? Math.min(MAX_CURSED_BELTS, Math.max(0, belts)) : 0)
       setShopStock(sanitizeShopStock(save.shopStock))
+      setEquipment(sanitizeEquipment(save.equipment))
       setSeed(String(save.seed ?? ''))
     },
     [commitTiles, commitMarkers],
@@ -469,6 +505,8 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       adjustCursedBelts,
       shopStock,
       toggleShopItem,
+      equipment,
+      setEquipped,
       seed,
       tool,
       terrain,
@@ -522,6 +560,8 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       adjustCursedBelts,
       shopStock,
       toggleShopItem,
+      equipment,
+      setEquipped,
       seed,
       tool,
       terrain,

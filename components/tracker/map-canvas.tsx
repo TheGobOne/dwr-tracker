@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CAVE_MAPS, CaveMapViewer } from './cave-map-viewer'
 import { ExperienceWizard } from './experience-table'
+import { EquipmentPanels } from './equipment-panels'
 import { DragonlordSimButton } from './dragonlord-sim'
 import { cn } from '@/lib/utils'
 import { ShopWindow, type ShopTown } from './shop-window'
@@ -828,14 +829,14 @@ export function MapCanvas() {
 
   return (
   <section aria-label="Overworld map" className="dw-window relative flex flex-none flex-col self-center overflow-hidden">
-      <p className="font-display pointer-events-none absolute inset-x-0 top-2.5 z-10 text-center text-[10px] leading-none text-[#F8D878] [text-shadow:0_0_3px_#000,0_0_3px_#000]">
-        Search spots {searchSpotsDone}/{searchSpotsTotal}
-      </p>
-      <div className="font-display pointer-events-none absolute inset-x-0 bottom-2.5 z-10 flex flex-col items-center gap-1 text-center text-[10px] leading-none [text-shadow:0_0_3px_#000,0_0_3px_#000]">
-        <h1 className={allLocationsPlaced ? 'text-[#58D854]' : 'text-foreground'}>
-          Locations {placedLocationCount}/{KNOWN_LOCATION_COUNT}
-        </h1>
-      </div>
+  <div className="font-display pointer-events-none absolute inset-x-0 bottom-2.5 z-10 flex flex-col items-center gap-1 text-center text-[10px] leading-none [text-shadow:0_0_3px_#000,0_0_3px_#000]">
+  <h1 className={allLocationsPlaced ? 'text-[#58D854]' : 'text-foreground'}>
+  Locations {placedLocationCount}/{KNOWN_LOCATION_COUNT}
+  </h1>
+  <p className="text-[#F8D878]">
+  Search spots {searchSpotsDone}/{searchSpotsTotal}
+  </p>
+  </div>
       <div ref={containerRef} className="flex items-center justify-center overflow-hidden bg-[#050508]">
         <canvas
           ref={canvasRef}
@@ -869,6 +870,9 @@ export function MapCanvas() {
         </span>
         Move
       </button>
+      <div className="absolute top-1.5 left-1.5 z-10">
+        <EquipmentPanels />
+      </div>
       <div className="absolute bottom-1.5 left-1.5 z-10 rounded-sm bg-black/60">
         <ExperienceWizard />
       </div>

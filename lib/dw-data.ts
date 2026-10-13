@@ -124,6 +124,26 @@ export const SHOP_GEAR: { label: string; items: { id: string; name: string; pric
   },
 ]
 
+export type EquipmentSlotId = 'weapon' | 'armor' | 'shield'
+
+export const EQUIPMENT_SLOTS: { id: EquipmentSlotId; label: string; options: { id: string; name: string }[] }[] = [
+  {
+    id: 'weapon',
+    label: 'Sword',
+    options: [...SHOP_GEAR[0].items, { id: 'erdricks-sword', name: "Erdrick's Sword" }],
+  },
+  {
+    id: 'armor',
+    label: 'Armor',
+    options: [...SHOP_GEAR[1].items, { id: 'erdricks-armor', name: "Erdrick's Armor" }],
+  },
+  {
+    id: 'shield',
+    label: 'Shield',
+    options: SHOP_GEAR[2].items,
+  },
+]
+
 export interface ItemDef {
   id: string
   name: string
