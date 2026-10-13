@@ -12,6 +12,7 @@ import {
 import { ControlsWindow } from './controls-window'
 import { AiDisclosureWindow } from './ai-disclosure-window'
 import { InstallWindow } from './install-window'
+import { LATEST_UPDATE, UPDATES_SEEN_STORAGE_KEY, UpdatesWindow } from './updates-window'
 import { ConfirmClearWindow } from './confirm-clear-window'
 import { useTracker } from './tracker-context'
 import { useInstallPrompt } from '@/hooks/use-install-prompt'
@@ -36,7 +37,11 @@ export function TrackerMenu() {
   const [gearSeen, setGearSeen] = useState(true)
   const [controlsSeen, setControlsSeen] = useState(true)
 
+  const [updatesOpen, setUpdatesOpen] = useState(false)
+  const closeUpdates = useCallback(() => setUpdatesOpen(false), [])
+
   useEffect(() => {
+    if (window.localStorage.getItem(UPDATES_SEEN_STORAGE_KEY) !== LATEST_UPDATE) setUpdatesOpen(true)
     setGearSeen(window.localStorage.getItem(GEAR_SEEN_STORAGE_KEY) === '1')
     setControlsSeen(window.localStorage.getItem(CONTROLS_SEEN_STORAGE_KEY) === '1')
   }, [])
@@ -95,6 +100,10 @@ export function TrackerMenu() {
               </span>
             )}
           </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => setUpdatesOpen(true)} className={menuItemClass}>
+            Updates
+          </DropdownMenuItem>
           {!installed && (
             <>
               <DropdownMenuSeparator />
@@ -111,6 +120,7 @@ export function TrackerMenu() {
       </DropdownMenu>
       {controlsOpen && <ControlsWindow onClose={closeControls} />}
       {disclosureOpen && <AiDisclosureWindow onClose={closeDisclosure} />}
+      {updatesOpen && <UpdatesWindow onClose={closeUpdates} />}
       {installOpen && (
         <InstallWindow
           onClose={closeInstall}
