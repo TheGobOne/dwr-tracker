@@ -80,7 +80,13 @@ export function EquipmentPanels() {
           </DropdownMenu>
           {equippedName && (
             <span aria-hidden="true" className="font-display text-[8px] leading-none tracking-wider text-[#F8D878]">
-              {toInitials(equippedName)}
+              {equippedName.toLowerCase() === 'small shield' ? (
+                <>
+                  <span className="text-[5px]">s</span>S
+                </>
+              ) : (
+                toInitials(equippedName)
+              )}
             </span>
           )}
           </div>
