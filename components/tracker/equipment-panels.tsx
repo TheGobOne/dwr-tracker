@@ -22,6 +22,14 @@ const SLOT_ICONS: Record<EquipmentSlotId, LucideIcon> = {
 const NONE = 'none'
 const itemClass = 'font-display text-[9px] uppercase tracking-wider'
 
+function toInitials(name: string) {
+  return name
+    .split(/[\s-]+/)
+    .filter(Boolean)
+    .map((word) => word[0].toUpperCase())
+    .join('')
+}
+
 export function EquipmentPanels() {
   const { equipment, setEquipped } = useTracker()
 
@@ -32,7 +40,8 @@ export function EquipmentPanels() {
         const equippedId = equipment[slot.id]
         const equippedName = slot.options.find((o) => o.id === equippedId)?.name
         return (
-          <DropdownMenu key={slot.id}>
+          <div key={slot.id} className="flex w-8 flex-col items-center gap-0.5">
+          <DropdownMenu>
             <DropdownMenuTrigger
               aria-label={`${slot.label}: ${equippedName ?? 'nothing equipped'}`}
               title={equippedName ?? `No ${slot.label.toLowerCase()}`}
@@ -68,6 +77,12 @@ export function EquipmentPanels() {
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
+          {equippedName && (
+            <span aria-hidden="true" className="font-display text-[8px] leading-none tracking-wider text-[#F8D878]">
+              {toInitials(equippedName)}
+            </span>
+          )}
+          </div>
         )
       })}
     </div>
