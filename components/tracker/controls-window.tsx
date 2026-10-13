@@ -33,13 +33,6 @@ const CONTROL_SECTIONS: { title: string; controls: { input: string; action: stri
 
     ],
   },
-  {
-    title: 'Corners',
-    controls: [
-      { input: 'King', action: 'Experience table' },
-      { input: 'DL2', action: 'Fight sim (heals at 48 HP)' },
-    ],
-  },
 ]
 
 export function ControlsWindow({ onClose }: { onClose: () => void }) {

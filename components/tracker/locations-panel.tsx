@@ -234,7 +234,7 @@ export function LocationsPanel() {
             <div className="absolute top-1/2 right-full -translate-y-1/2 pr-0.5">
               <CoordsDoneCheckbox />
             </div>
-            <CoordsInput locationId={COORDS_LOCATION_ID} name="Jerk" />
+            <CoordsInput locationId={COORDS_LOCATION_ID} name="Rainbow" />
           </div>
           {UNKNOWN_LOCATIONS.map((location) => (
             <UnknownLocationButton key={location.id} location={location} />

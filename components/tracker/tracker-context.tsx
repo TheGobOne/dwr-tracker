@@ -400,6 +400,8 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
         for (const extra of LOCATION_EXTRAS[id] ?? []) {
           if (extra.sprite !== 'key') next[extra.id] = next[id]
         }
+        // Idempotent, so it's safe if React replays this updater.
+        if (id === 'rainbow-shrine' && next[id]) setItems((items) => ({ ...items, 'rainbow-drop': true }))
         return next
       }),
     [],
@@ -410,6 +412,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
   const clearSpells = useCallback(() => setSpells({}), [])
   const updateCoords = useCallback((locationId: string, patch: Partial<ManualCoords>) => {
     setCoords((prev) => ({ ...prev, [locationId]: { ...(prev[locationId] ?? EMPTY_COORDS), ...patch } }))
+    if (locationId === 'rainbow-shrine' && patch.done) setItems((items) => ({ ...items, 'rainbow-drop': true }))
   }, [])
 
   const requestFocus = useCallback((x: number, y: number) => {

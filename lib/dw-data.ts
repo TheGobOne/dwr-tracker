@@ -77,7 +77,7 @@ export const LOCATIONS: DWLocation[] = [
   { id: 'swamp-north', name: 'Swamp (N)', abbr: 'SN', kind: 'cave', hint: 'North entrance. Green Dragon & Gwaelin.' },
   { id: 'swamp-south', name: 'Swamp (S)', abbr: 'SS', kind: 'cave', hint: 'South entrance of the Swamp Cave.' },
   { id: 'staff-shrine', name: 'Staff', abbr: 'SR', kind: 'shrine', hint: 'Requires the Silver Harp.' },
-  { id: 'rainbow-shrine', name: 'Jerk', abbr: 'JC', kind: 'shrine', hint: "Requires Staff, Stones & Token." },
+  { id: 'rainbow-shrine', name: 'Rainbow', abbr: 'RS', kind: 'shrine', hint: "Requires Staff, Stones & Token." },
   { id: 'freebie-cave', name: 'Freebie', abbr: 'FC', kind: 'shrine', hint: 'Freebie cave.' },
   { id: 'unknown-town', name: 'Town', abbr: '?', kind: 'town', hint: 'Unidentified town.', unknown: true },
   { id: 'unknown-cave', name: 'Cave', abbr: '?', kind: 'cave', hint: 'Unidentified cave.', unknown: true },
@@ -125,6 +125,20 @@ export const SHOP_GEAR: { label: string; items: { id: string; name: string; pric
 ]
 
 export type EquipmentSlotId = 'weapon' | 'armor' | 'shield'
+
+export function shopUpgrades(
+  stock: Record<string, boolean> | undefined,
+  equipped: Partial<Record<EquipmentSlotId, string>>,
+) {
+  if (!stock) return []
+  return EQUIPMENT_SLOTS.flatMap((slot) => {
+    const options = slot.options.map((o) => o.id)
+    const currentRank = equipped[slot.id] ? options.indexOf(equipped[slot.id] as string) : -1
+    return SHOP_GEAR.flatMap((group) => group.items).filter(
+      (item) => stock[item.id] && options.indexOf(item.id) > currentRank,
+    )
+  })
+}
 
 export const EQUIPMENT_SLOTS: { id: EquipmentSlotId; label: string; options: { id: string; name: string }[] }[] = [
   {

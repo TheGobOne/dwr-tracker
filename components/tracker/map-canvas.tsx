@@ -7,6 +7,7 @@ import { EquipmentPanels } from './equipment-panels'
 import { DragonlordSimButton } from './dragonlord-sim'
 import { cn } from '@/lib/utils'
 import { ShopWindow, type ShopTown } from './shop-window'
+import { TownUpgradeArrows } from './town-upgrade-arrows'
 import {
   KIND_META,
   LOCATION_BY_ID,
@@ -838,6 +839,7 @@ export function MapCanvas() {
   </p>
   </div>
       <div ref={containerRef} className="flex items-center justify-center overflow-hidden bg-[#050508]">
+        <div className="relative" style={{ width: canvasPx, height: canvasPx }}>
         <canvas
           ref={canvasRef}
           role="img"
@@ -852,6 +854,8 @@ export function MapCanvas() {
           onContextMenu={handleContextMenu}
           onAuxClick={(e) => e.preventDefault()}
         />
+        {!slide && <TownUpgradeArrows scale={scale} markerSize={(m) => markerSize(scale, m)} />}
+        </div>
       </div>
       <button
         type="button"
