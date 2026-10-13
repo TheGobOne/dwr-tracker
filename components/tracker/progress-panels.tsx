@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useRef, useState } from 'react'
 import { ITEM_GROUPS, SPELLS } from '@/lib/dw-data'
 import { cn } from '@/lib/utils'
 import { MonsterLookupButton } from './monster-lookup'
@@ -11,8 +12,32 @@ const toggleBase =
 const toggleOn = 'border-primary bg-primary text-primary-foreground'
 const toggleOff = 'border-foreground/25 text-muted-foreground hover:border-foreground hover:text-foreground'
 
+const RAINBOW_DROP_ID = 'rainbow-drop'
+const RAINBOW_DROP_PREREQS = ['erdricks-token', 'stones-of-sunlight', 'silver-harp', 'staff-of-rain']
+const DENIED_HIGHLIGHT_MS = 1000
+
 export function ItemsPanel() {
   const { items, toggleItem } = useTracker()
+  const [deniedKey, setDeniedKey] = useState(0)
+  const deniedTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => () => {
+    if (deniedTimer.current) clearTimeout(deniedTimer.current)
+  }, [])
+
+  const handleToggle = (id: string) => {
+    const blocked =
+      id === RAINBOW_DROP_ID && !items[id] && RAINBOW_DROP_PREREQS.some((req) => !items[req])
+    if (!blocked) {
+      toggleItem(id)
+      return
+    }
+    setDeniedKey((k) => k + 1)
+    if (deniedTimer.current) clearTimeout(deniedTimer.current)
+    deniedTimer.current = setTimeout(() => setDeniedKey(0), DENIED_HIGHLIGHT_MS)
+  }
+
+  const denied = deniedKey > 0
 
   return (
     <section aria-labelledby="items-heading" className="flex flex-col gap-1">
@@ -25,13 +50,23 @@ export function ItemsPanel() {
             <ul aria-label={group.label} className="grid min-w-0 flex-1 grid-cols-2 grid-rows-[repeat(2,1rem)] content-start gap-1">
               {group.items.map((item) => {
                 const has = !!items[item.id]
+                const isDrop = item.id === RAINBOW_DROP_ID
+                const highlighted = denied && RAINBOW_DROP_PREREQS.includes(item.id)
                 return (
                   <li key={item.id} className={cn('flex', item.wide && 'col-span-2')}>
                     <button
+                      key={isDrop && denied ? `drop-${deniedKey}` : undefined}
                       type="button"
                       aria-pressed={has}
-                      onClick={() => toggleItem(item.id)}
-                      className={cn(toggleBase, 'min-w-0 flex-1 px-1', has ? toggleOn : toggleOff)}
+                      aria-describedby={isDrop ? 'rainbow-drop-hint' : undefined}
+                      onClick={() => handleToggle(item.id)}
+                      className={cn(
+                        toggleBase,
+                        'min-w-0 flex-1 px-1',
+                        has ? toggleOn : toggleOff,
+                        isDrop && denied && 'animate-dw-shake border-destructive text-destructive',
+                        highlighted && 'ring-2 ring-destructive ring-offset-1 ring-offset-background',
+                      )}
                     >
                       <span className="truncate">{item.name}</span>
                     </button>
@@ -48,6 +83,12 @@ export function ItemsPanel() {
           </div>
         ))}
       </div>
+      <span id="rainbow-drop-hint" className="sr-only">
+        Requires Token, Stones, Harp, and Staff.
+      </span>
+      <span role="status" className="sr-only">
+        {denied ? 'Rainbow Drop needs Token, Stones, Harp, and Staff first.' : ''}
+      </span>
     </section>
   )
 }
