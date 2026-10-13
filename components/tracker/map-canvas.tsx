@@ -469,6 +469,33 @@ export function MapCanvas() {
       ctx.fillStyle = '#000000'
       ctx.fillText(markerText(marker), cx, cy + 1)
       ctx.globalAlpha = 1
+      if (marker.locationId === 'charlock' && !items['rainbow-drop']) {
+        const lw = Math.max(9, ms * 0.36)
+        const lh = lw * 0.75
+        const lx = cx + ms / 2 - lw * 0.55
+        const ly = cy + ms / 2 - lh * 0.55
+        const r = lw * 0.3
+        ctx.lineCap = 'round'
+        ctx.beginPath()
+        ctx.arc(lx + lw / 2, ly, r, Math.PI, 0)
+        ctx.lineTo(lx + lw / 2 + r, ly + 1)
+        ctx.moveTo(lx + lw / 2 - r, ly + 1)
+        ctx.lineTo(lx + lw / 2 - r, ly)
+        ctx.strokeStyle = '#000000'
+        ctx.lineWidth = Math.max(4, lw * 0.32)
+        ctx.stroke()
+        ctx.strokeStyle = '#F8B800'
+        ctx.lineWidth = Math.max(2, lw * 0.16)
+        ctx.stroke()
+        ctx.lineCap = 'butt'
+        ctx.fillStyle = '#000000'
+        ctx.fillRect(lx - 2, ly - 2, lw + 4, lh + 4)
+        ctx.fillStyle = '#F8B800'
+        ctx.fillRect(lx, ly, lw, lh)
+        ctx.fillStyle = '#000000'
+        const kw = Math.max(2, lw * 0.16)
+        ctx.fillRect(lx + lw / 2 - kw / 2, ly + lh * 0.3, kw, lh * 0.45)
+      }
       if (done) {
         const h = ms * 0.35
         const ty = cy - ms / 2 - 4 - h * 0.6
