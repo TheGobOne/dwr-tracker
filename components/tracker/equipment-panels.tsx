@@ -23,6 +23,7 @@ const NONE = 'none'
 const itemClass = 'font-display text-[9px] uppercase tracking-wider'
 
 function toInitials(name: string) {
+  if (name.toLowerCase() === 'small shield') return 'sS'
   return name
     .split(/[\s-]+/)
     .filter(Boolean)
