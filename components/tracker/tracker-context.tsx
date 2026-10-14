@@ -241,6 +241,11 @@ interface TrackerContextValue {
 }
 
 export const RAINBOW_DROP_ID = 'rainbow-drop'
+const ERDRICK_GEAR_SLOT: Record<string, EquipmentSlotId> = {
+  'erdricks-sword': 'weapon',
+  'erdricks-armor': 'armor',
+}
+
 export const RAINBOW_DROP_PREREQS = ['erdricks-token', 'stones-of-sunlight', 'silver-harp', 'staff-of-rain']
 const RAINBOW_DENIED_MS = 1000
 
@@ -380,7 +385,21 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     setZoomState(Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, Math.round(value))))
   }, [])
 
-  const toggleItem = useCallback((id: string) => setItems((prev) => ({ ...prev, [id]: !prev[id] })), [])
+  const toggleItem = useCallback(
+    (id: string) => {
+      const nowChecked = !items[id]
+      setItems((prev) => ({ ...prev, [id]: nowChecked }))
+      const slot = ERDRICK_GEAR_SLOT[id]
+      if (!slot) return
+      setEquipment((prev) => {
+        const next = { ...prev }
+        if (nowChecked) next[slot] = id
+        else if (prev[slot] === id) delete next[slot]
+        return next
+      })
+    },
+    [items],
+  )
   const adjustCursedBelts = useCallback(
     (delta: number) => setCursedBelts((n) => Math.min(MAX_CURSED_BELTS, Math.max(0, n + delta))),
     [],
@@ -391,13 +410,16 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     [],
   )
   const setEquipped = useCallback(
-    (slot: EquipmentSlotId, itemId: string | null) =>
+    (slot: EquipmentSlotId, itemId: string | null) => {
+      const gearId = Object.keys(ERDRICK_GEAR_SLOT).find((id) => ERDRICK_GEAR_SLOT[id] === slot)
+      if (gearId) setItems((prev) => ({ ...prev, [gearId]: itemId === gearId }))
       setEquipment((prev) => {
         const next = { ...prev }
         if (itemId) next[slot] = itemId
         else delete next[slot]
         return next
-      }),
+      })
+    },
     [],
   )
   const [rainbowDeniedKey, setRainbowDeniedKey] = useState(0)
