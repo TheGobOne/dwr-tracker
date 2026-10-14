@@ -19,7 +19,8 @@ import {
   hasEquipmentShop,
   locationColor,
 } from '@/lib/dw-data'
-import { useTracker, type Marker } from './tracker-context'
+import { useTracker, type ManualCoords, type Marker } from './tracker-context'
+import { COORDS_LOCATION_ID } from './locations-panel'
 
 const MAX_TRACKER_WIDTH = 640
 
@@ -228,6 +229,19 @@ function strokeHits(stroke: Point[], p: Point, radius: number) {
 
 const KNOWN_LOCATION_COUNT = Object.values(LOCATION_BY_ID).filter((l) => !l.unknown).length
 
+function estimatedCoordsTile(markers: Marker[], value: ManualCoords | undefined): Point | null {
+  if (!value || value.done) return null
+  const tantegel = markers.find((m) => m.locationId === 'tantegel')
+  const ns = Number.parseInt(value.first, 10)
+  const ew = Number.parseInt(value.second, 10)
+  if (!tantegel || !value.firstDir || !value.secondDir || Number.isNaN(ns) || Number.isNaN(ew)) return null
+  const clamp = (n: number) => Math.max(0, Math.min(MAP_SIZE - 1, n))
+  return {
+    x: clamp(tantegel.x + (value.secondDir === 'E' ? ew : -ew)),
+    y: clamp(tantegel.y + (value.firstDir === 'S' ? ns : -ns)),
+  }
+}
+
 function markerText(marker: Marker) {
   const location = marker.locationId ? LOCATION_BY_ID[marker.locationId] : null
   return location ? location.abbr : '!'
@@ -239,6 +253,7 @@ export function MapCanvas() {
     markers,
     visited,
     items,
+    coords,
     showGrid,
     placeMarker,
     removeMarker,
@@ -532,6 +547,32 @@ export function MapCanvas() {
       }
     }
 
+    const estimate = estimatedCoordsTile(displayMarkers, coords[COORDS_LOCATION_ID])
+    if (estimate) {
+      const cx = estimate.x * scale + scale / 2
+      const cy = estimate.y * scale + scale / 2
+      const r = Math.max(5, markerSize(scale) * 0.32)
+      const angle = Math.PI / 4
+      const hx = cx + Math.cos(angle) * r
+      const hy = cy + Math.sin(angle) * r
+      const ex = cx + Math.cos(angle) * r * 2.3
+      const ey = cy + Math.sin(angle) * r * 2.3
+      ctx.lineCap = 'round'
+      for (const [color, width] of [
+        ['#000000', Math.max(5, r * 0.75)],
+        ['#FCFCFC', Math.max(2.5, r * 0.38)],
+      ] as const) {
+        ctx.strokeStyle = color
+        ctx.lineWidth = width
+        ctx.beginPath()
+        ctx.arc(cx, cy, r, 0, Math.PI * 2)
+        ctx.moveTo(hx, hy)
+        ctx.lineTo(ex, ey)
+        ctx.stroke()
+      }
+      ctx.lineCap = 'butt'
+    }
+
     if (slide && selectionBounds) {
       const dx = shift?.x ?? 0
       const dy = shift?.y ?? 0
@@ -568,7 +609,7 @@ export function MapCanvas() {
       ctx.arc(flash.x * scale + scale / 2, flash.y * scale + scale / 2, markerSize(scale) * 1.4, 0, Math.PI * 2)
       ctx.stroke()
     }
-  }, [tiles, markers, visited, items, canvasPx, scale, showGrid, hover, flash, bridgeImg, sprites, drawings, activeStroke, mode, slide, held, selection, selectedMarkers, selectedStrokes, selectionBounds, box])
+  }, [tiles, markers, visited, items, coords, canvasPx, scale, showGrid, hover, flash, bridgeImg, sprites, drawings, activeStroke, mode, slide, held, selection, selectedMarkers, selectedStrokes, selectionBounds, box])
 
   useEffect(() => {
     if (!focusRequest) return
