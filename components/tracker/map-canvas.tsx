@@ -133,11 +133,11 @@ function linkedCaveChestIcons(badge: LinkedCaveBadge, canvasSize: number): Extra
   const gap = 2
   const total = chests.length * size + (chests.length - 1) * gap
   const rightOfTown = badge.x > badge.fromX
-  let startX = rightOfTown ? badge.x + badge.size + 5 : badge.x - 5 - total
-  if (startX + total > canvasSize - 1) startX = badge.x - 5 - total
-  if (startX < 1) startX = badge.x + badge.size + 5
-  const y = badge.y + badge.size / 2 - size / 2
-  return chests.map((extra, i) => ({ id: extra.id, sprite: extra.sprite, x: startX + i * (size + gap), y, size }))
+  let x = rightOfTown ? badge.x + badge.size + 5 : badge.x - 5 - size
+  if (x + size > canvasSize - 1) x = badge.x - 5 - size
+  if (x < 1) x = badge.x + badge.size + 5
+  const startY = Math.max(1, Math.min(canvasSize - total - 1, badge.y + badge.size / 2 - total / 2))
+  return chests.map((extra, i) => ({ id: extra.id, sprite: extra.sprite, x, y: startY + i * (size + gap), size }))
 }
 
 function markerFill(
