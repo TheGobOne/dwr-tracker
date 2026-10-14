@@ -20,8 +20,8 @@ export const UPDATES: { date: string; notes: string[] }[] = [
     date: '10/14/26',
     notes: [
       'Checking off the Sword or Armor item now sets it as your equipped gear, and equipping Erdrick\'s Sword or Armor in the panels checks the item off',
-      'Entering both coordinates puts a blue magnifying glass on the map at the estimated spot, measured from Tantegel',
-      'Right-click a staircase to link it to one of the 8 caves. The cave appears next to the town with a dashed line, shows its chests stacked underneath, and counts toward Locations',
+      'Entering both coordinates puts a blue magnifying glass on the map at the estimated spot',
+      'Right-click a town staircase to link it to one of the 8 caves. The cave appears next to the town with a dashed line, shows its chests stacked underneath, and counts toward Locations',
       'Various visual adjustments',
     ],
   },
