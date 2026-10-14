@@ -83,27 +83,28 @@ function CursedBelts() {
   const active = cursedBelts > 0
 
   return (
-    <li className="col-span-2 flex gap-1">
-        <span id="cursed-belts-label" className={cn(toggleBase, toggleOff, 'pointer-events-none min-w-0 flex-1 px-1')}>
-          <span className="truncate">Cursed Belts</span>
-        </span>
-        <button
-          type="button"
-          aria-labelledby="cursed-belts-label"
-          aria-describedby="cursed-belts-hint"
-          title="Left click: +1 · Right click: -1"
-          onClick={() => adjustCursedBelts(1)}
-          onContextMenu={(e) => {
-            e.preventDefault()
-            adjustCursedBelts(-1)
-          }}
-          className={cn(toggleBase, 'w-7 shrink-0 px-1 tabular-nums', active ? toggleOn : toggleOff)}
-        >
-          {cursedBelts}
-        </button>
-        <span id="cursed-belts-hint" className="sr-only">
-          {`${cursedBelts} of ${MAX_CURSED_BELTS}. Click to add, right click to remove.`}
-        </span>
+    <li className="col-span-2 flex">
+      <button
+        type="button"
+        aria-describedby="cursed-belts-hint"
+        title="Left click: +1 · Right click: -1"
+        onClick={() => adjustCursedBelts(1)}
+        onContextMenu={(e) => {
+          e.preventDefault()
+          adjustCursedBelts(-1)
+        }}
+        className={cn(
+          toggleBase,
+          'min-w-0 flex-1 gap-1.5 px-1',
+          active ? 'border-purple-500 bg-purple-600 text-white' : toggleOff,
+        )}
+      >
+        <span className="truncate">Cursed Belts</span>
+        <span className="shrink-0 tabular-nums">- {cursedBelts}</span>
+      </button>
+      <span id="cursed-belts-hint" className="sr-only">
+        {`${cursedBelts} of ${MAX_CURSED_BELTS}. Click to add, right click to remove.`}
+      </span>
     </li>
   )
 }
