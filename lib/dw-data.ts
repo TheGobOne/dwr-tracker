@@ -77,7 +77,7 @@ export const LOCATIONS: DWLocation[] = [
   { id: 'swamp-north', name: 'Swamp (N)', abbr: 'SN', kind: 'cave', hint: 'North entrance. Green Dragon & Gwaelin.' },
   { id: 'swamp-south', name: 'Swamp (S)', abbr: 'SS', kind: 'cave', hint: 'South entrance of the Swamp Cave.' },
   { id: 'staff-shrine', name: 'Staff', abbr: 'SR', kind: 'shrine', hint: 'Requires the Silver Harp.' },
-  { id: 'rainbow-shrine', name: 'Rainbow', abbr: 'RS', kind: 'shrine', hint: "Requires Staff, Stones & Token." },
+  { id: 'rainbow-shrine', name: 'Rainbow', abbr: 'RD', kind: 'shrine', hint: "Requires Staff, Stones & Token." },
   { id: 'freebie-cave', name: 'Freebie', abbr: 'FC', kind: 'shrine', hint: 'Freebie cave.' },
   { id: 'unknown-town', name: 'Town', abbr: '?', kind: 'town', hint: 'Unidentified town.', unknown: true },
   { id: 'unknown-cave', name: 'Cave', abbr: '?', kind: 'cave', hint: 'Unidentified cave.', unknown: true },
