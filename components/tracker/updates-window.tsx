@@ -7,6 +7,18 @@ export const UPDATES: { date: string; notes: string[] }[] = [
   {
     date: '10/13/26',
     notes: [
+      'Checking off the Sword or Armor item now sets it as your equipped gear, and equipping Erdrick\'s Sword or Armor in the panels checks the item off',
+      'Cursed Belts and its counter are now one box that turns purple when checked',
+      'Entering both coordinates puts a blue magnifying glass on the map at the estimated spot, measured from Tantegel',
+      'Right-click a staircase to link it to one of the 8 caves. The cave appears next to the town with a dashed line, shows its chests stacked underneath, and counts toward Locations',
+      'Checking off a linked cave also checks off its staircase',
+      'Removed the Search Spots section',
+      'Various visual adjustments',
+    ],
+  },
+  {
+    date: '10/13/26',
+    notes: [
       'Added equipment slots (top left): click Sword, Armor or Shield to set what you have equipped',
       'Added town upgrade arrows: a green arrow appears next to a town when its shop sells something better than your gear. Hover the arrow to see the upgrades',
       "Rainbow Drop and the Rainbow cave can't be checked until Token, Stones, Harp and Staff are all checked",
