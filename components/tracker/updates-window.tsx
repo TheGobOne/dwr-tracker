@@ -5,15 +5,6 @@ import { createPortal } from 'react-dom'
 
 export const UPDATES: { date: string; notes: string[] }[] = [
   {
-    date: '10/14/26',
-    notes: [
-      'Checking off the Sword or Armor item now sets it as your equipped gear, and equipping Erdrick\'s Sword or Armor in the panels checks the item off',
-      'Entering both coordinates puts a blue magnifying glass on the map at the estimated spot, measured from Tantegel',
-      'Right-click a staircase to link it to one of the 8 caves. The cave appears next to the town with a dashed line, shows its chests stacked underneath, and counts toward Locations',
-      'Various visual adjustments',
-    ],
-  },
-  {
     date: '10/13/26',
     notes: [
       'Added equipment slots (top left): click Sword, Armor or Shield to set what you have equipped',
@@ -25,9 +16,18 @@ export const UPDATES: { date: string; notes: string[] }[] = [
       'Added an AI Disclosure',
     ],
   },
+  {
+    date: '10/14/26',
+    notes: [
+      'Checking off the Sword or Armor item now sets it as your equipped gear, and equipping Erdrick\'s Sword or Armor in the panels checks the item off',
+      'Entering both coordinates puts a blue magnifying glass on the map at the estimated spot, measured from Tantegel',
+      'Right-click a staircase to link it to one of the 8 caves. The cave appears next to the town with a dashed line, shows its chests stacked underneath, and counts toward Locations',
+      'Various visual adjustments',
+    ],
+  },
 ]
 
-export const LATEST_UPDATE = UPDATES[0].date
+export const LATEST_UPDATE = UPDATES[UPDATES.length - 1].date
 export const UPDATES_SEEN_STORAGE_KEY = 'dwr-tracker-updates-dismissed'
 
 export function UpdatesWindow({ onClose }: { onClose: () => void }) {
@@ -89,7 +89,7 @@ export function UpdatesWindow({ onClose }: { onClose: () => void }) {
         <div className="flex items-center justify-between gap-2">
           <button
             type="button"
-            aria-label="Newer updates"
+            aria-label="Older updates"
             disabled={index === 0}
             onClick={() => setIndex((i) => i - 1)}
             className={arrowClass}
@@ -99,7 +99,7 @@ export function UpdatesWindow({ onClose }: { onClose: () => void }) {
           <p className="font-display text-[9px] text-white">{entry.date}</p>
           <button
             type="button"
-            aria-label="Older updates"
+            aria-label="Newer updates"
             disabled={index === UPDATES.length - 1}
             onClick={() => setIndex((i) => i + 1)}
             className={arrowClass}
