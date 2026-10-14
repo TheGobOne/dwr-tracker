@@ -232,9 +232,11 @@ const KNOWN_LOCATION_COUNT = Object.values(LOCATION_BY_ID).filter((l) => !l.unkn
 function estimatedCoordsTile(markers: Marker[], value: ManualCoords | undefined): Point | null {
   if (!value || value.done) return null
   const tantegel = markers.find((m) => m.locationId === 'tantegel')
-  const ns = Number.parseInt(value.first, 10)
-  const ew = Number.parseInt(value.second, 10)
-  if (!tantegel || !value.firstDir || !value.secondDir || Number.isNaN(ns) || Number.isNaN(ew)) return null
+  const first = value.first?.trim() ?? ''
+  const second = value.second?.trim() ?? ''
+  if (!tantegel || !value.firstDir || !value.secondDir || !/^\d+$/.test(first) || !/^\d+$/.test(second)) return null
+  const ns = Number.parseInt(first, 10)
+  const ew = Number.parseInt(second, 10)
   const clamp = (n: number) => Math.max(0, Math.min(MAP_SIZE - 1, n))
   return {
     x: clamp(tantegel.x + (value.secondDir === 'E' ? ew : -ew)),
@@ -560,7 +562,7 @@ export function MapCanvas() {
       ctx.lineCap = 'round'
       for (const [color, width] of [
         ['#000000', Math.max(5, r * 0.75)],
-        ['#FCFCFC', Math.max(2.5, r * 0.38)],
+        [KIND_META.shrine.color, Math.max(2.5, r * 0.38)],
       ] as const) {
         ctx.strokeStyle = color
         ctx.lineWidth = width
