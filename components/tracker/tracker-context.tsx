@@ -482,17 +482,9 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     setSpells((prev) => ({ ...prev, [name]: { ...(prev[name] ?? { learned: false, level: '' }), ...patch } }))
   }, [])
   const clearSpells = useCallback(() => setSpells({}), [])
-  const updateCoords = useCallback(
-    (locationId: string, patch: Partial<ManualCoords>) => {
-      if (locationId === 'rainbow-shrine' && patch.done && rainbowDropBlocked) {
-        denyRainbowDrop()
-        return
-      }
-      setCoords((prev) => ({ ...prev, [locationId]: { ...(prev[locationId] ?? EMPTY_COORDS), ...patch } }))
-      if (locationId === 'rainbow-shrine' && patch.done) setItems((items) => ({ ...items, 'rainbow-drop': true }))
-    },
-    [rainbowDropBlocked, denyRainbowDrop],
-  )
+  const updateCoords = useCallback((locationId: string, patch: Partial<ManualCoords>) => {
+    setCoords((prev) => ({ ...prev, [locationId]: { ...(prev[locationId] ?? EMPTY_COORDS), ...patch } }))
+  }, [])
 
   const requestFocus = useCallback((x: number, y: number) => {
     setFocusRequest({ x, y, nonce: Date.now() })
