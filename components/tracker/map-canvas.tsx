@@ -114,12 +114,10 @@ function linkedCaveBadges(
       if (!caveId) continue
       const ms = markerSize(scale, marker)
       const badgeSize = Math.round(ms * 0.85)
-      const cx = marker.x * scale + scale / 2
-      const cy = marker.y * scale + scale / 2
-      const gap = Math.max(18, ms * 0.9)
-      let x = Math.max(cx + ms / 2, icon.x + icon.size) + gap
-      if (x + badgeSize > canvasSize - 2) x = Math.min(cx - ms / 2, icon.x) - gap - badgeSize
-      const y = Math.max(2, Math.min(canvasSize - badgeSize - 2, cy - badgeSize / 2))
+      const gap = 6
+      const x = Math.max(2, Math.min(canvasSize - badgeSize - 2, icon.x + icon.size / 2 - badgeSize / 2))
+      let y = icon.y - gap - badgeSize
+      if (y < 2) y = icon.y + icon.size + gap
       badges.push({ caveId, fromX: icon.x + icon.size / 2, fromY: icon.y + icon.size / 2, x, y, size: badgeSize })
     }
   }
@@ -132,8 +130,7 @@ function linkedCaveChestIcons(badge: LinkedCaveBadge, canvasSize: number): Extra
   const size = Math.max(10, Math.round(badge.size * 0.7))
   const gap = 2
   const total = chests.length * size + (chests.length - 1) * gap
-  const rightOfTown = badge.x > badge.fromX
-  let x = rightOfTown ? badge.x + badge.size + 5 : badge.x - 5 - size
+  let x = badge.x + badge.size + 5
   if (x + size > canvasSize - 1) x = badge.x - 5 - size
   if (x < 1) x = badge.x + badge.size + 5
   const startY = Math.max(1, Math.min(canvasSize - total - 1, badge.y + badge.size / 2 - total / 2))
