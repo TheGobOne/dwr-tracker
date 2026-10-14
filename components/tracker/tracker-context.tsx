@@ -468,12 +468,15 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
         for (const extra of LOCATION_EXTRAS[id] ?? []) {
           if (extra.sprite !== 'key') next[extra.id] = next[id]
         }
+        for (const [stairId, caveId] of Object.entries(stairLinks)) {
+          if (caveId === id) next[stairId] = next[id]
+        }
         // Idempotent, so it's safe if React replays this updater.
         if (id === 'rainbow-shrine' && next[id]) setItems((items) => ({ ...items, 'rainbow-drop': true }))
         return next
       })
     },
-    [visited, rainbowDropBlocked, denyRainbowDrop],
+    [visited, rainbowDropBlocked, denyRainbowDrop, stairLinks],
   )
   const updateSpell = useCallback((name: string, patch: Partial<SpellState>) => {
     setSpells((prev) => ({ ...prev, [name]: { ...(prev[name] ?? { learned: false, level: '' }), ...patch } }))

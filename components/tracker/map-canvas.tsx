@@ -126,6 +126,20 @@ function linkedCaveBadges(
   return badges
 }
 
+function linkedCaveChestIcons(badge: LinkedCaveBadge, canvasSize: number): ExtraIcon[] {
+  const chests = (LOCATION_EXTRAS[badge.caveId] ?? []).filter((extra) => extra.sprite === 'chest')
+  if (!chests.length) return []
+  const size = Math.max(10, Math.round(badge.size * 0.7))
+  const gap = 2
+  const total = chests.length * size + (chests.length - 1) * gap
+  const rightOfTown = badge.x > badge.fromX
+  let startX = rightOfTown ? badge.x + badge.size + 5 : badge.x - 5 - total
+  if (startX + total > canvasSize - 1) startX = badge.x - 5 - total
+  if (startX < 1) startX = badge.x + badge.size + 5
+  const y = badge.y + badge.size / 2 - size / 2
+  return chests.map((extra, i) => ({ id: extra.id, sprite: extra.sprite, x: startX + i * (size + gap), y, size }))
+}
+
 function markerFill(
   ctx: CanvasRenderingContext2D,
   marker: Marker,
@@ -615,6 +629,23 @@ export function MapCanvas() {
       ctx.fillStyle = '#000000'
       ctx.fillText(location.abbr, bx, by + 1)
       ctx.globalAlpha = 1
+      for (const icon of linkedCaveChestIcons(badge, size)) {
+        const opened = visited[icon.id]
+        ctx.fillStyle = '#000000'
+        ctx.fillRect(icon.x - 1, icon.y - 1, icon.size + 2, icon.size + 2)
+        ctx.globalAlpha = opened ? 0.3 : 1
+        const img = sprites[icon.sprite]
+        if (img) ctx.drawImage(img, icon.x, icon.y, icon.size, icon.size)
+        ctx.globalAlpha = 1
+        if (opened) {
+          ctx.strokeStyle = '#FCFCFC'
+          ctx.lineWidth = 1.5
+          ctx.beginPath()
+          ctx.moveTo(icon.x + 1, icon.y + icon.size - 1)
+          ctx.lineTo(icon.x + icon.size - 1, icon.y + 1)
+          ctx.stroke()
+        }
+      }
     }
 
     const estimate = estimatedCoordsTile(displayMarkers, coords[COORDS_LOCATION_ID])
@@ -722,6 +753,12 @@ export function MapCanvas() {
     for (const marker of markers) {
       const hit = locationExtraIcons(marker, scale, canvasPx).find(
         (icon) => icon.sprite !== 'key' && px >= icon.x - 1 && px <= icon.x + icon.size + 1 && py >= icon.y - 1 && py <= icon.y + icon.size + 1,
+      )
+      if (hit) return hit
+    }
+    for (const badge of linkedCaveBadges(markers, stairLinks, scale, canvasPx)) {
+      const hit = linkedCaveChestIcons(badge, canvasPx).find(
+        (icon) => px >= icon.x - 1 && px <= icon.x + icon.size + 1 && py >= icon.y - 1 && py <= icon.y + icon.size + 1,
       )
       if (hit) return hit
     }

@@ -1,7 +1,7 @@
 'use client'
 
 import { Check, MapPin } from 'lucide-react'
-import { KIND_META, LOCATIONS, badgeBackground, locationColor, type DWLocation, type LocationKind } from '@/lib/dw-data'
+import { KIND_META, LOCATIONS, LOCATION_EXTRAS, badgeBackground, locationColor, type DWLocation, type LocationKind } from '@/lib/dw-data'
 import { cn } from '@/lib/utils'
 import {
   EMPTY_COORDS,
@@ -150,9 +150,14 @@ function CoordsDoneCheckbox() {
 }
 
 export function LocationsPanel() {
-  const { markers, visited, items, selectedLocation, setSelectedLocation, setTool, requestFocus } = useTracker()
+  const { markers, visited, items, selectedLocation, setSelectedLocation, setTool, requestFocus, stairLinks } = useTracker()
 
   const markerByLocation = new Map(markers.filter((m) => m.locationId).map((m) => [m.locationId as string, m]))
+  for (const [stairId, caveId] of Object.entries(stairLinks)) {
+    if (markerByLocation.has(caveId)) continue
+    const town = markers.find((m) => m.locationId && LOCATION_EXTRAS[m.locationId]?.some((extra) => extra.id === stairId))
+    if (town) markerByLocation.set(caveId, town)
+  }
 
   return (
     <section aria-labelledby="locations-heading" className="flex flex-col gap-1">
