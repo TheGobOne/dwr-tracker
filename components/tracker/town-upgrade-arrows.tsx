@@ -21,8 +21,8 @@ export function TownUpgradeArrows({ scale, markerSize }: { scale: number; marker
         const upgrades = shopUpgrades(shopStock[townKey(marker)], equipment)
         if (upgrades.length === 0) return []
         const half = markerSize(marker) / 2
-        const left = marker.x * scale + scale / 2 + half + 1
-        const top = marker.y * scale + scale / 2 - half
+        const left = marker.x * scale + scale / 2 - 7
+        const top = marker.y * scale + scale / 2 - half - 15
         const townName = LOCATION_BY_ID[marker.locationId as string].name
         const open = openId === marker.id
         const tooltipId = `upgrades-${marker.id}`
