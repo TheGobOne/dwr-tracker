@@ -4,10 +4,8 @@ import { Shield, Shirt, Sword, type LucideIcon } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { EQUIPMENT_SLOTS, type EquipmentSlotId } from '@/lib/dw-data'
@@ -66,8 +64,7 @@ export function EquipmentPanels() {
                 value={equippedId ?? NONE}
                 onValueChange={(value) => setEquipped(slot.id, value === NONE ? null : value)}
               >
-                <DropdownMenuLabel className={`${itemClass} text-muted-foreground`}>{slot.label}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
+
                 <DropdownMenuRadioItem value={NONE} className={itemClass} closeOnClick>
                   None
                 </DropdownMenuRadioItem>
