@@ -85,6 +85,17 @@ export const LOCATIONS: DWLocation[] = [
 
 export const LOCATION_BY_ID = Object.fromEntries(LOCATIONS.map((l) => [l.id, l])) as Record<string, DWLocation>
 
+export const STAIR_CAVE_IDS = [
+  'erdricks-cave',
+  'garins-grave',
+  'mountain-cave',
+  'swamp-north',
+  'swamp-south',
+  'staff-shrine',
+  'rainbow-shrine',
+  'freebie-cave',
+] as const
+
 const TOWNS_WITHOUT_SHOPS = new Set(['hauksness'])
 
 export function hasEquipmentShop(locationId: string | null) {

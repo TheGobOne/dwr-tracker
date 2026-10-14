@@ -8,6 +8,7 @@ import { DragonlordSimButton } from './dragonlord-sim'
 import { cn } from '@/lib/utils'
 import { ShopWindow, type ShopTown } from './shop-window'
 import { TownUpgradeArrows } from './town-upgrade-arrows'
+import { StairLinkMenu, type StairMenuAnchor } from './stair-link-menu'
 import {
   KIND_META,
   LOCATION_BY_ID,
@@ -89,6 +90,40 @@ function locationExtraIcons(marker: Marker, scale: number, canvasSize: number): 
   }
 
   return icons
+}
+
+interface LinkedCaveBadge {
+  caveId: string
+  fromX: number
+  fromY: number
+  x: number
+  y: number
+  size: number
+}
+
+function linkedCaveBadges(
+  markers: Marker[],
+  stairLinks: Record<string, string>,
+  scale: number,
+  canvasSize: number,
+): LinkedCaveBadge[] {
+  const badges: LinkedCaveBadge[] = []
+  for (const marker of markers) {
+    for (const icon of locationExtraIcons(marker, scale, canvasSize)) {
+      const caveId = icon.sprite === 'stairs' ? stairLinks[icon.id] : undefined
+      if (!caveId) continue
+      const ms = markerSize(scale, marker)
+      const badgeSize = Math.round(ms * 0.85)
+      const cx = marker.x * scale + scale / 2
+      const cy = marker.y * scale + scale / 2
+      const gap = Math.max(18, ms * 0.9)
+      let x = Math.max(cx + ms / 2, icon.x + icon.size) + gap
+      if (x + badgeSize > canvasSize - 2) x = Math.min(cx - ms / 2, icon.x) - gap - badgeSize
+      const y = Math.max(2, Math.min(canvasSize - badgeSize - 2, cy - badgeSize / 2))
+      badges.push({ caveId, fromX: icon.x + icon.size / 2, fromY: icon.y + icon.size / 2, x, y, size: badgeSize })
+    }
+  }
+  return badges
 }
 
 function markerFill(
@@ -265,10 +300,15 @@ export function MapCanvas() {
     focusRequest,
     drawings,
     setDrawings,
+    stairLinks,
+    setStairLink,
   } = useTracker()
-  const placedLocationCount = new Set(
-    markers.flatMap((m) => (m.locationId && !LOCATION_BY_ID[m.locationId]?.unknown ? [m.locationId] : [])),
-  ).size
+  const [stairMenu, setStairMenu] = useState<StairMenuAnchor | null>(null)
+  const closeStairMenu = useCallback(() => setStairMenu(null), [])
+  const placedLocationCount = new Set([
+    ...markers.flatMap((m) => (m.locationId && !LOCATION_BY_ID[m.locationId]?.unknown ? [m.locationId] : [])),
+    ...linkedCaveBadges(markers, stairLinks, 1, MAP_SIZE).map((b) => b.caveId),
+  ]).size
   const allLocationsPlaced = placedLocationCount >= KNOWN_LOCATION_COUNT
   const [mode, setMode] = useState<MapMode>('place')
   const [activeStroke, setActiveStroke] = useState<Point[] | null>(null)
@@ -549,6 +589,34 @@ export function MapCanvas() {
       }
     }
 
+    for (const badge of linkedCaveBadges(displayMarkers, stairLinks, scale, size)) {
+      const location = LOCATION_BY_ID[badge.caveId]
+      const bx = badge.x + badge.size / 2
+      const by = badge.y + badge.size / 2
+      const toX = bx < badge.fromX ? badge.x + badge.size + 2 : badge.x - 2
+      ctx.setLineDash([3, 3])
+      for (const [color, width] of [['#000000', 3.5], ['#FCFCFC', 1.5]] as const) {
+        ctx.strokeStyle = color
+        ctx.lineWidth = width
+        ctx.beginPath()
+        ctx.moveTo(badge.fromX, badge.fromY)
+        ctx.lineTo(toX, by)
+        ctx.stroke()
+      }
+      ctx.setLineDash([])
+      const done = visited[badge.caveId]
+      ctx.fillStyle = '#000000'
+      ctx.beginPath()
+      ctx.roundRect(badge.x - 2, badge.y - 2, badge.size + 4, badge.size + 4, 4)
+      ctx.fill()
+      ctx.globalAlpha = done ? 0.4 : 1
+      markerFill(ctx, { id: badge.caveId, x: 0, y: 0, locationId: badge.caveId, label: '' }, badge.x, badge.y, badge.size, items)
+      ctx.font = `${Math.round(badge.size * (location.abbr.length > 1 ? 0.36 : 0.5))}px ${nesFont}`
+      ctx.fillStyle = '#000000'
+      ctx.fillText(location.abbr, bx, by + 1)
+      ctx.globalAlpha = 1
+    }
+
     const estimate = estimatedCoordsTile(displayMarkers, coords[COORDS_LOCATION_ID])
     if (estimate) {
       const cx = estimate.x * scale + scale / 2
@@ -611,7 +679,7 @@ export function MapCanvas() {
       ctx.arc(flash.x * scale + scale / 2, flash.y * scale + scale / 2, markerSize(scale) * 1.4, 0, Math.PI * 2)
       ctx.stroke()
     }
-  }, [tiles, markers, visited, items, coords, canvasPx, scale, showGrid, hover, flash, bridgeImg, sprites, drawings, activeStroke, mode, slide, held, selection, selectedMarkers, selectedStrokes, selectionBounds, box])
+  }, [tiles, markers, visited, items, coords, stairLinks, canvasPx, scale, showGrid, hover, flash, bridgeImg, sprites, drawings, activeStroke, mode, slide, held, selection, selectedMarkers, selectedStrokes, selectionBounds, box])
 
   useEffect(() => {
     if (!focusRequest) return
@@ -658,6 +726,17 @@ export function MapCanvas() {
       if (hit) return hit
     }
     return null
+  }
+
+  function linkedCaveAtPointer(e: React.MouseEvent) {
+    const rect = (e.currentTarget as HTMLCanvasElement).getBoundingClientRect()
+    const px = e.clientX - rect.left
+    const py = e.clientY - rect.top
+    return (
+      linkedCaveBadges(markers, stairLinks, scale, canvasPx).find(
+        (b) => px >= b.x - 2 && px <= b.x + b.size + 2 && py >= b.y - 2 && py <= b.y + b.size + 2,
+      ) ?? null
+    )
   }
 
   function pointerToMapPoint(e: React.PointerEvent | React.MouseEvent): Point {
@@ -797,6 +876,11 @@ export function MapCanvas() {
       toggleVisited(extra.id)
       return
     }
+    const linkedCave = linkedCaveAtPointer(e)
+    if (linkedCave) {
+      toggleVisited(linkedCave.caveId)
+      return
+    }
     if (!selectedLocation) {
       const hit = markerAtPointer(e)
       if (hit) {
@@ -840,7 +924,19 @@ export function MapCanvas() {
       setMode('place')
       return
     }
-    if (extraAtPointer(e)) return
+    const extra = extraAtPointer(e)
+    if (extra) {
+      if (extra.sprite === 'stairs') {
+        setStairMenu({ stairId: extra.id, x: extra.x + extra.size / 2, y: extra.y + extra.size })
+      }
+      return
+    }
+    const linkedCave = linkedCaveAtPointer(e)
+    if (linkedCave) {
+      const stairId = Object.keys(stairLinks).find((id) => stairLinks[id] === linkedCave.caveId)
+      if (stairId) setStairLink(stairId, null)
+      return
+    }
     const marker = markerAtPointer(e)
     if (marker) {
       removeMarker(marker.id)
@@ -879,6 +975,7 @@ export function MapCanvas() {
           onAuxClick={(e) => e.preventDefault()}
         />
         {!slide && <TownUpgradeArrows scale={scale} markerSize={(m) => markerSize(scale, m)} />}
+        <StairLinkMenu anchor={stairMenu} canvasSize={canvasPx} onClose={closeStairMenu} />
         </div>
       </div>
       <button

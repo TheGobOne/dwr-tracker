@@ -6,6 +6,7 @@ import {
   LOCATION_BY_ID,
   LOCATION_EXTRAS,
   MAP_SIZE,
+  STAIR_CAVE_IDS,
   TERRAINS,
   type EquipmentSlotId,
 } from '@/lib/dw-data'
@@ -77,7 +78,19 @@ export interface SaveFile {
   coords?: Record<string, ManualCoords>
   cursedBelts?: number
   shopStock?: ShopStock
-  equipment?: Equipment
+equipment?: Equipment
+  stairLinks?: StairLinks
+  }
+
+export type StairLinks = Record<string, string>
+
+function sanitizeStairLinks(raw: unknown): StairLinks {
+  if (!raw || typeof raw !== 'object') return {}
+  const out: StairLinks = {}
+  for (const [stairId, caveId] of Object.entries(raw as Record<string, unknown>)) {
+    if (typeof caveId === 'string' && (STAIR_CAVE_IDS as readonly string[]).includes(caveId)) out[stairId] = caveId
+  }
+  return out
 }
 
 export type ShopStock = Record<string, Record<string, boolean>>
@@ -192,6 +205,8 @@ interface TrackerContextValue {
   toggleShopItem: (townKey: string, itemId: string) => void
   equipment: Equipment
   setEquipped: (slot: EquipmentSlotId, itemId: string | null) => void
+  stairLinks: StairLinks
+  setStairLink: (stairId: string, caveId: string | null) => void
   seed: string
   tool: Tool
   terrain: number
@@ -262,6 +277,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
   const [cursedBelts, setCursedBelts] = useState(0)
   const [shopStock, setShopStock] = useState<ShopStock>({})
   const [equipment, setEquipment] = useState<Equipment>({})
+  const [stairLinks, setStairLinks] = useState<StairLinks>({})
   const [seed, setSeed] = useState('')
   const [tool, setTool] = useState<Tool>('paint')
   const [terrain, setTerrain] = useState(2)
@@ -422,6 +438,13 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     },
     [],
   )
+  const setStairLink = useCallback((stairId: string, caveId: string | null) => {
+    setStairLinks((prev) => {
+      const next = Object.fromEntries(Object.entries(prev).filter(([id, cave]) => id !== stairId && cave !== caveId))
+      if (caveId) next[stairId] = caveId
+      return next
+    })
+  }, [])
   const [rainbowDeniedKey, setRainbowDeniedKey] = useState(0)
   const rainbowDeniedTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   useEffect(() => () => {
@@ -485,6 +508,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     setCursedBelts(0)
     setShopStock({})
     setEquipment({})
+    setStairLinks({})
     setSeed('')
     setSelectedLocation(null)
     setDrawings([])
@@ -505,8 +529,9 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       cursedBelts,
       shopStock,
       equipment,
+      stairLinks,
     }),
-    [seed, visited, items, spells, notes, coords, cursedBelts, shopStock, equipment],
+    [seed, visited, items, spells, notes, coords, cursedBelts, shopStock, equipment, stairLinks],
   )
 
   const importSave = useCallback(
@@ -543,6 +568,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       setCursedBelts(Number.isInteger(belts) ? Math.min(MAX_CURSED_BELTS, Math.max(0, belts)) : 0)
       setShopStock(sanitizeShopStock(save.shopStock))
       setEquipment(sanitizeEquipment(save.equipment))
+      setStairLinks(sanitizeStairLinks(save.stairLinks))
       setSeed(String(save.seed ?? ''))
     },
     [commitTiles, commitMarkers],
@@ -563,6 +589,8 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       toggleShopItem,
       equipment,
       setEquipped,
+      stairLinks,
+      setStairLink,
       seed,
       tool,
       terrain,
@@ -621,6 +649,8 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       toggleShopItem,
       equipment,
       setEquipped,
+      stairLinks,
+      setStairLink,
       seed,
       tool,
       terrain,
