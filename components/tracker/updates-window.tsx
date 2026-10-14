@@ -32,7 +32,7 @@ export const UPDATES_SEEN_STORAGE_KEY = 'dwr-tracker-updates-dismissed'
 
 export function UpdatesWindow({ onClose }: { onClose: () => void }) {
   const closeRef = useRef<HTMLButtonElement>(null)
-  const [index, setIndex] = useState(0)
+  const [index, setIndex] = useState(UPDATES.length - 1)
   const [dontShow, setDontShow] = useState(
     () => window.localStorage.getItem(UPDATES_SEEN_STORAGE_KEY) === LATEST_UPDATE,
   )
