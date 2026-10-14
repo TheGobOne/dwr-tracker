@@ -35,22 +35,23 @@ export function EquipmentPanels() {
   const { equipment, setEquipped } = useTracker()
 
   return (
-    <div role="group" aria-label="Equipped gear" className="flex gap-1">
+    <div role="group" aria-label="Equipped gear" className="grid grid-cols-3">
       {EQUIPMENT_SLOTS.map((slot) => {
         const Icon = SLOT_ICONS[slot.id]
         const equippedId = equipment[slot.id]
         const equippedName = slot.options.find((o) => o.id === equippedId)?.name
         return (
-          <div key={slot.id} className="flex w-8 flex-col items-center gap-0.5">
+          <div key={slot.id} className="flex aspect-square flex-col items-center justify-center gap-0.5">
           <DropdownMenu>
             <DropdownMenuTrigger
               aria-label={`${slot.label}: ${equippedName ?? 'nothing equipped'}`}
               title={equippedName ?? `No ${slot.label.toLowerCase()}`}
-              className={`flex size-8 items-center justify-center rounded-sm border bg-black/60 outline-none transition-colors hover:border-primary focus-visible:ring-2 focus-visible:ring-primary ${
+              style={{ width: '72%', height: '72%' }}
+              className={`flex items-center justify-center rounded-sm border bg-black/60 outline-none transition-colors hover:border-primary focus-visible:ring-2 focus-visible:ring-primary ${
                 equippedName ? 'border-[#F8D878] text-[#F8D878]' : 'border-muted-foreground/40 text-muted-foreground'
               }`}
             >
-              <Icon className="size-4" aria-hidden="true" />
+              <Icon className="size-[55%]" aria-hidden="true" />
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="start"

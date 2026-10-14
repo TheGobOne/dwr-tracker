@@ -990,7 +990,7 @@ export function MapCanvas() {
 
   return (
   <section aria-label="Overworld map" className="dw-window relative flex flex-none flex-col self-center overflow-hidden">
-  <div className="font-display pointer-events-none absolute inset-x-0 bottom-2.5 z-10 flex flex-col items-center gap-1 text-center text-[10px] leading-none [text-shadow:0_0_3px_#000,0_0_3px_#000]">
+  <div className="font-display pointer-events-none absolute inset-x-0 bottom-0 z-10 flex aspect-[12/1] flex-col items-center justify-center gap-1 text-center text-[10px] leading-none [text-shadow:0_0_3px_#000,0_0_3px_#000]">
   <h1 className={allLocationsPlaced ? 'text-[#58D854]' : 'text-foreground'}>
   Locations {placedLocationCount}/{KNOWN_LOCATION_COUNT}
   </h1>
@@ -1015,12 +1015,13 @@ export function MapCanvas() {
         <StairLinkMenu anchor={stairMenu} canvasSize={canvasPx} onClose={closeStairMenu} />
         </div>
       </div>
+      <div className="pointer-events-none absolute top-0 right-0 z-10 flex aspect-[2/1] w-1/6 items-center justify-center">
       <button
         type="button"
         role="switch"
         aria-checked={slide}
         onClick={toggleSlide}
-        className="font-display absolute top-1.5 right-1.5 z-10 flex items-center gap-1.5 rounded-sm bg-black/60 px-1.5 py-1 text-[10px] leading-none text-foreground outline-none hover:text-primary focus-visible:ring-2 focus-visible:ring-primary"
+        className="font-display pointer-events-auto flex items-center gap-1.5 rounded-sm bg-black/60 px-1.5 py-1 text-[10px] leading-none text-foreground outline-none hover:text-primary focus-visible:ring-2 focus-visible:ring-primary"
       >
         <span
           aria-hidden="true"
@@ -1032,11 +1033,14 @@ export function MapCanvas() {
         </span>
         Move
       </button>
-      <div className="absolute top-1.5 left-1.5 z-10">
+      </div>
+      <div className="absolute top-0 left-0 z-10 w-1/4">
         <EquipmentPanels />
       </div>
-      <div className="absolute bottom-1.5 left-1.5 z-10 rounded-sm bg-black/60">
-        <ExperienceWizard />
+      <div className="pointer-events-none absolute bottom-0 left-0 z-10 flex aspect-square w-1/12 items-center justify-center">
+        <div className="pointer-events-auto rounded-sm bg-black/60">
+          <ExperienceWizard />
+        </div>
       </div>
       <div className="absolute right-1.5 bottom-1.5 z-10 rounded-sm bg-black/60">
         <DragonlordSimButton />
