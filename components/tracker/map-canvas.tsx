@@ -869,6 +869,11 @@ export function MapCanvas() {
         return
       }
       if (mode === 'place') {
+        const linked = linkedCaveAtPointer(e)
+        if (linked && CAVE_MAPS[linked.caveId]) {
+          setCaveMapId(linked.caveId)
+          return
+        }
         const hit = markerAtPointer(e)
         if (hit?.locationId && CAVE_MAPS[hit.locationId]) {
           setCaveMapId(hit.locationId)
