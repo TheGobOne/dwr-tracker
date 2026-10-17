@@ -190,7 +190,7 @@ function newMarkerId() {
   return `m-${Date.now().toString(36)}-${markerCounter}`
 }
 
-export type DrawingStroke = { x: number; y: number }[]
+export type DrawingStroke = { x: number; y: number }[] & { color?: string; size?: number }
 
 interface TrackerContextValue {
   tiles: Uint8Array

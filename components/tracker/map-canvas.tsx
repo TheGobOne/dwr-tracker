@@ -20,7 +20,8 @@ import {
   hasEquipmentShop,
   locationColor,
 } from '@/lib/dw-data'
-import { useTracker, type ManualCoords, type Marker } from './tracker-context'
+import { useTracker, type DrawingStroke, type ManualCoords, type Marker } from './tracker-context'
+import { PEN_COLORS, PEN_SIZE_DEFAULT, PenSettings } from './pen-settings'
 import { COORDS_LOCATION_ID } from './locations-panel'
 
 const MAX_TRACKER_WIDTH = 640
@@ -164,7 +165,6 @@ function markerFill(
 
 type MapMode = 'place' | 'pen' | 'eraser'
 
-const PEN_COLOR = '#00D800'
 const ERASER_RADIUS_PX = 10
 
 function clampShift(markers: Marker[], strokes: Point[][], dx: number, dy: number): Point {
@@ -230,25 +230,31 @@ function inPaddedBounds(b: Bounds, p: Point) {
   )
 }
 
-function translateStroke(stroke: Point[], dx: number, dy: number) {
-  return stroke.map((p) => ({ x: p.x + dx, y: p.y + dy }))
+function translateStroke(stroke: DrawingStroke, dx: number, dy: number): DrawingStroke {
+  return Object.assign(
+    stroke.map((p) => ({ x: p.x + dx, y: p.y + dy })),
+    { color: stroke.color, size: stroke.size },
+  )
+}
+
+function penCursor(color: string) {
+  return svgCursor(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path d="M3 21l1.5-5.5L16 4l4 4L8.5 19.5z" fill="${color}" stroke="#000" stroke-width="1.5" stroke-linejoin="round"/><path d="M3 21l1.5-5.5 4 4z" fill="#FCFCFC" stroke="#000" stroke-width="1.5" stroke-linejoin="round"/></svg>`,
+    2,
+    16,
+    'crosshair',
+  )
 }
 
 function svgCursor(svg: string, hotX: number, hotY: number, fallback: string) {
   return `url("data:image/svg+xml,${encodeURIComponent(svg)}") ${hotX} ${hotY}, ${fallback}`
 }
 
-const MODE_CURSOR: Record<MapMode, string> = {
+const MODE_CURSOR: Record<Exclude<MapMode, 'pen'>, string> = {
   place: svgCursor(
     `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"><path d="M9 1v16M1 9h16" stroke="#000" stroke-width="3"/><path d="M9 1v16M1 9h16" stroke="#FCFCFC" stroke-width="1"/></svg>`,
     9,
     9,
-    'crosshair',
-  ),
-  pen: svgCursor(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path d="M3 21l1.5-5.5L16 4l4 4L8.5 19.5z" fill="${PEN_COLOR}" stroke="#000" stroke-width="1.5" stroke-linejoin="round"/><path d="M3 21l1.5-5.5 4 4z" fill="#FCFCFC" stroke="#000" stroke-width="1.5" stroke-linejoin="round"/></svg>`,
-    2,
-    16,
     'crosshair',
   ),
   eraser: svgCursor(
@@ -323,6 +329,8 @@ export function MapCanvas() {
   const allLocationsPlaced = placedLocationCount >= KNOWN_LOCATION_COUNT
   const [mode, setMode] = useState<MapMode>('place')
   const [activeStroke, setActiveStroke] = useState<Point[] | null>(null)
+  const [penColor, setPenColor] = useState<string>(PEN_COLORS[0].value)
+  const [penSize, setPenSize] = useState(PEN_SIZE_DEFAULT)
   const isErasingRef = useRef(false)
   const [slide, setSlide] = useState(false)
   const [held, setHeld] = useState<Point | null>(null)
@@ -465,15 +473,18 @@ export function MapCanvas() {
       shift && selection
         ? drawings.map((s, i) => (selection.strokeIdx.has(i) ? translateStroke(s, shift.x, shift.y) : s))
         : drawings
-    const strokes = activeStroke ? [...placedStrokes, activeStroke] : placedStrokes
+    const strokes: DrawingStroke[] = activeStroke
+      ? [...placedStrokes, Object.assign([...activeStroke], { color: penColor, size: penSize })]
+      : placedStrokes
     if (strokes.length > 0) {
       ctx.lineCap = 'round'
       ctx.lineJoin = 'round'
-      ctx.strokeStyle = PEN_COLOR
-      ctx.fillStyle = PEN_COLOR
-      const width = Math.max(2, scale * 0.6)
-      ctx.lineWidth = width
       for (const stroke of strokes) {
+        const color = stroke.color ?? PEN_COLORS[0].value
+        const width = Math.max(1.5, scale * (stroke.size ?? PEN_SIZE_DEFAULT))
+        ctx.strokeStyle = color
+        ctx.fillStyle = color
+        ctx.lineWidth = width
         if (stroke.length === 1) {
           ctx.beginPath()
           ctx.arc(stroke[0].x * scale, stroke[0].y * scale, width / 2, 0, Math.PI * 2)
@@ -790,7 +801,10 @@ export function MapCanvas() {
   }
 
   function finishStroke() {
-    if (activeStroke) setDrawings((prev) => [...prev, activeStroke])
+    if (activeStroke) {
+      const stroke = Object.assign([...activeStroke], { color: penColor, size: penSize })
+      setDrawings((prev) => [...prev, stroke])
+    }
     setActiveStroke(null)
     isErasingRef.current = false
   }
@@ -988,7 +1002,7 @@ export function MapCanvas() {
   const modeLabel = slide ? ', slide mode' : mode === 'pen' ? ', pen mode' : mode === 'eraser' ? ', eraser mode' : ''
   const overSelection =
     !!selectionBounds && !!hover && inPaddedBounds(selectionBounds, { x: hover.x + 0.5, y: hover.y + 0.5 })
-  const cursor = slide ? (held ? 'grabbing' : overSelection ? 'grab' : 'crosshair') : MODE_CURSOR[mode]
+  const cursor = slide ? (held ? 'grabbing' : overSelection ? 'grab' : 'crosshair') : mode === 'pen' ? penCursor(penColor) : MODE_CURSOR[mode]
 
   return (
   <section aria-label="Overworld map" className="dw-window relative flex flex-none flex-col self-center overflow-hidden">
@@ -1018,6 +1032,9 @@ export function MapCanvas() {
         </div>
       </div>
       <div className="pointer-events-none absolute top-0 right-0 z-10 flex aspect-[2/1] w-1/6 items-center justify-center">
+      <div className="absolute top-1/2 right-full -translate-y-1/2">
+        <PenSettings color={penColor} size={penSize} onColorChange={setPenColor} onSizeChange={setPenSize} />
+      </div>
       <button
         type="button"
         role="switch"
