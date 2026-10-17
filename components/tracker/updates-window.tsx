@@ -22,10 +22,20 @@ export const UPDATES: { date: string; notes: string[] }[] = [
       'Checking off the Sword or Armor item now sets it as your equipped gear, and equipping Erdrick\'s Sword or Armor in the panels checks the item off',
       'Entering both coordinates puts a blue magnifying glass on the map at the estimated spot',
       'Right-click a town staircase to link it to another location',
-      'Various visual adjustments',
-    ],
+  'Various visual adjustments',
+  ],
   },
-]
+  {
+  date: '10/15/26',
+  notes: [
+  "Opening a town's shop now highlights the gear you're wearing, and you can't pick anything worse than what you have",
+  'Middle-click a cave linked to a town to open its map',
+  "Added a pen button next to Move to change the pen's size and color",
+  'Checking off Coordinates no longer counts toward unlocking the Rainbow Drop',
+  'Various visual adjustments',
+  ],
+  },
+  ]
 
 export const LATEST_UPDATE = UPDATES[UPDATES.length - 1].date
 export const UPDATES_SEEN_STORAGE_KEY = 'dwr-tracker-updates-dismissed'
