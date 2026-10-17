@@ -33,11 +33,13 @@ export function CoordsInput({
   <fieldset
     className={cn(
       'flex shrink-0',
-      horizontal ? 'w-full min-w-0 flex-row items-center gap-2' : 'w-full min-w-0 flex-col items-stretch gap-0.5',
+      horizontal
+        ? 'w-full min-w-0 flex-row items-center gap-2'
+        : 'min-w-0 flex-1 flex-row items-center gap-2 sm:w-full sm:flex-col sm:items-stretch sm:gap-0.5',
     )}
   >
       <legend className="sr-only">{`${name} coordinates`}</legend>
-      <div className={cn('flex min-w-0 items-center gap-0.5', horizontal && 'flex-1')}>
+      <div className={cn('flex min-w-0 items-center gap-0.5', horizontal ? 'flex-1' : 'flex-1 sm:flex-none')}>
       <input
         type="text"
         inputMode="numeric"
@@ -62,7 +64,7 @@ export function CoordsInput({
         ))}
       </select>
       </div>
-      <div className={cn('flex min-w-0 items-center gap-0.5', horizontal && 'flex-1')}>
+      <div className={cn('flex min-w-0 items-center gap-0.5', horizontal ? 'flex-1' : 'flex-1 sm:flex-none')}>
       <input
         type="text"
         inputMode="numeric"
@@ -234,9 +236,9 @@ export function LocationsPanel() {
             </li>,
           ]
         })}
-        <li className="col-span-2 flex flex-col items-center sm:col-span-1 sm:col-start-5 sm:row-span-4 sm:row-start-1">
-          <div className="relative flex h-10 w-full items-center px-0.5">
-            <div className="absolute top-1/2 right-full -translate-y-1/2 pr-0.5">
+        <li className="col-span-2 grid grid-cols-2 gap-x-1 sm:col-span-1 sm:col-start-5 sm:row-span-4 sm:row-start-1 sm:flex sm:flex-col sm:items-center">
+          <div className="relative col-span-2 flex h-5 w-full items-center gap-1 px-0.5 sm:h-10 sm:gap-0">
+            <div className="shrink-0 sm:absolute sm:top-1/2 sm:right-full sm:-translate-y-1/2 sm:pr-0.5">
               <CoordsDoneCheckbox />
             </div>
             <CoordsInput locationId={COORDS_LOCATION_ID} name="Rainbow" />
