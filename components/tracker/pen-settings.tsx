@@ -11,6 +11,18 @@ export const PEN_COLORS = [
   { value: '#F8B800', name: 'Yellow' },
   { value: '#F878F8', name: 'Pink' },
   { value: '#FCFCFC', name: 'White' },
+  { value: '#FC7460', name: 'Salmon' },
+  { value: '#E45C10', name: 'Orange' },
+  { value: '#B8F818', name: 'Lime' },
+  { value: '#00E8D8', name: 'Cyan' },
+  { value: '#0058F8', name: 'Navy' },
+  { value: '#6844FC', name: 'Purple' },
+  { value: '#D800CC', name: 'Magenta' },
+  { value: '#AC7C00', name: 'Brown' },
+  { value: '#BCBCBC', name: 'Light Gray' },
+  { value: '#787878', name: 'Gray' },
+  { value: '#3C3C3C', name: 'Dark Gray' },
+  { value: '#000000', name: 'Black' },
 ] as const
 
 export const PEN_SIZE_MIN = 0.2
@@ -108,7 +120,7 @@ export function PenSettings({ color, size, onColorChange, onSizeChange }: PenSet
                     aria-pressed={selected}
                     onClick={() => onColorChange(c.value)}
                     className={`aspect-square rounded-sm border-2 outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-                      selected ? 'border-foreground' : 'border-transparent'
+                      selected ? 'border-foreground' : 'border-white/20'
                     }`}
                     style={{ backgroundColor: c.value }}
                   />
