@@ -26,7 +26,7 @@ export const UPDATES: { date: string; notes: string[] }[] = [
   ],
   },
   {
-  date: '10/15/26',
+  date: '10/17/26',
   notes: [
   "Opening a town's shop now highlights the gear you're wearing, and you can't pick anything worse than what you have",
   'Middle-click a cave linked to a town to open its map',
