@@ -136,7 +136,7 @@ function CoordPart({ direction }: { direction: 'first' | 'second' }) {
   const value = coords[COORDS_LOCATION_ID] ?? EMPTY_COORDS
   const isFirst = direction === 'first'
   return (
-    <div className="flex min-w-0 flex-1 items-center gap-0.5">
+    <div className="flex min-w-0 items-center gap-0.5">
       <input
         type="text"
         inputMode="numeric"
@@ -145,7 +145,7 @@ function CoordPart({ direction }: { direction: 'first' | 'second' }) {
         onChange={(e) => updateCoords(COORDS_LOCATION_ID, isFirst ? { first: e.target.value } : { second: e.target.value })}
         aria-label={isFirst ? 'First coordinate' : 'Second coordinate'}
         data-coords-field
-        className={cn(fieldClass, 'w-0 min-w-0 flex-1 px-0.5 text-center')}
+        className={cn(fieldClass, 'w-5 shrink-0 px-0.5 text-center')}
       />
       <select
         value={isFirst ? value.firstDir : value.secondDir}
@@ -159,26 +159,6 @@ function CoordPart({ direction }: { direction: 'first' | 'second' }) {
         ))}
       </select>
     </div>
-  )
-}
-
-function CoordsDoneCheckbox() {
-  const { coords, updateCoords } = useTracker()
-  const done = !!coords[COORDS_LOCATION_ID]?.done
-  return (
-    <button
-      type="button"
-      role="checkbox"
-      aria-checked={done}
-      aria-label="Coordinates search spot complete"
-      onClick={() => updateCoords(COORDS_LOCATION_ID, { done: !done })}
-      className={cn(
-        'flex size-3 shrink-0 items-center justify-center rounded-[2px] border focus-visible:outline-2 focus-visible:outline-primary',
-        done ? 'border-[#22c55e] bg-[#22c55e]/20' : 'border-border bg-input/40',
-      )}
-    >
-      {done && <Check className="size-2.5 text-[#22c55e]" strokeWidth={4} aria-hidden="true" />}
-    </button>
   )
 }
 
@@ -272,11 +252,9 @@ export function LocationsPanel() {
             <UnknownLocationButton key={location.id} location={location} />
           ))}
           <div className="flex min-w-0 w-full items-center gap-1 px-0.5">
-            <CoordsDoneCheckbox />
             <CoordPart direction="first" />
           </div>
           <div className="flex min-w-0 w-full items-center gap-1 px-0.5">
-            <span className="size-3 shrink-0" aria-hidden="true" />
             <CoordPart direction="second" />
           </div>
         </li>
