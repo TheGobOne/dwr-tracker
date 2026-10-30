@@ -131,6 +131,37 @@ function UnknownLocationButton({ location }: { location: DWLocation }) {
 }
 
 
+function CoordPart({ direction }: { direction: 'first' | 'second' }) {
+  const { coords, updateCoords } = useTracker()
+  const value = coords[COORDS_LOCATION_ID] ?? EMPTY_COORDS
+  const isFirst = direction === 'first'
+  return (
+    <div className="flex min-w-0 flex-1 items-center gap-0.5">
+      <input
+        type="text"
+        inputMode="numeric"
+        maxLength={4}
+        value={isFirst ? value.first : value.second}
+        onChange={(e) => updateCoords(COORDS_LOCATION_ID, isFirst ? { first: e.target.value } : { second: e.target.value })}
+        aria-label={isFirst ? 'First coordinate' : 'Second coordinate'}
+        data-coords-field
+        className={cn(fieldClass, 'w-0 min-w-0 flex-1 px-0.5 text-center')}
+      />
+      <select
+        value={isFirst ? value.firstDir : value.secondDir}
+        onChange={(e) => updateCoords(COORDS_LOCATION_ID, isFirst ? { firstDir: e.target.value as NSDirection } : { secondDir: e.target.value as EWDirection })}
+        aria-label={isFirst ? 'First coordinate direction' : 'Second coordinate direction'}
+        className={cn(fieldClass, 'px-0')}
+      >
+        <option value="" className="bg-background text-foreground" />
+        {(isFirst ? NS_DIRECTIONS : EW_DIRECTIONS).map((direction) => (
+          <option key={direction} value={direction} className="bg-background text-foreground">{direction}</option>
+        ))}
+      </select>
+    </div>
+  )
+}
+
 function CoordsDoneCheckbox() {
   const { coords, updateCoords } = useTracker()
   const done = !!coords[COORDS_LOCATION_ID]?.done
@@ -236,16 +267,18 @@ export function LocationsPanel() {
             </li>,
           ]
         })}
-        <li className="col-span-2 grid grid-cols-2 gap-x-1 sm:col-span-1 sm:col-start-5 sm:row-span-4 sm:row-start-1 sm:flex sm:flex-col sm:items-center">
-          <div className="relative col-span-2 flex h-5 w-full items-center gap-1 px-0.5 sm:h-10 sm:gap-0">
-            <div className="shrink-0 sm:absolute sm:top-1/2 sm:right-full sm:-translate-y-1/2 sm:pr-0.5">
-              <CoordsDoneCheckbox />
-            </div>
-            <CoordsInput locationId={COORDS_LOCATION_ID} name="Rainbow" />
-          </div>
+        <li className="col-span-2 grid grid-cols-2 gap-x-1 gap-y-0.5 sm:col-span-1 sm:col-start-5 sm:row-span-4 sm:row-start-1 sm:flex sm:flex-col sm:items-center">
           {UNKNOWN_LOCATIONS.map((location) => (
             <UnknownLocationButton key={location.id} location={location} />
           ))}
+          <div className="flex min-w-0 w-full items-center gap-1 px-0.5">
+            <CoordsDoneCheckbox />
+            <CoordPart direction="first" />
+          </div>
+          <div className="flex min-w-0 w-full items-center gap-1 px-0.5">
+            <span className="size-3 shrink-0" aria-hidden="true" />
+            <CoordPart direction="second" />
+          </div>
         </li>
       </ul>
     </section>
