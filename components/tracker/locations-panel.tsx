@@ -177,7 +177,7 @@ export function LocationsPanel() {
       <h2 id="locations-heading" className="sr-only">
         Locations
       </h2>
-          <ul className="grid grid-cols-2 gap-x-1 sm:grid-cols-[repeat(4,auto)_4.5rem] sm:justify-between">
+          <ul className="grid grid-cols-2 gap-x-1 sm:grid-cols-[repeat(4,minmax(0,auto))_4.5rem] sm:justify-between">
         {ORDERED_LOCATIONS.flatMap((location) => {
           const marker = markerByLocation.get(location.id)
           const isSelected = selectedLocation === location.id

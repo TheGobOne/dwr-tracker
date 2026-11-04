@@ -35,6 +35,14 @@ export const UPDATES: { date: string; notes: string[] }[] = [
   'Various visual adjustments',
   ],
   },
+  {
+    date: '11/04/26',
+    notes: [
+      'Your tracker now saves automatically: markers, map, drawings, items, spells, notes and coordinates are restored when you reload',
+      'Fixed the bottom panel scrolling sideways on desktop',
+      'Fixed the Move switch and pen button being cut off on phones',
+    ],
+  },
   ]
 
 export const LATEST_UPDATE = UPDATES[UPDATES.length - 1].date

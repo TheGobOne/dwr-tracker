@@ -80,7 +80,28 @@ export interface SaveFile {
   shopStock?: ShopStock
 equipment?: Equipment
   stairLinks?: StairLinks
+  drawings?: { points: { x: number; y: number }[]; color?: string; size?: number }[]
   }
+
+export const AUTOSAVE_STORAGE_KEY = 'dwr-tracker-autosave'
+const AUTOSAVE_DELAY_MS = 300
+
+function sanitizeDrawings(raw: unknown): DrawingStroke[] {
+  if (!Array.isArray(raw)) return []
+  const out: DrawingStroke[] = []
+  for (const entry of raw) {
+    const points = (entry as { points?: unknown })?.points
+    if (!Array.isArray(points)) continue
+    const stroke = points
+      .filter((p) => p && Number.isFinite(p.x) && Number.isFinite(p.y))
+      .map((p) => ({ x: Number(p.x), y: Number(p.y) })) as DrawingStroke
+    if (stroke.length === 0) continue
+    if (typeof entry.color === 'string') stroke.color = entry.color
+    if (typeof entry.size === 'number') stroke.size = entry.size
+    out.push(stroke)
+  }
+  return out
+}
 
 export type StairLinks = Record<string, string>
 
@@ -525,8 +546,9 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       shopStock,
       equipment,
       stairLinks,
+      drawings: drawings.map((s) => ({ points: s.map((p) => ({ x: p.x, y: p.y })), color: s.color, size: s.size })),
     }),
-    [seed, visited, items, spells, notes, coords, cursedBelts, shopStock, equipment, stairLinks],
+    [seed, visited, items, spells, notes, coords, cursedBelts, shopStock, equipment, stairLinks, drawings],
   )
 
   const importSave = useCallback(
@@ -565,9 +587,34 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
       setEquipment(sanitizeEquipment(save.equipment))
       setStairLinks(sanitizeStairLinks(save.stairLinks))
       setSeed(String(save.seed ?? ''))
+      setDrawings(sanitizeDrawings(save.drawings))
     },
     [commitTiles, commitMarkers],
   )
+
+  // Autosave: restore once on mount, then save (debounced) whenever tracked state changes.
+  const [hydrated, setHydrated] = useState(false)
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(AUTOSAVE_STORAGE_KEY)
+      if (stored) importSave(JSON.parse(stored))
+    } catch {
+      // Corrupt or unavailable storage: start fresh.
+    }
+    setHydrated(true)
+  }, [importSave])
+
+  useEffect(() => {
+    if (!hydrated) return
+    const timer = setTimeout(() => {
+      try {
+        window.localStorage.setItem(AUTOSAVE_STORAGE_KEY, JSON.stringify(exportSave()))
+      } catch {
+        // Storage full or blocked: skip this save.
+      }
+    }, AUTOSAVE_DELAY_MS)
+    return () => clearTimeout(timer)
+  }, [hydrated, tiles, markers, exportSave])
 
   const value = useMemo<TrackerContextValue>(
     () => ({

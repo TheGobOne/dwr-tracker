@@ -1031,8 +1031,8 @@ export function MapCanvas() {
         <StairLinkMenu anchor={stairMenu} canvasSize={canvasPx} onClose={closeStairMenu} />
         </div>
       </div>
-      <div className="pointer-events-none absolute top-0 right-0 z-10 flex aspect-[2/1] w-1/6 items-center justify-center">
-      <div className="absolute top-1/2 right-full -translate-y-1/2">
+      <div className="pointer-events-none absolute top-0 right-0 z-10 flex items-center justify-end gap-1 p-1">
+      <div>
         <PenSettings color={penColor} size={penSize} onColorChange={setPenColor} onSizeChange={setPenSize} />
       </div>
       <button
