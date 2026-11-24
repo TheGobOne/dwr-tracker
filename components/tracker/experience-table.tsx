@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { withBase } from '@/lib/base-path'
 
 const EXP_LEVELS: { level: number; veryFast: number; fast: number; normal: number }[] = [
   { level: 2, veryFast: 3, fast: 5, normal: 7 },
@@ -153,7 +154,7 @@ export function ExperienceWizard() {
         onClick={() => setOpen(true)}
         className="shrink-0 rounded-sm p-0.5 transition-transform hover:scale-110 focus-visible:outline-2 focus-visible:outline-primary"
       >
-        <img src="/sprites/king.png" alt="" width={32} height={32} className="size-8 [image-rendering:pixelated]" />
+        <img src={withBase('/sprites/king.png')} alt="" width={32} height={32} className="size-8 [image-rendering:pixelated]" />
       </button>
       {open && <ExperienceWindow onClose={() => setOpen(false)} />}
     </>

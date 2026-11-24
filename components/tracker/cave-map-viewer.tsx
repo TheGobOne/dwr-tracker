@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useTracker } from './tracker-context'
+import { withBase } from '@/lib/base-path'
 
 type GoldChest = { id: string; x: number; y: number }
 
@@ -20,10 +21,10 @@ type MapInfo = {
 }
 
 export const CAVE_MAPS: Record<string, MapInfo> = {
-  'erdricks-cave': { title: "Erdrick's Cave", src: '/cave-maps/erdricks.png?v=3' },
+  'erdricks-cave': { title: "Erdrick's Cave", src: withBase('/cave-maps/erdricks.png?v=3') },
   'garins-grave': {
     title: "Garin's Grave",
-    src: '/cave-maps/grave.png?v=3',
+    src: withBase('/cave-maps/grave.png?v=3'),
     width: 684,
     height: 780,
     ringPx: 16,
@@ -39,7 +40,7 @@ export const CAVE_MAPS: Record<string, MapInfo> = {
   },
   'mountain-cave': {
     title: 'Mountain Cave',
-    src: '/cave-maps/mountain.png?v=3',
+    src: withBase('/cave-maps/mountain.png?v=3'),
     width: 290,
     height: 588,
     ringPx: 16,
@@ -53,12 +54,12 @@ export const CAVE_MAPS: Record<string, MapInfo> = {
       { id: 'chest-5', x: 199.5, y: 477.5 },
     ],
   },
-  'swamp-north': { title: 'Swamp Cave', src: '/cave-maps/swamp.png?v=3' },
-  'swamp-south': { title: 'Swamp Cave', src: '/cave-maps/swamp.png?v=3' },
-  charlock: { title: 'Charlock Castle', src: '/cave-maps/charlock.png?v=1' },
+  'swamp-north': { title: 'Swamp Cave', src: withBase('/cave-maps/swamp.png?v=3') },
+  'swamp-south': { title: 'Swamp Cave', src: withBase('/cave-maps/swamp.png?v=3') },
+  charlock: { title: 'Charlock Castle', src: withBase('/cave-maps/charlock.png?v=1') },
   tantegel: {
     title: 'Tantegel Castle',
-    src: '/cave-maps/tantegel.png?v=2',
+    src: withBase('/cave-maps/tantegel.png?v=2'),
     width: 96,
     height: 80,
     goldChests: [
@@ -122,7 +123,7 @@ export function CaveMapViewer({ locationId, onClose }: { locationId: string | nu
               }}
             >
               <img
-                src={map.src || '/placeholder.svg'}
+                src={map.src || withBase('/placeholder.svg')}
                 alt={`${map.title} map`}
                 className="block size-full"
                 style={{ imageRendering: 'pixelated' }}
@@ -158,7 +159,7 @@ export function CaveMapViewer({ locationId, onClose }: { locationId: string | nu
           </div>
         ) : (
           <img
-            src={map.src || '/placeholder.svg'}
+            src={map.src || withBase('/placeholder.svg')}
             alt={`${map.title} dungeon map`}
             className="min-h-0 w-full flex-1 object-contain"
             style={{ imageRendering: 'pixelated' }}

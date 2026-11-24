@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { withBase } from '@/lib/base-path'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -13,7 +14,7 @@ export function useInstallPrompt() {
 
   useEffect(() => {
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(() => {})
+      navigator.serviceWorker.register(withBase('/sw.js')).catch(() => {})
     }
     setInstalled(window.matchMedia('(display-mode: standalone)').matches)
 

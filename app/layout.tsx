@@ -1,8 +1,7 @@
-import { Analytics } from '@vercel/analytics/next'
-import { SpeedInsights } from '@vercel/speed-insights/next'
 import type { Metadata, Viewport } from 'next'
 import { Pixelify_Sans, Press_Start_2P } from 'next/font/google'
 import './globals.css'
+import { withBase } from '@/lib/base-path'
 
 const pixelify = Pixelify_Sans({ subsets: ['latin'], variable: '--font-pixelify' })
 const pressStart = Press_Start_2P({ subsets: ['latin'], weight: '400', variable: '--font-press-start' })
@@ -12,8 +11,8 @@ export const metadata: Metadata = {
   description: 'DWR Tracker',
   generator: 'v0.app',
   icons: {
-    icon: [{ url: '/dragonlord-icon.png', type: 'image/png' }],
-    apple: '/icon-192.png',
+    icon: [{ url: withBase('/dragonlord-icon.png'), type: 'image/png' }],
+    apple: withBase('/icon-192.png'),
   },
   appleWebApp: { capable: true, title: 'DWR Tracker', statusBarStyle: 'black-translucent' },
 }
@@ -32,8 +31,6 @@ export default function RootLayout({
     <html lang="en" className={`${pixelify.variable} ${pressStart.variable} bg-background`}>
       <body className="font-sans antialiased">
         {children}
-        {process.env.NODE_ENV === 'production' && <Analytics />}
-        {process.env.NODE_ENV === 'production' && <SpeedInsights />}
       </body>
     </html>
   )

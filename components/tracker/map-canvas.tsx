@@ -23,6 +23,7 @@ import {
 import { useTracker, type DrawingStroke, type ManualCoords, type Marker } from './tracker-context'
 import { PEN_COLORS, PEN_SIZE_DEFAULT, PenSettings } from './pen-settings'
 import { COORDS_LOCATION_ID } from './locations-panel'
+import { withBase } from '@/lib/base-path'
 
 const MAX_TRACKER_WIDTH = 640
 
@@ -45,10 +46,10 @@ function markerColor(marker: Marker, items: Record<string, boolean>) {
 }
 
 const SPRITE_SRC = {
-  bridge: '/sprites/bridge.png',
-  chest: '/sprites/chest.png',
-  stairs: '/sprites/stairs.png',
-  key: '/sprites/key.png',
+  bridge: withBase('/sprites/bridge.png'),
+  chest: withBase('/sprites/chest.png'),
+  stairs: withBase('/sprites/stairs.png'),
+  key: withBase('/sprites/key.png'),
 } as const
 
 type SpriteName = keyof typeof SPRITE_SRC

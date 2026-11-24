@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
 import { useTracker } from '@/components/tracker/tracker-context'
 import { HEALMORE, runSimulation, type SimInput } from '@/lib/dragonlord-sim'
+import { withBase } from '@/lib/base-path'
 
 const TRIALS = 10000
 
@@ -398,7 +399,7 @@ export function DragonlordSimButton() {
             </span>
           )}
           <img
-            src="/dragonlord-icon.png"
+            src={withBase('/dragonlord-icon.png')}
             alt=""
             width={36}
             height={36}
