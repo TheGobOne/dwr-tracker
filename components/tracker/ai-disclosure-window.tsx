@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 
 const PARAGRAPHS = [
-  'This tracker is made with the use of Assistive AI with Vercel. I am not a coder, programmer, or designer, so this tool is critical to my ability to make rapid changes to the tracker.',
+  'This tracker is made with the use of Assistive AI. I am not a coder, programmer, or designer, so this tool is critical to my ability to make rapid changes to the tracker.',
   'No generative AI was used. All art is pulled from NES sprite sheets found online.',
   "I understand if you don't approve and stop using the tracker.",
 ]
