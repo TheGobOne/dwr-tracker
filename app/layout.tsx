@@ -9,7 +9,6 @@ const pressStart = Press_Start_2P({ subsets: ['latin'], weight: '400', variable:
 export const metadata: Metadata = {
   title: 'DWR Tracker',
   description: 'DWR Tracker',
-  generator: 'v0.app',
   icons: {
     icon: [{ url: withBase('/dragonlord-icon.png'), type: 'image/png' }],
     apple: withBase('/icon-192.png'),
